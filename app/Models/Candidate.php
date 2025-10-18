@@ -19,6 +19,28 @@ class Candidate extends Model
         'vote_count',
     ];
 
+    // Accessor: Get photo URL
+    public function getPhotoUrlAttribute()
+    {
+        if ($this->photo) {
+            // Check if it's a full URL (starts with http)
+            if (str_starts_with($this->photo, 'http')) {
+                return $this->photo;
+            }
+            // Return storage URL
+            return asset('storage/' . $this->photo);
+        }
+        
+        // Default avatar
+        return asset('images/default-avatar.png');
+    }
+
+    // Accessor: Get vision (alias for visi)
+    public function getVisionAttribute()
+    {
+        return $this->attributes['visi'] ?? '';
+    }
+
     // Relationship: Candidate belongs to one Election
     public function election()
     {

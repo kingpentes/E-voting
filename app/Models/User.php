@@ -50,10 +50,18 @@ class User extends Authenticatable
         ];
     }
 
-    // Relationship: User (Organizer) has many Elections
+    // Relationship: User (Organizer) has many Elections (as creator)
     public function elections()
     {
         return $this->hasMany(Election::class);
+    }
+
+    // Relationship: User (Voter) belongs to many Elections (as participant)
+    public function participatingElections()
+    {
+        return $this->belongsToMany(Election::class, 'election_user')
+            ->withPivot('access_code_used', 'joined_at')
+            ->withTimestamps();
     }
 
     // Relationship: User (Voter) has many Votes

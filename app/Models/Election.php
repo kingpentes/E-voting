@@ -71,6 +71,14 @@ class Election extends Model
         return $this->hasMany(Vote::class);
     }
 
+    // Relationship: Election has many Participants (Voters)
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'election_user')
+            ->withPivot('access_code_used', 'joined_at')
+            ->withTimestamps();
+    }
+
     // Scope: Only get elections for current organizer
     public function scopeForOrganizer($query, $userId)
     {

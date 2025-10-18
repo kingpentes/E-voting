@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\OrganizerRegisterController;
 use App\Http\Controllers\Auth\VoterRegisterController;
 use App\Http\Controllers\Admin\ElectionController;
 use App\Http\Controllers\Admin\CandidateController;
+use App\Http\Controllers\VoterElectionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,6 +32,13 @@ Route::post('/register/organizer', [OrganizerRegisterController::class, 'store']
 Route::post('/register/voter', [VoterRegisterController::class, 'store'])
     ->middleware('guest')
     ->name('register.voter.store');
+
+// Voter Election Routes - Access by invite code
+Route::prefix('election')->name('voter.')->group(function () {
+    Route::get('/{code}', [VoterElectionController::class, 'show'])->name('election');
+    Route::get('/{code}/candidate/{candidateId}', [VoterElectionController::class, 'candidateDetail'])->name('candidate.detail');
+    Route::post('/{code}/vote', [VoterElectionController::class, 'vote'])->middleware('auth')->name('vote');
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');
