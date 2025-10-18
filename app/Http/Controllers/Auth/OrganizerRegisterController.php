@@ -7,25 +7,22 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
-class RegisteredUserController extends Controller
+class OrganizerRegisterController extends Controller
 {
     /**
-     * Display the registration view.
+     * Display the organizer registration view.
      */
     public function create(): View
     {
-        return view('auth.register');
+        return view('auth.register-organizer');
     }
 
     /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Handle an incoming organizer registration request.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -33,21 +30,20 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'organization' => ['nullable', 'string', 'max:255'],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'voter', // Default role
+            'role' => 'organizer', // Set role as organizer
+            'organization' => $request->organization,
         ]);
 
         event(new Registered($user));
 
-        // HAPUS baris ini agar tidak auto-login
-        // Auth::login($user);
-
         // Redirect ke halaman login dengan pesan sukses
-        return redirect()->route('login')->with('status', 'Registrasi berhasil! Silakan login.');
+        return redirect()->route('login')->with('status', '✓ Registrasi sebagai Penyelenggara berhasil! Silakan login untuk mulai membuat pemilu.');
     }
 }

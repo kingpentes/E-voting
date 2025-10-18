@@ -20,7 +20,7 @@
         
         <main class="flex-1 overflow-y-auto p-8">
             <div class="max-w-4xl mx-auto">
-                <form action="{{ route('admin.candidates.update', 1) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form action="{{ route('admin.candidates.update', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
                     
@@ -28,12 +28,29 @@
                     <div class="bg-white rounded-2xl shadow-md p-8">
                         <h2 class="text-2xl font-bold text-gray-900 mb-6">Data Kandidat</h2>
                         
+                        <!-- Pilih Pemilu -->
+                        <div class="mb-6">
+                            <label for="election_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Pilih Pemilu <span class="text-red-500">*</span>
+                            </label>
+                            <select id="election_id" name="election_id" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                                <option value="">-- Pilih Pemilu --</option>
+                                @foreach($elections as $election)
+                                    <option value="{{ $election->id }}" {{ old('election_id', $candidate->election_id) == $election->id ? 'selected' : '' }}>
+                                        {{ $election->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
                         <!-- Nomor Urut -->
                         <div class="mb-6">
                             <label for="number" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Nomor Urut <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" id="number" name="number" required min="1" value="1"
+                            <input type="number" id="number" name="number" required min="1" 
+                                   value="{{ old('number', $candidate->candidate_number) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                                    placeholder="Masukkan nomor urut kandidat">
                             <p class="text-sm text-gray-500 mt-1">Nomor urut kandidat dalam pemilu</p>
@@ -44,7 +61,8 @@
                             <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Nama Kandidat <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="name" name="name" required value="Dr. Ahmad Santoso"
+                            <input type="text" id="name" name="name" required 
+                                   value="{{ old('name', $candidate->name) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                                    placeholder="Masukkan nama lengkap kandidat">
                         </div>
@@ -56,7 +74,9 @@
                             </label>
                             <div class="flex items-center space-x-6">
                                 <div class="flex-shrink-0">
-                                    <img id="photoPreview" src="https://i.pravatar.cc/256?img=12" alt="Preview" 
+                                    <img id="photoPreview" 
+                                         src="{{ $candidate->photo_url ? asset('storage/' . $candidate->photo_url) : 'https://ui-avatars.com/api/?name=' . urlencode($candidate->name) . '&size=256&background=random' }}" 
+                                         alt="{{ $candidate->name }}" 
                                          class="w-32 h-32 rounded-full object-cover border-4 border-gray-200">
                                 </div>
                                 <div class="flex-1">
@@ -75,7 +95,7 @@
                             </label>
                             <textarea id="visi" name="visi" rows="4" required
                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                      placeholder="Masukkan visi kandidat...">Mewujudkan kepemimpinan yang humanis, efektif, dan berintegritas.</textarea>
+                                      placeholder="Masukkan visi kandidat...">{{ old('visi', $candidate->vision) }}</textarea>
                             <p class="text-sm text-gray-500 mt-1">Visi jangka panjang kandidat</p>
                         </div>
 
@@ -85,36 +105,23 @@
                                 Misi <span class="text-red-500">*</span>
                             </label>
                             <div id="misiContainer" class="space-y-3">
+                                @foreach($candidate->missions->sortBy('order') as $index => $mission)
                                 <div class="flex items-start space-x-2 misi-item">
-                                    <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">1</span>
-                                    <input type="text" name="misi[]" required value="Meningkatkan program pengembangan karakter siswa"
+                                    <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">{{ $index + 1 }}</span>
+                                    <input type="text" name="misi[]" required 
+                                           value="{{ old('misi.' . $index, $mission->mission) }}"
                                            class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                           placeholder="Masukkan misi ke-1">
-                                </div>
-                                <div class="flex items-start space-x-2 misi-item">
-                                    <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">2</span>
-                                    <input type="text" name="misi[]" required value="Memperkuat kolaborasi antar organisasi siswa"
-                                           class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                           placeholder="Masukkan misi ke-2">
+                                           placeholder="Masukkan misi ke-{{ $index + 1 }}">
+                                    @if($index > 0)
                                     <button type="button" onclick="removeMisi(this)" 
                                             class="flex-shrink-0 w-10 h-10 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all mt-2">
                                         <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
                                     </button>
+                                    @endif
                                 </div>
-                                <div class="flex items-start space-x-2 misi-item">
-                                    <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">3</span>
-                                    <input type="text" name="misi[]" required value="Transparansi dalam setiap pengambilan keputusan"
-                                           class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                           placeholder="Masukkan misi ke-3">
-                                    <button type="button" onclick="removeMisi(this)" 
-                                            class="flex-shrink-0 w-10 h-10 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all mt-2">
-                                        <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
+                                @endforeach
                             </div>
                             <button type="button" onclick="addMisi()" 
                                     class="mt-4 inline-flex items-center px-4 py-2 bg-purple-100 text-purple-700 font-semibold rounded-lg hover:bg-purple-200 transition-all">
@@ -148,7 +155,7 @@
     </div>
 
     <script>
-        let misiCount = 3;
+        let misiCount = {{ $candidate->missions->count() }};
 
         function previewPhoto(event) {
             const file = event.target.files[0];

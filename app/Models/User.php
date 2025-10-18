@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'id_number',
+        'face_photo',
+        'organization',
     ];
 
     /**
@@ -44,5 +48,41 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relationship: User (Organizer) has many Elections
+    public function elections()
+    {
+        return $this->hasMany(Election::class);
+    }
+
+    // Relationship: User (Voter) has many Votes
+    public function votes()
+    {
+        return $this->hasMany(Vote::class, 'voter_id');
+    }
+
+    // Helper: Check if user is organizer
+    public function isOrganizer()
+    {
+        return $this->role === 'organizer';
+    }
+
+    // Helper: Check if user is voter
+    public function isVoter()
+    {
+        return $this->role === 'voter';
+    }
+
+    // Helper: Check if user is admin
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    // Helper: Check if user has voted in specific election
+    public function hasVotedIn($electionId)
+    {
+        return $this->votes()->where('election_id', $electionId)->exists();
     }
 }

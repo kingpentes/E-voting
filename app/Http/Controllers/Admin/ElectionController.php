@@ -1,0 +1,202 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Election;
+use App\Models\ElectionRule;
+use App\Models\ElectionSetting;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class ElectionController extends Controller
+{
+    /**
+     * Display a listing of the resource (manage elections).
+     */
+    public function index()
+    {
+        // Get only elections created by current organizer
+        $elections = Election::forOrganizer(Auth::id())
+            ->with(['rules', 'settings', 'candidates'])
+            ->latest()
+            ->get();
+
+        return view('admin.elections.manage', compact('elections'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('admin.elections.rules');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'start_time' => ['nullable', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i'],
+            'rules' => ['required', 'array', 'min:1'],
+            'rules.*' => ['required', 'string'],
+            'allow_abstain' => ['boolean'],
+            'show_results_after_vote' => ['boolean'],
+            'require_confirmation' => ['boolean'],
+            'allow_vote_change' => ['boolean'],
+            'max_votes_per_voter' => ['integer', 'min:1'],
+        ]);
+
+        DB::transaction(function () use ($validated, $request) {
+            // Create Election
+            $election = Election::create([
+                'user_id' => Auth::id(),
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'start_date' => $validated['start_date'] ?? null,
+                'end_date' => $validated['end_date'] ?? null,
+                'start_time' => $validated['start_time'] ?? null,
+                'end_time' => $validated['end_time'] ?? null,
+                'status' => 'draft',
+                'is_published' => false,
+            ]);
+
+            // Create Rules
+            foreach ($validated['rules'] as $index => $rule) {
+                ElectionRule::create([
+                    'election_id' => $election->id,
+                    'rule' => $rule,
+                    'order' => $index + 1,
+                ]);
+            }
+
+            // Create Settings
+            ElectionSetting::create([
+                'election_id' => $election->id,
+                'allow_abstain' => $request->boolean('allow_abstain'),
+                'show_results_after_vote' => $request->boolean('show_results_after_vote'),
+                'require_confirmation' => $request->boolean('require_confirmation'),
+                'allow_vote_change' => $request->boolean('allow_vote_change'),
+                'max_votes_per_voter' => $validated['max_votes_per_voter'] ?? 1,
+            ]);
+        });
+
+        return redirect()->route('admin.elections.manage')
+            ->with('success', '✓ Pengaturan pemilu berhasil dibuat!');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $election = Election::forOrganizer(Auth::id())
+            ->with(['rules', 'settings'])
+            ->findOrFail($id);
+
+        return view('admin.elections.edit', compact('election'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'start_time' => ['nullable', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i'],
+            'rules' => ['required', 'array', 'min:1'],
+            'rules.*' => ['required', 'string'],
+            'allow_abstain' => ['boolean'],
+            'show_results_after_vote' => ['boolean'],
+            'require_confirmation' => ['boolean'],
+            'allow_vote_change' => ['boolean'],
+            'max_votes_per_voter' => ['integer', 'min:1'],
+        ]);
+
+        DB::transaction(function () use ($election, $validated, $request) {
+            // Update Election
+            $election->update([
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'start_date' => $validated['start_date'] ?? null,
+                'end_date' => $validated['end_date'] ?? null,
+                'start_time' => $validated['start_time'] ?? null,
+                'end_time' => $validated['end_time'] ?? null,
+            ]);
+
+            // Delete old rules and create new ones
+            $election->rules()->delete();
+            foreach ($validated['rules'] as $index => $rule) {
+                ElectionRule::create([
+                    'election_id' => $election->id,
+                    'rule' => $rule,
+                    'order' => $index + 1,
+                ]);
+            }
+
+            // Update Settings
+            $election->settings()->update([
+                'allow_abstain' => $request->boolean('allow_abstain'),
+                'show_results_after_vote' => $request->boolean('show_results_after_vote'),
+                'require_confirmation' => $request->boolean('require_confirmation'),
+                'allow_vote_change' => $request->boolean('allow_vote_change'),
+                'max_votes_per_voter' => $validated['max_votes_per_voter'] ?? 1,
+            ]);
+        });
+
+        return redirect()->route('admin.elections.manage')
+            ->with('success', '✓ Pengaturan pemilu berhasil diupdate!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+        
+        $title = $election->title;
+        $election->delete();
+
+        return redirect()->route('admin.elections.manage')
+            ->with('success', "✓ Pemilu '$title' berhasil dihapus!");
+    }
+
+    /**
+     * Publish or unpublish an election.
+     */
+    public function togglePublish(string $id)
+    {
+        $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+
+        // Check if election has candidates before publishing
+        if (!$election->is_published && $election->candidates()->count() === 0) {
+            return redirect()->back()
+                ->with('error', '✗ Tidak dapat mempublish pemilu tanpa kandidat. Tambahkan kandidat terlebih dahulu.');
+        }
+
+        $election->update([
+            'is_published' => !$election->is_published,
+            'status' => $election->is_published ? 'draft' : 'active',
+        ]);
+
+        $status = $election->is_published ? 'dipublish' : 'draft';
+        return redirect()->back()
+            ->with('success', "✓ Pemilu berhasil $status!");
+    }
+}

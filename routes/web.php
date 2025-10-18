@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\OrganizerRegisterController;
+use App\Http\Controllers\Auth\VoterRegisterController;
+use App\Http\Controllers\Admin\ElectionController;
+use App\Http\Controllers\Admin\CandidateController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -12,93 +16,76 @@ Route::get('/register', function () {
     return view('auth.register-choice');
 })->name('register');
 
-Route::get('/register/organizer', function () {
-    return view('auth.register-organizer');
-})->name('register.organizer');
+Route::get('/register/organizer', [OrganizerRegisterController::class, 'create'])
+    ->middleware('guest')
+    ->name('register.organizer');
 
-Route::get('/register/voter', function () {
-    return view('auth.register-voter');
-})->name('register.voter');
+Route::get('/register/voter', [VoterRegisterController::class, 'create'])
+    ->middleware('guest')
+    ->name('register.voter');
 
-// Registration Form Handlers (you'll need to create these controllers later)
-Route::post('/register/organizer', function () {
-    // Handle organizer registration
-    return redirect()->route('dashboard');
-})->name('register.organizer.store');
+Route::post('/register/organizer', [OrganizerRegisterController::class, 'store'])
+    ->middleware('guest')
+    ->name('register.organizer.store');
 
-Route::post('/register/voter', function () {
-    // Handle voter registration with ID and face verification
-    return redirect()->route('dashboard');
-})->name('register.voter.store');
+Route::post('/register/voter', [VoterRegisterController::class, 'store'])
+    ->middleware('guest')
+    ->name('register.voter.store');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Admin Routes
-Route::prefix('admin')->name('admin.')->group(function () {
+// Admin Routes - Protected by organizer middleware
+Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\EnsureUserIsOrganizer::class])->group(function () {
+    // Dashboard
     Route::get('/dashboard', function () {
-        return view('admin.dashboard');
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $elections = \App\Models\Election::forOrganizer(\Illuminate\Support\Facades\Auth::id())
+            ->withCount(['candidates', 'votes'])
+            ->latest()
+            ->get();
+        
+        $stats = [
+            'total_elections' => $elections->count(),
+            'active_elections' => $elections->where('status', 'active')->count(),
+            'total_candidates' => $elections->sum('candidates_count'),
+            'total_votes' => $elections->sum('votes_count'),
+        ];
+
+        return view('admin.dashboard', compact('user', 'elections', 'stats'));
     })->name('dashboard');
     
-    Route::get('/candidates/create', function () {
-        return view('admin.candidates.create');
-    })->name('candidates.create');
+    // Candidates Resource Routes
+    // Custom route MUST be before resource route to avoid being overridden
+    Route::get('/candidates/manage', [CandidateController::class, 'index'])->name('candidates.manage');
+    Route::resource('candidates', CandidateController::class)->except(['show']);
     
-    Route::post('/candidates/store', function () {
-        // Handle candidate store logic here
-        return redirect()->route('admin.dashboard')->with('success', 'Kandidat berhasil ditambahkan!');
-    })->name('candidates.store');
+    // Elections Resource Routes
+    Route::get('/elections', [ElectionController::class, 'index'])->name('elections.manage');
+    Route::get('/elections/create', [ElectionController::class, 'create'])->name('elections.create');
+    Route::post('/elections', [ElectionController::class, 'store'])->name('elections.store');
+    Route::get('/elections/{id}/edit', [ElectionController::class, 'edit'])->name('elections.edit');
+    Route::put('/elections/{id}', [ElectionController::class, 'update'])->name('elections.update');
+    Route::delete('/elections/{id}', [ElectionController::class, 'destroy'])->name('elections.delete');
+    Route::post('/elections/{id}/toggle-publish', [ElectionController::class, 'togglePublish'])->name('elections.toggle-publish');
     
-    Route::get('/candidates/manage', function () {
-        return view('admin.candidates.manage');
-    })->name('candidates.manage');
-    
-    Route::get('/candidates/edit/{id}', function ($id) {
-        // In real app, fetch candidate data from database
-        return view('admin.candidates.edit', compact('id'));
-    })->name('candidates.edit');
-    
-    Route::put('/candidates/update/{id}', function ($id) {
-        // Handle candidate update logic here
-        return redirect()->route('admin.candidates.manage')->with('success', 'Kandidat berhasil diupdate!');
-    })->name('candidates.update');
-    
-    Route::delete('/candidates/delete/{id}', function ($id) {
-        // Handle candidate delete logic here
-        return redirect()->route('admin.candidates.manage')->with('success', 'Kandidat berhasil dihapus!');
-    })->name('candidates.delete');
-    
+    // Election Link Management
     Route::get('/elections/link', function () {
-        return view('admin.elections.link');
+        $elections = \App\Models\Election::forOrganizer(\Illuminate\Support\Facades\Auth::id())
+            ->with('candidates')
+            ->latest()
+            ->get();
+        return view('admin.elections.link', compact('elections'));
     })->name('elections.link');
     
-    Route::get('/elections/rules/manage', function () {
-        return view('admin.elections.manage');
-    })->name('elections.rules.manage');
-    
-    Route::get('/elections/rules', function () {
-        return view('admin.elections.rules');
-    })->name('elections.rules.create');
-    
-    Route::get('/elections/rules/edit/{id}', function ($id) {
-        return view('admin.elections.edit', compact('id'));
-    })->name('elections.rules.edit');
-    
-    Route::post('/elections/rules/store', function () {
-        // Handle rules store logic here
-        return redirect()->route('admin.elections.rules.manage')->with('success', 'Pengaturan berhasil dibuat!');
-    })->name('elections.rules.store');
-    
-    Route::put('/elections/rules/update/{id}', function ($id) {
-        // Handle rules update logic here
-        return redirect()->route('admin.elections.rules.manage')->with('success', 'Pengaturan berhasil diupdate!');
-    })->name('elections.rules.update');
-    
-    Route::delete('/elections/rules/delete/{id}', function ($id) {
-        // Handle rules delete logic here
-        return redirect()->route('admin.elections.rules.manage')->with('success', 'Pengaturan berhasil dihapus!');
-    })->name('elections.rules.delete');
+    // Old route aliases for backward compatibility
+    Route::get('/elections/rules/manage', [ElectionController::class, 'index'])->name('elections.rules.manage');
+    Route::get('/elections/rules', [ElectionController::class, 'create'])->name('elections.rules.create');
+    Route::post('/elections/rules/store', [ElectionController::class, 'store'])->name('elections.rules.store');
+    Route::get('/elections/rules/edit/{id}', [ElectionController::class, 'edit'])->name('elections.rules.edit');
+    Route::put('/elections/rules/update/{id}', [ElectionController::class, 'update'])->name('elections.rules.update');
+    Route::delete('/elections/rules/delete/{id}', [ElectionController::class, 'destroy'])->name('elections.rules.delete');
 });
 
 // Public Voter Dashboard (no middleware for now)

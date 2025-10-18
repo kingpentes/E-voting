@@ -18,6 +18,21 @@
                     <div class="bg-white rounded-2xl shadow-md p-8">
                         <h2 class="text-2xl font-bold text-gray-900 mb-6">Data Kandidat</h2>
                         
+                        <!-- Pilih Pemilu -->
+                        <div class="mb-6">
+                            <label for="election_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Pilih Pemilu <span class="text-red-500">*</span>
+                            </label>
+                            <select id="election_id" name="election_id" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                                <option value="">-- Pilih Pemilu --</option>
+                                @foreach($elections as $election)
+                                    <option value="{{ $election->id }}">{{ $election->title }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-sm text-gray-500 mt-1">Pilih pemilu untuk kandidat ini</p>
+                        </div>
+                        
                         <!-- Nomor Urut -->
                         <div class="mb-6">
                             <label for="number" class="block text-sm font-semibold text-gray-700 mb-2">

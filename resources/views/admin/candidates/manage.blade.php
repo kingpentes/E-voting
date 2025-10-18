@@ -1,4 +1,4 @@
-<x-admin-layout title="Kelola Kandidat">
+﻿<x-admin-layout title="Kelola Kandidat">
     <x-admin-sidebar active="manage" />
     
     <div class="flex-1 flex flex-col overflow-hidden">
@@ -6,278 +6,92 @@
             <div class="px-8 py-6 flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Kelola Kandidat</h1>
-                    <p class="text-gray-600 mt-1">Lihat dan kelola semua kandidat pemilu</p>
+                    <p class="text-gray-600 mt-1">{{ $candidates->count() }} kandidat dari pemilu Anda</p>
                 </div>
                 <a href="{{ route('admin.candidates.create') }}" 
-                   class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg flex items-center space-x-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    <span>Tambah Kandidat Baru</span>
+                   class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl">
+                    <span>+ Tambah Kandidat Baru</span>
                 </a>
             </div>
         </header>
         
         <main class="flex-1 overflow-y-auto p-8">
-            <div class="space-y-6">
-                <!-- Candidate 1 -->
-                <div class="bg-white rounded-2xl shadow-md overflow-hidden">
-                    <div class="bg-gray-50 px-8 py-4 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-lg">
-                                    1
-                                </div>
-                                <div>
-                                    <h2 class="text-2xl font-bold text-gray-900">Dr. Ahmad Santoso</h2>
-                                    <p class="text-gray-500">Kandidat Nomor Urut 1</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <a href="{{ route('admin.candidates.edit', 1) }}" 
-                                   class="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all flex items-center space-x-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                    <span>Edit</span>
-                                </a>
-                                <button onclick="confirmDelete(1, 'Dr. Ahmad Santoso')" 
-                                        class="px-5 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all flex items-center space-x-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                    <span>Hapus</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="p-8">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <!-- Photo -->
-                            <div class="md:col-span-1">
-                                <img src="https://i.pravatar.cc/256?img=12" alt="Dr. Ahmad Santoso" 
-                                     class="w-full rounded-xl shadow-lg">
-                            </div>
-                            
-                            <!-- Content -->
-                            <div class="md:col-span-2">
-                                <!-- Visi -->
-                                <div class="mb-6">
-                                    <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center">
-                                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
-                                        Visi
-                                    </h3>
-                                    <p class="text-gray-700 bg-blue-50 p-4 rounded-lg">
-                                        Mewujudkan kepemimpinan yang humanis, efektif, dan berintegritas.
-                                    </p>
-                                </div>
-
-                                <!-- Misi -->
-                                <div>
-                                    <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">
-                                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                        Misi
-                                    </h3>
-                                    <ul class="space-y-2">
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                                            <p class="text-gray-700 pt-0.5">Meningkatkan program pengembangan karakter siswa</p>
-                                        </li>
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                                            <p class="text-gray-700 pt-0.5">Memperkuat kolaborasi antar organisasi siswa</p>
-                                        </li>
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                                            <p class="text-gray-700 pt-0.5">Transparansi dalam setiap pengambilan keputusan</p>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            @if(session('success'))
+                <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+                    <p class="text-green-800 font-medium">{{ session('success') }}</p>
                 </div>
+            @endif
 
-                <!-- Candidate 2 -->
-                <div class="bg-white rounded-2xl shadow-md overflow-hidden">
-                    <div class="bg-gray-50 px-8 py-4 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-lg">
-                                    2
-                                </div>
-                                <div>
-                                    <h2 class="text-2xl font-bold text-gray-900">Prof. Dr. Siti Nurhaliza</h2>
-                                    <p class="text-gray-500">Kandidat Nomor Urut 2</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <a href="{{ route('admin.candidates.edit', 2) }}" 
-                                   class="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all flex items-center space-x-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                    <span>Edit</span>
-                                </a>
-                                <button onclick="confirmDelete(2, 'Prof. Dr. Siti Nurhaliza')" 
-                                        class="px-5 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all flex items-center space-x-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                    <span>Hapus</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="p-8">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="md:col-span-1">
-                                <img src="https://i.pravatar.cc/256?img=47" alt="Prof. Dr. Siti Nurhaliza" 
-                                     class="w-full rounded-xl shadow-lg">
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <div class="mb-6">
-                                    <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center">
-                                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
-                                        Visi
-                                    </h3>
-                                    <p class="text-gray-700 bg-blue-50 p-4 rounded-lg">
-                                        Mewujudkan institusi pendidikan berkelas dunia.
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">
-                                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                        Misi
-                                    </h3>
-                                    <ul class="space-y-2">
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                                            <p class="text-gray-700 pt-0.5">Meningkatkan kualitas pembelajaran melalui digitalisasi</p>
-                                        </li>
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                                            <p class="text-gray-700 pt-0.5">Mendorong budaya riset dan publikasi ilmiah</p>
-                                        </li>
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                                            <p class="text-gray-700 pt-0.5">Memperkuat jaringan alumni dan stakeholder</p>
-                                        </li>
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                                            <p class="text-gray-700 pt-0.5">Mengembangkan program pengabdian masyarakat berdampak</p>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            @if($candidates->isEmpty())
+                <div class="bg-white rounded-2xl shadow-md p-12 text-center">
+                    <h3 class="text-2xl font-bold text-gray-700 mb-2">Belum Ada Kandidat</h3>
+                    <p class="text-gray-500 mb-6">Mulai dengan menambahkan kandidat pertama Anda</p>
                 </div>
-
-                <!-- Candidate 3 -->
-                <div class="bg-white rounded-2xl shadow-md overflow-hidden">
-                    <div class="bg-gray-50 px-8 py-4 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-lg">
-                                    3
+            @else
+                <div class="space-y-6">
+                    @foreach($candidates as $candidate)
+                    <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                        <div class="bg-gray-50 px-8 py-4 border-b">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-2xl">
+                                        {{ $candidate->number }}
+                                    </div>
+                                    <div>
+                                        <h2 class="text-2xl font-bold text-gray-900">{{ $candidate->name }}</h2>
+                                        <p class="text-gray-500">{{ $candidate->election->title }}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h2 class="text-2xl font-bold text-gray-900">Ir. Budi Pratama</h2>
-                                    <p class="text-gray-500">Kandidat Nomor Urut 3</p>
+                                <div class="flex space-x-2">
+                                    <a href="{{ route('admin.candidates.edit', $candidate->id) }}" 
+                                       class="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg">Edit</a>
+                                    <form action="{{ route('admin.candidates.destroy', $candidate->id) }}" method="POST" 
+                                          onsubmit="return confirm('Yakin hapus {{ $candidate->name }}?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="px-5 py-2.5 bg-red-600 text-white font-semibold rounded-lg">Hapus</button>
+                                    </form>
                                 </div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <a href="{{ route('admin.candidates.edit', 3) }}" 
-                                   class="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all flex items-center space-x-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                    <span>Edit</span>
-                                </a>
-                                <button onclick="confirmDelete(3, 'Ir. Budi Pratama')" 
-                                        class="px-5 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all flex items-center space-x-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                    <span>Hapus</span>
-                                </button>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="p-8">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="md:col-span-1">
-                                <img src="https://i.pravatar.cc/256?img=15" alt="Ir. Budi Pratama" 
-                                     class="w-full rounded-xl shadow-lg">
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <div class="mb-6">
-                                    <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center">
-                                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
-                                        Visi
-                                    </h3>
-                                    <p class="text-gray-700 bg-blue-50 p-4 rounded-lg">
-                                        Membangun budaya kerja yang disiplin dan berprestasi.
-                                    </p>
-                                </div>
-
+                        
+                        <div class="p-8">
+                            <div class="grid grid-cols-3 gap-6">
                                 <div>
-                                    <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">
-                                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                        Misi
-                                    </h3>
-                                    <ul class="space-y-2">
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                                            <p class="text-gray-700 pt-0.5">Optimalisasi fasilitas dan sumber daya</p>
-                                        </li>
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                                            <p class="text-gray-700 pt-0.5">Program efisiensi dan tata kelola modern</p>
-                                        </li>
-                                        <li class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg">
-                                            <span class="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                                            <p class="text-gray-700 pt-0.5">Kompetisi akademik dan non-akademik rutin</p>
-                                        </li>
-                                    </ul>
+                                    @if($candidate->photo)
+                                        <img src="{{ asset('storage/' . $candidate->photo) }}" alt="{{ $candidate->name }}" class="w-full rounded-xl">
+                                    @else
+                                        <div class="w-full aspect-square bg-gray-200 rounded-xl"></div>
+                                    @endif
+                                </div>
+                                
+                                <div class="col-span-2">
+                                    <div class="mb-6">
+                                        <h3 class="font-bold text-gray-900 mb-2">Visi</h3>
+                                        <p class="text-gray-700 bg-blue-50 p-4 rounded-lg">{{ $candidate->visi }}</p>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-gray-900 mb-2">Misi</h3>
+                                        @if($candidate->missions->isEmpty())
+                                            <p class="text-gray-500 italic">Belum ada misi</p>
+                                        @else
+                                            <ul class="space-y-2">
+                                                @foreach($candidate->missions as $mission)
+                                                    <li class="flex space-x-2 bg-purple-50 p-3 rounded-lg">
+                                                        <span class="font-bold">{{ $loop->iteration }}.</span>
+                                                        <p>{{ $mission->mission }}</p>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    @endforeach
                 </div>
-            </div>
+            @endif
         </main>
     </div>
-
-    <script>
-        function confirmDelete(id, name) {
-            if (confirm(`Apakah Anda yakin ingin menghapus kandidat "${name}"?\n\nTindakan ini tidak dapat dibatalkan.`)) {
-                alert(`Kandidat "${name}" berhasil dihapus!`);
-                // In real app: form submit or fetch API call
-                // window.location.href = '/admin/candidates/delete/' + id;
-            }
-        }
-    </script>
 </x-admin-layout>

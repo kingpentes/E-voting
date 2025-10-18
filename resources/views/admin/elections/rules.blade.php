@@ -20,8 +20,8 @@
         
         <main class="flex-1 overflow-y-auto p-8">
             <div class="max-w-5xl mx-auto">
-                <form action="{{ route('admin.elections.rules.update') }}" method="POST" class="space-y-6">
-                    @method('PUT')
+                <form action="{{ route('admin.elections.store') }}" method="POST" class="space-y-6">
+                    @csrf
                     
                     <!-- Informasi Pemilu -->
                     <div class="bg-white rounded-2xl shadow-md p-8">
@@ -37,7 +37,7 @@
                             <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Judul Pemilu <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="title" name="title" required value="E-Voting"
+                            <input type="text" id="title" name="title" required
                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-lg font-semibold"
                                    placeholder="Contoh: Pemilihan Ketua OSIS 2025">
                         </div>
@@ -49,7 +49,7 @@
                             </label>
                             <textarea id="description" name="description" rows="3" required
                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                      placeholder="Masukkan deskripsi singkat tentang pemilu...">Sistem Pemilihan Elektronik untuk memilih pemimpin masa depan dengan transparan, aman, dan demokratis</textarea>
+                                      placeholder="Masukkan deskripsi singkat tentang pemilu..."></textarea>
                         </div>
 
                         <!-- Tanggal Pemilu -->
@@ -83,30 +83,9 @@
                         <div id="rulesContainer" class="space-y-4">
                             <div class="flex items-start space-x-3 rule-item bg-gray-50 p-4 rounded-xl">
                                 <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">1</div>
-                                <input type="text" name="rules[]" required value="Setiap pemilih hanya dapat memberikan satu suara"
+                                <input type="text" name="rules[]" required
                                        class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                       placeholder="Masukkan peraturan...">
-                            </div>
-                            
-                            <div class="flex items-start space-x-3 rule-item bg-gray-50 p-4 rounded-xl">
-                                <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">2</div>
-                                <input type="text" name="rules[]" required value="Klik pada kartu kandidat untuk melihat detail visi dan misi"
-                                       class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                       placeholder="Masukkan peraturan...">
-                            </div>
-                            
-                            <div class="flex items-start space-x-3 rule-item bg-gray-50 p-4 rounded-xl">
-                                <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">3</div>
-                                <input type="text" name="rules[]" required value="Pastikan pilihan Anda sudah tepat sebelum mengkonfirmasi"
-                                       class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                       placeholder="Masukkan peraturan...">
-                            </div>
-                            
-                            <div class="flex items-start space-x-3 rule-item bg-gray-50 p-4 rounded-xl">
-                                <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">4</div>
-                                <input type="text" name="rules[]" required value="Hasil pemilihan akan diumumkan setelah periode voting berakhir"
-                                       class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                       placeholder="Masukkan peraturan...">
+                                       placeholder="Contoh: Setiap pemilih hanya dapat memberikan satu suara">
                             </div>
                         </div>
                         
@@ -132,35 +111,54 @@
                         <div class="space-y-4">
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Tampilkan Hasil Real-time</h3>
-                                    <p class="text-sm text-gray-600">Pemilih dapat melihat hasil sementara saat pemilu berlangsung</p>
+                                    <h3 class="font-semibold text-gray-900">Izinkan Golput</h3>
+                                    <p class="text-sm text-gray-600">Pemilih dapat memilih untuk tidak memilih (abstain)</p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="show_realtime" value="1" class="sr-only peer">
+                                    <input type="checkbox" name="allow_abstain" value="1" class="sr-only peer">
                                     <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
                                 </label>
                             </div>
                             
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Izinkan Perubahan Suara</h3>
-                                    <p class="text-sm text-gray-600">Pemilih dapat mengubah pilihan sebelum periode berakhir</p>
+                                    <h3 class="font-semibold text-gray-900">Tampilkan Hasil Setelah Vote</h3>
+                                    <p class="text-sm text-gray-600">Pemilih dapat melihat hasil setelah mereka memilih</p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="allow_revote" value="1" class="sr-only peer">
+                                    <input type="checkbox" name="show_results_after_vote" value="1" class="sr-only peer">
                                     <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
                                 </label>
                             </div>
                             
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Wajib Verifikasi Email</h3>
-                                    <p class="text-sm text-gray-600">Pemilih harus verifikasi email sebelum dapat memilih</p>
+                                    <h3 class="font-semibold text-gray-900">Butuh Konfirmasi</h3>
+                                    <p class="text-sm text-gray-600">Pemilih harus konfirmasi pilihan sebelum submit</p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="require_verification" value="1" checked class="sr-only peer">
+                                    <input type="checkbox" name="require_confirmation" value="1" checked class="sr-only peer">
                                     <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
                                 </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900">Izinkan Ubah Pilihan</h3>
+                                    <p class="text-sm text-gray-600">Pemilih dapat mengubah pilihan mereka</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="allow_vote_change" value="1" class="sr-only peer">
+                                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div class="p-4 bg-gray-50 rounded-xl">
+                                <label for="max_votes_per_voter" class="block font-semibold text-gray-900 mb-2">
+                                    Maksimal Suara Per Pemilih
+                                </label>
+                                <input type="number" id="max_votes_per_voter" name="max_votes_per_voter" value="1" min="1" max="10"
+                                       class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
                             </div>
                         </div>
                     </div>
@@ -187,7 +185,7 @@
     </div>
 
     <script>
-        let ruleCount = 4;
+        let ruleCount = 1;
 
         function addRule() {
             ruleCount++;

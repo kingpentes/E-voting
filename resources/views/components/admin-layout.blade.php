@@ -17,6 +17,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="font-sans antialiased bg-gray-100">
+    <!-- Navbar -->
+    <x-navbar />
+    
     <div class="flex h-screen overflow-hidden">
         {{ $slot }}
     </div>

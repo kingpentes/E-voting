@@ -20,7 +20,7 @@
         
         <main class="flex-1 overflow-y-auto p-8">
             <div class="max-w-5xl mx-auto">
-                <form action="{{ route('admin.elections.rules.update', $id ?? 1) }}" method="POST" class="space-y-6">
+                <form action="{{ route('admin.elections.update', $election->id) }}" method="POST" class="space-y-6">
                     @csrf
                     @method('PUT')
                     
@@ -38,7 +38,7 @@
                             <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Judul Pemilu <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="title" name="title" required value="E-Voting 2025"
+                            <input type="text" id="title" name="title" required value="{{ old('title', $election->title) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-lg font-semibold"
                                    placeholder="Contoh: Pemilihan Ketua OSIS 2025">
                         </div>
@@ -50,7 +50,7 @@
                             </label>
                             <textarea id="description" name="description" rows="3" required
                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                      placeholder="Masukkan deskripsi singkat tentang pemilu...">Sistem Pemilihan Elektronik untuk memilih pemimpin masa depan dengan transparan, aman, dan demokratis</textarea>
+                                      placeholder="Masukkan deskripsi singkat tentang pemilu...">{{ old('description', $election->description) }}</textarea>
                         </div>
 
                         <!-- Tanggal Pemilu -->
@@ -59,14 +59,16 @@
                                 <label for="start_date" class="block text-sm font-semibold text-gray-700 mb-2">
                                     Tanggal Mulai <span class="text-red-500">*</span>
                                 </label>
-                                <input type="datetime-local" id="start_date" name="start_date" required value="2025-10-20T08:00"
+                                <input type="datetime-local" id="start_date" name="start_date" 
+                                       value="{{ old('start_date', $election->start_date ? $election->start_date->format('Y-m-d\TH:i') : '') }}"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
                             </div>
                             <div>
                                 <label for="end_date" class="block text-sm font-semibold text-gray-700 mb-2">
                                     Tanggal Berakhir <span class="text-red-500">*</span>
                                 </label>
-                                <input type="datetime-local" id="end_date" name="end_date" required value="2025-10-25T17:00"
+                                <input type="datetime-local" id="end_date" name="end_date" 
+                                       value="{{ old('end_date', $election->end_date ? $election->end_date->format('Y-m-d\TH:i') : '') }}"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
                             </div>
                         </div>
@@ -82,35 +84,22 @@
                         </h2>
                         
                         <div id="rulesContainer" class="space-y-4">
+                            @foreach($election->rules as $index => $rule)
                             <div class="flex items-start space-x-3 rule-item bg-gray-50 p-4 rounded-xl">
-                                <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">1</div>
-                                <input type="text" name="rules[]" required value="Setiap pemilih hanya dapat memberikan satu suara"
+                                <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">{{ $index + 1 }}</div>
+                                <input type="text" name="rules[]" required value="{{ old('rules.' . $index, $rule->rule) }}"
                                        class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                                        placeholder="Masukkan peraturan...">
-                            </div>
-                            
-                            <div class="flex items-start space-x-3 rule-item bg-gray-50 p-4 rounded-xl">
-                                <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">2</div>
-                                <input type="text" name="rules[]" required value="Klik pada kartu kandidat untuk melihat detail visi dan misi"
-                                       class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                       placeholder="Masukkan peraturan...">
+                                @if($index > 0)
                                 <button type="button" onclick="removeRule(this)" 
                                         class="flex-shrink-0 w-10 h-10 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all mt-1">
                                     <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                 </button>
+                                @endif
                             </div>
-                            
-                            <div class="flex items-start space-x-3 rule-item bg-gray-50 p-4 rounded-xl">
-                                <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">3</div>
-                                <input type="text" name="rules[]" required value="Pastikan pilihan Anda sudah tepat sebelum mengkonfirmasi"
-                                       class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                       placeholder="Masukkan peraturan...">
-                                <button type="button" onclick="removeRule(this)" 
-                                        class="flex-shrink-0 w-10 h-10 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all mt-1">
-                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            @endforeach
                                     </svg>
                                 </button>
                             </div>
@@ -151,35 +140,54 @@
                         <div class="space-y-4">
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Tampilkan Hasil Real-time</h3>
-                                    <p class="text-sm text-gray-600">Pemilih dapat melihat hasil sementara saat pemilu berlangsung</p>
+                                    <h3 class="font-semibold text-gray-900">Izinkan Abstain</h3>
+                                    <p class="text-sm text-gray-600">Pemilih dapat memilih untuk tidak memilih (abstain)</p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="show_realtime" value="1" class="sr-only peer">
+                                    <input type="checkbox" name="allow_abstain" value="1" {{ old('allow_abstain', $election->settings->allow_abstain ?? false) ? 'checked' : '' }} class="sr-only peer">
                                     <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
                                 </label>
                             </div>
                             
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Izinkan Perubahan Suara</h3>
-                                    <p class="text-sm text-gray-600">Pemilih dapat mengubah pilihan sebelum periode berakhir</p>
+                                    <h3 class="font-semibold text-gray-900">Tampilkan Hasil Setelah Memilih</h3>
+                                    <p class="text-sm text-gray-600">Pemilih dapat melihat hasil sementara setelah memberikan suara</p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="allow_revote" value="1" class="sr-only peer">
+                                    <input type="checkbox" name="show_results_after_vote" value="1" {{ old('show_results_after_vote', $election->settings->show_results_after_vote ?? false) ? 'checked' : '' }} class="sr-only peer">
                                     <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
                                 </label>
                             </div>
                             
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Wajib Verifikasi Email</h3>
-                                    <p class="text-sm text-gray-600">Pemilih harus verifikasi email sebelum dapat memilih</p>
+                                    <h3 class="font-semibold text-gray-900">Wajib Konfirmasi</h3>
+                                    <p class="text-sm text-gray-600">Pemilih harus mengkonfirmasi pilihan sebelum mengirim suara</p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="require_verification" value="1" checked class="sr-only peer">
+                                    <input type="checkbox" name="require_confirmation" value="1" {{ old('require_confirmation', $election->settings->require_confirmation ?? false) ? 'checked' : '' }} class="sr-only peer">
                                     <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
                                 </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900">Izinkan Ubah Suara</h3>
+                                    <p class="text-sm text-gray-600">Pemilih dapat mengubah pilihan sebelum pemilu berakhir</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="allow_vote_change" value="1" {{ old('allow_vote_change', $election->settings->allow_vote_change ?? false) ? 'checked' : '' }} class="sr-only peer">
+                                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div class="p-4 bg-gray-50 rounded-xl">
+                                <label for="max_votes_per_voter" class="block font-semibold text-gray-900 mb-2">Maksimal Suara per Pemilih</label>
+                                <p class="text-sm text-gray-600 mb-3">Jumlah maksimal kandidat yang dapat dipilih oleh satu pemilih</p>
+                                <input type="number" id="max_votes_per_voter" name="max_votes_per_voter" min="1" 
+                                       value="{{ old('max_votes_per_voter', $election->settings->max_votes_per_voter ?? 1) }}"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
                             </div>
                         </div>
                     </div>
