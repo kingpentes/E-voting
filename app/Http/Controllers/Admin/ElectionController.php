@@ -102,6 +102,12 @@ class ElectionController extends Controller
             ->with(['rules', 'settings'])
             ->findOrFail($id);
 
+        // Prevent editing published election
+        if ($election->is_published) {
+            return redirect()->route('admin.elections.manage')
+                ->with('error', '✗ Tidak dapat mengedit pemilu yang sudah dipublish. Unpublish terlebih dahulu jika perlu melakukan perubahan.');
+        }
+
         return view('admin.elections.edit', compact('election'));
     }
 
@@ -111,6 +117,12 @@ class ElectionController extends Controller
     public function update(Request $request, string $id)
     {
         $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+
+        // Prevent updating published election
+        if ($election->is_published) {
+            return redirect()->route('admin.elections.manage')
+                ->with('error', '✗ Tidak dapat mengupdate pemilu yang sudah dipublish. Unpublish terlebih dahulu jika perlu melakukan perubahan.');
+        }
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -169,6 +181,12 @@ class ElectionController extends Controller
     public function destroy(string $id)
     {
         $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+        
+        // Prevent deleting published election
+        if ($election->is_published) {
+            return redirect()->route('admin.elections.manage')
+                ->with('error', '✗ Tidak dapat menghapus pemilu yang sudah dipublish. Unpublish terlebih dahulu jika ingin menghapus.');
+        }
         
         $title = $election->title;
         $election->delete();

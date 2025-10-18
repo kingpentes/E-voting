@@ -30,7 +30,7 @@
             @else
                 <div class="space-y-6">
                     @foreach($candidates as $candidate)
-                    <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                    <div class="bg-white rounded-2xl shadow-md overflow-hidden {{ $candidate->election->is_published ? 'border-2 border-green-500' : '' }}">
                         <div class="bg-gray-50 px-8 py-4 border-b">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-4">
@@ -39,18 +39,36 @@
                                     </div>
                                     <div>
                                         <h2 class="text-2xl font-bold text-gray-900">{{ $candidate->name }}</h2>
-                                        <p class="text-gray-500">{{ $candidate->election->title }}</p>
+                                        <div class="flex items-center space-x-2">
+                                            <p class="text-gray-500">{{ $candidate->election->title }}</p>
+                                            @if($candidate->election->is_published)
+                                                <span class="px-2 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full">AKTIF</span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('admin.candidates.edit', $candidate->id) }}" 
-                                       class="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg">Edit</a>
-                                    <form action="{{ route('admin.candidates.destroy', $candidate->id) }}" method="POST" 
-                                          onsubmit="return confirm('Yakin hapus {{ $candidate->name }}?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="px-5 py-2.5 bg-red-600 text-white font-semibold rounded-lg">Hapus</button>
-                                    </form>
+                                    @if($candidate->election->is_published)
+                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed" title="Tidak dapat edit kandidat dari pemilu yang sudah dipublish">
+                                            Edit
+                                        </button>
+                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed" title="Tidak dapat hapus kandidat dari pemilu yang sudah dipublish">
+                                            Hapus
+                                        </button>
+                                    @else
+                                        <a href="{{ route('admin.candidates.edit', $candidate->id) }}" 
+                                           class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('admin.candidates.destroy', $candidate->id) }}" method="POST" 
+                                              onsubmit="return confirm('Yakin hapus {{ $candidate->name }}?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         </div>

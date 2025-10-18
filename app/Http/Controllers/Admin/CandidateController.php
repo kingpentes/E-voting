@@ -63,6 +63,12 @@ class CandidateController extends Controller
         // Verify election belongs to current organizer
         $election = Election::forOrganizer(Auth::id())->findOrFail($validated['election_id']);
 
+        // Prevent adding candidate to published election
+        if ($election->is_published) {
+            return redirect()->back()
+                ->with('error', '✗ Tidak dapat menambah kandidat ke pemilu yang sudah dipublish.');
+        }
+
         // Check if candidate number already exists in this election
         $exists = Candidate::where('election_id', $election->id)
             ->where('number', $validated['number'])
@@ -116,6 +122,12 @@ class CandidateController extends Controller
             abort(403, 'Anda tidak memiliki akses ke kandidat ini.');
         }
 
+        // Prevent editing candidate from published election
+        if ($candidate->election->is_published) {
+            return redirect()->route('admin.candidates.manage')
+                ->with('error', '✗ Tidak dapat mengedit kandidat dari pemilu yang sudah dipublish.');
+        }
+
         $elections = Election::forOrganizer(Auth::id())->get();
 
         return view('admin.candidates.edit', compact('candidate', 'elections'));
@@ -131,6 +143,12 @@ class CandidateController extends Controller
         // Verify candidate's election belongs to current organizer
         if ($candidate->election->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke kandidat ini.');
+        }
+
+        // Prevent updating candidate from published election
+        if ($candidate->election->is_published) {
+            return redirect()->route('admin.candidates.manage')
+                ->with('error', '✗ Tidak dapat mengupdate kandidat dari pemilu yang sudah dipublish.');
         }
 
         $validated = $request->validate([
@@ -202,6 +220,12 @@ class CandidateController extends Controller
         // Verify candidate's election belongs to current organizer
         if ($candidate->election->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke kandidat ini.');
+        }
+
+        // Prevent deleting candidate from published election
+        if ($candidate->election->is_published) {
+            return redirect()->route('admin.candidates.manage')
+                ->with('error', '✗ Tidak dapat menghapus kandidat dari pemilu yang sudah dipublish.');
         }
 
         $name = $candidate->name;

@@ -50,17 +50,31 @@
                                 <div class="flex space-x-2">
                                     <form action="{{ route('admin.elections.toggle-publish', $election->id) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="px-5 py-2.5 {{ $election->is_published ? 'bg-yellow-600' : 'bg-green-600' }} text-white font-semibold rounded-lg">
+                                        <button type="submit" class="px-5 py-2.5 {{ $election->is_published ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }} text-white font-semibold rounded-lg transition-colors">
                                             {{ $election->is_published ? 'Unpublish' : 'Publish' }}
                                         </button>
                                     </form>
-                                    <a href="{{ route('admin.elections.edit', $election->id) }}" class="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg">Edit</a>
-                                    <form action="{{ route('admin.elections.delete', $election->id) }}" method="POST" 
-                                          onsubmit="return confirm('Yakin hapus {{ $election->title }}?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="px-5 py-2.5 bg-red-600 text-white font-semibold rounded-lg">Hapus</button>
-                                    </form>
+                                    
+                                    @if($election->is_published)
+                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed" title="Tidak dapat edit pemilu yang sudah dipublish">
+                                            Edit
+                                        </button>
+                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed" title="Tidak dapat hapus pemilu yang sudah dipublish">
+                                            Hapus
+                                        </button>
+                                    @else
+                                        <a href="{{ route('admin.elections.edit', $election->id) }}" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('admin.elections.delete', $election->id) }}" method="POST" 
+                                              onsubmit="return confirm('Yakin hapus {{ $election->title }}?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                             
