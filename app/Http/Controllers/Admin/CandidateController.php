@@ -22,6 +22,7 @@ class CandidateController extends Controller
         $elections = Election::forOrganizer(Auth::id())->pluck('id');
         $candidates = Candidate::whereIn('election_id', $elections)
             ->with(['election', 'missions'])
+            ->withCount('votes') // Add vote count
             ->orderBy('election_id')
             ->orderBy('number')
             ->get();

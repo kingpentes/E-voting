@@ -42,7 +42,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                 </svg>
-                <span class="font-medium">Link Pemilu</span>
+                <span class="font-medium">Daftar Voter (pake kah jit?)</span>
             </a>
 
             <!-- Judul & Peraturan -->
@@ -67,9 +67,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="absolute bottom-0 left-0 right-0 p-6 text-center text-sm text-indigo-300">
-        <p>&copy; 2025 E-Voter System</p>
-    </div>
+    
 </aside>
 
 <script>
