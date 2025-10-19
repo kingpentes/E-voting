@@ -1,6 +1,6 @@
 @props(['transparent' => false])
 
-<nav class="{{ $transparent ? 'bg-transparent' : 'bg-gradient-to-r from-indigo-600 to-purple-600' }} text-white shadow-lg sticky top-0 z-50 backdrop-blur-sm">
+<nav class="{{ $transparent ? 'bg-transparent' : 'bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-900' }} text-white shadow-lg sticky top-0 z-50 backdrop-blur-sm">
     <div class="container mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
             <!-- Logo & Brand -->
