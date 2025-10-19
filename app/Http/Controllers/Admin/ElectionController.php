@@ -224,13 +224,41 @@ class ElectionController extends Controller
                 ->with('error', '✗ Tidak dapat mempublish pemilu tanpa kandidat. Tambahkan kandidat terlebih dahulu.');
         }
 
+        // Once published, cannot unpublish - only can close
+        if ($election->is_published) {
+            return redirect()->back()
+                ->with('error', '✗ Pemilu yang sudah dipublish tidak dapat di-unpublish. Gunakan tombol "Tutup Pemilu" untuk mengakhiri pemilu.');
+        }
+
+        // Publish the election
         $election->update([
-            'is_published' => !$election->is_published,
-            'status' => $election->is_published ? 'draft' : 'active',
+            'is_published' => true,
+            'status' => 'active',
         ]);
 
-        $status = $election->is_published ? 'dipublish' : 'draft';
         return redirect()->back()
-            ->with('success', "✓ Pemilu berhasil $status!");
+            ->with('success', "✓ Pemilu berhasil dipublish! Sekarang voter dapat mulai memberikan suara.");
+    }
+
+    /**
+     * Close an election to show results.
+     */
+    public function closeElection(string $id)
+    {
+        $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+
+        // Can only close published elections
+        if (!$election->is_published) {
+            return redirect()->back()
+                ->with('error', '✗ Hanya pemilu yang sudah dipublish yang dapat ditutup.');
+        }
+
+        // Close the election
+        $election->update([
+            'status' => 'closed',
+        ]);
+
+        return redirect()->back()
+            ->with('success', "✓ Pemilu berhasil ditutup! Hasil voting sekarang dapat dilihat oleh voter.");
     }
 }

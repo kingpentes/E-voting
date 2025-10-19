@@ -22,7 +22,7 @@ class VoterElectionController extends Controller
 
         // Get all candidates for this election
         $candidates = $election->candidates()
-            ->with('missions')
+            ->with(['missions', 'votes'])
             ->orderBy('number')
             ->get();
 

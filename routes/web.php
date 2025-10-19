@@ -117,6 +117,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::put('/elections/{id}', [ElectionController::class, 'update'])->name('elections.update');
     Route::delete('/elections/{id}', [ElectionController::class, 'destroy'])->name('elections.delete');
     Route::post('/elections/{id}/toggle-publish', [ElectionController::class, 'togglePublish'])->name('elections.toggle-publish');
+    Route::post('/elections/{id}/close', [ElectionController::class, 'closeElection'])->name('elections.close');
     
     // Election Link Management
     Route::get('/elections/link', function () {

@@ -151,6 +151,77 @@
             </div>
             @endif
 
+            <!-- Voting Results (shown when election is closed) -->
+            @if($election->status === 'closed')
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-xl p-8 mb-8 text-white">
+                <div class="flex items-center justify-center mb-6">
+                    <svg class="w-10 h-10 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <h3 class="text-3xl font-bold">Hasil Voting</h3>
+                </div>
+                
+                @php
+                    $totalVotes = $candidates->sum(function($candidate) {
+                        return $candidate->votes->count();
+                    });
+                @endphp
+
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xl font-semibold">Total Suara Masuk:</span>
+                        <span class="text-4xl font-bold">{{ $totalVotes }}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    @foreach($candidates->sortByDesc(function($candidate) { return $candidate->votes->count(); }) as $candidate)
+                        @php
+                            $voteCount = $candidate->votes->count();
+                            $percentage = $totalVotes > 0 ? ($voteCount / $totalVotes) * 100 : 0;
+                            $isWinner = $loop->first && $voteCount > 0;
+                        @endphp
+                        
+                        <div class="bg-white rounded-xl p-5 {{ $isWinner ? 'ring-4 ring-yellow-400 shadow-2xl' : 'shadow-lg' }}">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center space-x-4">
+                                    @if($isWinner)
+                                        <div class="flex-shrink-0">
+                                            <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                    <img src="{{ $candidate->photo_url }}" alt="{{ $candidate->name }}" class="w-12 h-12 rounded-full object-cover border-2 border-purple-200">
+                                    <div>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="font-bold text-gray-900 text-lg">{{ $candidate->name }}</span>
+                                            @if($isWinner)
+                                                <span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">PEMENANG</span>
+                                            @endif
+                                        </div>
+                                        <span class="text-sm text-gray-600">Kandidat #{{ $candidate->number }}</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-purple-600">{{ $voteCount }}</div>
+                                    <div class="text-sm text-gray-600">suara</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Progress Bar -->
+                            <div class="relative w-full bg-gray-200 rounded-full h-6 overflow-hidden">
+                                <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500 flex items-center justify-end px-3" 
+                                     style="width: {{ $percentage }}%">
+                                    <span class="text-xs font-bold text-white">{{ number_format($percentage, 1) }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             <!-- Candidates Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @forelse($candidates as $candidate)

@@ -44,9 +44,11 @@
                     @foreach($elections as $election)
                     <div class="bg-white rounded-2xl shadow-md overflow-hidden {{ $election->is_published ? 'border-2 border-green-500' : '' }}">
                         <div class="bg-gradient-to-r {{ $election->is_published ? 'from-green-50 to-emerald-50' : 'from-gray-50 to-gray-100' }} px-8 py-4 border-b">
-                            <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
-                                    @if($election->is_published)
+                                    @if($election->status === 'closed')
+                                        <span class="px-4 py-1.5 bg-red-500 text-white text-sm font-bold rounded-full">DITUTUP</span>
+                                    @elseif($election->is_published)
                                         <span class="px-4 py-1.5 bg-green-500 text-white text-sm font-bold rounded-full">AKTIF</span>
                                     @else
                                         <span class="px-4 py-1.5 bg-gray-400 text-white text-sm font-bold rounded-full">DRAFT</span>
@@ -54,24 +56,38 @@
                                     <h2 class="text-2xl font-bold text-gray-900">{{ $election->title }}</h2>
                                 </div>
                                 <div class="flex space-x-2">
+                                    <!-- Publish Button (Only for Draft) -->
                                     @if(!$election->is_published && $election->candidates_count === 0)
                                         <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed" title="Tambahkan kandidat terlebih dahulu untuk publish">
                                             Publish (Perlu Kandidat)
                                         </button>
-                                    @else
-                                        <form action="{{ route('admin.elections.toggle-publish', $election->id) }}" method="POST">
+                                    @elseif(!$election->is_published)
+                                        <form action="{{ route('admin.elections.toggle-publish', $election->id) }}" method="POST" 
+                                              onsubmit="return confirm('⚠️ PERINGATAN!\n\nSetelah dipublish, Anda TIDAK DAPAT:\n- Mengubah data pemilu\n- Mengedit atau menghapus kandidat\n- Unpublish pemilu\n\nAnda hanya dapat menutup pemilu untuk menampilkan hasil.\n\nApakah Anda yakin ingin mempublish pemilu ini?')">
                                             @csrf
-                                            <button type="submit" class="px-5 py-2.5 {{ $election->is_published ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }} text-white font-semibold rounded-lg transition-colors">
-                                                {{ $election->is_published ? 'Unpublish' : 'Publish' }}
+                                            <button type="submit" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                                                Publish Pemilu
                                             </button>
                                         </form>
                                     @endif
                                     
-                                    @if($election->is_published)
-                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed" title="Tidak dapat edit pemilu yang sudah dipublish">
+                                    <!-- Close Election Button (Only for Active/Published) -->
+                                    @if($election->is_published && $election->status !== 'closed')
+                                        <form action="{{ route('admin.elections.close', $election->id) }}" method="POST"
+                                              onsubmit="return confirm('Yakin ingin menutup pemilu ini?\n\nSetelah ditutup, hasil voting akan ditampilkan kepada voter.')">
+                                            @csrf
+                                            <button type="submit" class="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors">
+                                                Tutup Pemilu
+                                            </button>
+                                        </form>
+                                    @endif
+                                    
+                                    <!-- Edit/Delete Buttons (Only for Draft or Closed cannot edit) -->
+                                    @if($election->is_published || $election->status === 'closed')
+                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed" title="Tidak dapat edit pemilu yang sudah dipublish atau ditutup">
                                             Edit
                                         </button>
-                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed" title="Tidak dapat hapus pemilu yang sudah dipublish">
+                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed" title="Tidak dapat hapus pemilu yang sudah dipublish atau ditutup">
                                             Hapus
                                         </button>
                                     @else
