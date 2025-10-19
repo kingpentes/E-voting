@@ -27,12 +27,24 @@ class RedirectIfAuthenticated
                     return redirect()->route('admin.dashboard')
                         ->with('error', 'Anda sudah login! Klik tombol KELUAR terlebih dahulu jika ingin registrasi akun baru.');
                 } elseif ($user->role === 'voter') {
-                    return redirect()->route('voter.dashboard')
-                        ->with('error', 'Anda sudah login! Klik tombol KELUAR terlebih dahulu jika ingin registrasi akun baru.');
+                    // Redirect voter ke election terakhir mereka
+                    $lastElection = $user->participatingElections()
+                        ->where('is_published', true)
+                        ->latest('election_user.joined_at')
+                        ->first();
+                    
+                    if ($lastElection) {
+                        return redirect()->route('voter.election', ['code' => $lastElection->access_code])
+                            ->with('info', 'Anda sudah login! Klik tombol KELUAR jika ingin registrasi akun baru.');
+                    }
+                    
+                    // Jika tidak ada election, redirect ke home
+                    return redirect('/')
+                        ->with('info', 'Anda sudah login. Silakan masukkan kode akses pemilu untuk melanjutkan.');
                 }
                 
                 // Default redirect
-                return redirect('/dashboard')
+                return redirect('/')
                     ->with('error', 'Anda sudah login! Logout terlebih dahulu untuk registrasi akun baru.');
             }
         }

@@ -33,8 +33,8 @@
                 <!-- Total Pemilih -->
                 <x-stat-card 
                     title="Total Pemilih" 
-                    value="2,847"
-                    change="+12.5%"
+                    value="{{ number_format($stats['total_voters']) }}"
+                    change=""
                     iconColor="text-purple-600">
                     <x-slot name="icon">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,8 +46,8 @@
                 <!-- Sudah Memilih -->
                 <x-stat-card 
                     title="Sudah Memilih" 
-                    value="1,453"
-                    change="51%"
+                    value="{{ number_format($stats['voted']) }}"
+                    change="{{ $stats['total_voters'] > 0 ? round(($stats['voted'] / $stats['total_voters']) * 100, 1) . '%' : '0%' }}"
                     iconColor="text-green-600">
                     <x-slot name="icon">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,8 +59,8 @@
                 <!-- Belum Memilih -->
                 <x-stat-card 
                     title="Belum Memilih" 
-                    value="1,394"
-                    change="49%"
+                    value="{{ number_format($stats['not_voted']) }}"
+                    change="{{ $stats['total_voters'] > 0 ? round(($stats['not_voted'] / $stats['total_voters']) * 100, 1) . '%' : '0%' }}"
                     iconColor="text-yellow-600">
                     <x-slot name="icon">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,15 +69,15 @@
                     </x-slot>
                 </x-stat-card>
 
-                <!-- Tingkat Partisipasi -->
+                <!-- Tidak Memilih -->
                 <x-stat-card 
-                    title="Tingkat Partisipasi" 
-                    value="51%"
-                    change="+5.2%"
-                    iconColor="text-blue-600">
+                    title="Tidak Memilih" 
+                    value="{{ number_format($stats['not_voted']) }}"
+                    change="{{ $stats['participation_rate'] }}% partisipasi"
+                    iconColor="text-red-600">
                     <x-slot name="icon">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </x-slot>
                 </x-stat-card>
@@ -107,34 +107,24 @@
 
                 <!-- Legend -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-4 h-4 bg-pink-600 rounded"></div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900">Kandidat A</p>
-                            <p class="text-xs text-gray-600">542 suara</p>
+                    @if($candidateStats->isNotEmpty())
+                        @php
+                            $colors = ['bg-pink-600', 'bg-blue-500', 'bg-green-500', 'bg-orange-500', 'bg-purple-500', 'bg-yellow-500', 'bg-red-500', 'bg-indigo-500'];
+                        @endphp
+                        @foreach($candidateStats as $index => $candidate)
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 {{ $colors[$index % count($colors)] }} rounded"></div>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-900">{{ $candidate['name'] }}</p>
+                                    <p class="text-xs text-gray-600">{{ number_format($candidate['votes']) }} suara</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="col-span-full text-center text-gray-500 py-4">
+                            <p>Belum ada data kandidat</p>
                         </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-4 h-4 bg-blue-500 rounded"></div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900">Kandidat B</p>
-                            <p class="text-xs text-gray-600">438 suara</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-4 h-4 bg-green-500 rounded"></div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900">Kandidat C</p>
-                            <p class="text-xs text-gray-600">325 suara</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-4 h-4 bg-orange-500 rounded"></div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900">Kandidat D</p>
-                            <p class="text-xs text-gray-600">148 suara</p>
-                        </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </main>
@@ -142,16 +132,24 @@
 
     <script>
         let chart = null;
+        
+        // Get candidate data from server
+        const candidateData = @json($candidateStats);
+        
         const chartData = {
-            labels: ['Kandidat A', 'Kandidat B', 'Kandidat C', 'Kandidat D'],
+            labels: candidateData.length > 0 ? candidateData.map(c => c.name) : ['Belum ada data'],
             datasets: [{
                 label: 'Jumlah Suara',
-                data: [542, 438, 325, 148],
+                data: candidateData.length > 0 ? candidateData.map(c => c.votes) : [0],
                 backgroundColor: [
-                    'rgb(219, 39, 119)', // pink-600
-                    'rgb(59, 130, 246)',  // blue-500
-                    'rgb(34, 197, 94)',   // green-500
-                    'rgb(249, 115, 22)'   // orange-500
+                    'rgb(219, 39, 119)',  // pink-600
+                    'rgb(59, 130, 246)',   // blue-500
+                    'rgb(34, 197, 94)',    // green-500
+                    'rgb(249, 115, 22)',   // orange-500
+                    'rgb(168, 85, 247)',   // purple-500
+                    'rgb(234, 179, 8)',    // yellow-500
+                    'rgb(239, 68, 68)',    // red-500
+                    'rgb(99, 102, 241)',   // indigo-500
                 ],
                 borderWidth: 0,
                 borderRadius: 8
@@ -197,7 +195,8 @@
                             ticks: {
                                 font: {
                                     size: 12
-                                }
+                                },
+                                stepSize: 1
                             }
                         },
                         x: {

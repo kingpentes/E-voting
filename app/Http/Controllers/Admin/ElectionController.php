@@ -31,6 +31,14 @@ class ElectionController extends Controller
      */
     public function create()
     {
+        // Check if user already has an election
+        $existingElection = Election::forOrganizer(Auth::id())->first();
+        
+        if ($existingElection) {
+            return redirect()->route('admin.elections.manage')
+                ->with('error', '✗ Anda sudah memiliki pemilu. Setiap organizer hanya dapat membuat 1 pemilu.');
+        }
+        
         return view('admin.elections.rules');
     }
 
@@ -39,6 +47,14 @@ class ElectionController extends Controller
      */
     public function store(Request $request)
     {
+        // Check if user already has an election
+        $existingElection = Election::forOrganizer(Auth::id())->first();
+        
+        if ($existingElection) {
+            return redirect()->route('admin.elections.manage')
+                ->with('error', '✗ Anda sudah memiliki pemilu. Setiap organizer hanya dapat membuat 1 pemilu.');
+        }
+        
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],

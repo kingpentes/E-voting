@@ -49,25 +49,65 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Dashboard
     Route::get('/dashboard', function () {
         $user = \Illuminate\Support\Facades\Auth::user();
-        $elections = \App\Models\Election::forOrganizer(\Illuminate\Support\Facades\Auth::id())
-            ->withCount(['candidates', 'votes'])
-            ->latest()
-            ->get();
+        $election = \App\Models\Election::forOrganizer(\Illuminate\Support\Facades\Auth::id())
+            ->with(['candidates', 'votes'])
+            ->first();
         
+        // Initialize stats
         $stats = [
-            'total_elections' => $elections->count(),
-            'active_elections' => $elections->where('status', 'active')->count(),
-            'total_candidates' => $elections->sum('candidates_count'),
-            'total_votes' => $elections->sum('votes_count'),
+            'total_voters' => 0,
+            'voted' => 0,
+            'not_voted' => 0,
+            'participation_rate' => 0,
         ];
+        
+        $candidateStats = [];
+        
+        if ($election) {
+            // Get all voters who joined this election
+            $totalVoters = $election->participants()->count();
+            
+            // Get voters who already voted (distinct voter_id)
+            $votedCount = $election->votes()->distinct('voter_id')->count();
+            
+            // Calculate not voted
+            $notVotedCount = $totalVoters - $votedCount;
+            
+            // Calculate participation rate
+            $participationRate = $totalVoters > 0 ? round(($votedCount / $totalVoters) * 100, 1) : 0;
+            
+            $stats = [
+                'total_voters' => $totalVoters,
+                'voted' => $votedCount,
+                'not_voted' => $notVotedCount,
+                'participation_rate' => $participationRate,
+            ];
+            
+            // Get candidate statistics
+            $candidates = $election->candidates()
+                ->withCount('votes')
+                ->orderBy('votes_count', 'desc')
+                ->get();
+            
+            $candidateStats = $candidates->map(function ($candidate) {
+                return [
+                    'name' => $candidate->name,
+                    'votes' => $candidate->votes_count,
+                ];
+            });
+        }
 
-        return view('admin.dashboard', compact('user', 'elections', 'stats'));
+        return view('admin.dashboard', compact('user', 'election', 'stats', 'candidateStats'));
     })->name('dashboard');
     
     // Candidates Resource Routes
     // Custom route MUST be before resource route to avoid being overridden
     Route::get('/candidates/manage', [CandidateController::class, 'index'])->name('candidates.manage');
     Route::resource('candidates', CandidateController::class)->except(['show']);
+    
+    // Voters Routes
+    Route::get('/voters', [\App\Http\Controllers\Admin\VoterController::class, 'index'])->name('voters.index');
+    Route::get('/voters/{id}', [\App\Http\Controllers\Admin\VoterController::class, 'show'])->name('voters.show');
     
     // Elections Resource Routes
     Route::get('/elections', [ElectionController::class, 'index'])->name('elections.manage');
@@ -96,167 +136,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::delete('/elections/rules/delete/{id}', [ElectionController::class, 'destroy'])->name('elections.rules.delete');
 });
 
-// Public Voter Dashboard (no middleware for now)
+// Redirect /voter ke home (voter harus akses via access code)
 Route::get('/voter', function () {
-    $election = [
-        'title' => 'E-Voting',
-        'description' => 'Sistem Pemilihan Elektronik untuk memilih pemimpin masa depan dengan transparan, aman, dan demokratis'
-    ];
-
-    $candidates = [
-        [
-            'id' => 1,
-            'number' => 1,
-            'name' => 'Dr. Ahmad Santoso',
-            'photo' => 'https://i.pravatar.cc/256?img=12',
-            'visi' => 'Mewujudkan kepemimpinan yang humanis, efektif, dan berintegritas.',
-            'misi' => [
-                'Meningkatkan program pengembangan karakter siswa',
-                'Memperkuat kolaborasi antar organisasi siswa',
-                'Transparansi dalam setiap pengambilan keputusan',
-            ],
-        ],
-        [
-            'id' => 2,
-            'number' => 2,
-            'name' => 'Prof. Dr. Siti Nurhaliza, M.Pd.',
-            'photo' => 'https://i.pravatar.cc/256?img=47',
-            'visi' => 'Mewujudkan institusi pendidikan berkelas dunia.',
-            'misi' => [
-                'Meningkatkan kualitas pembelajaran melalui digitalisasi',
-                'Mendorong budaya riset dan publikasi ilmiah',
-                'Memperkuat jaringan alumni dan stakeholder',
-                'Mengembangkan program pengabdian masyarakat berdampak',
-            ],
-        ],
-        [
-            'id' => 3,
-            'number' => 3,
-            'name' => 'Ir. Budi Pratama',
-            'photo' => 'https://i.pravatar.cc/256?img=15',
-            'visi' => 'Membangun budaya kerja yang disiplin dan berprestasi.',
-            'misi' => [
-                'Optimalisasi fasilitas dan sumber daya',
-                'Program efisiensi dan tata kelola modern',
-                'Kompetisi akademik dan non-akademik rutin',
-            ],
-        ],
-        [
-            'id' => 4,
-            'number' => 4,
-            'name' => 'Dr. Maya Kusuma',
-            'photo' => 'https://i.pravatar.cc/256?img=49',
-            'visi' => 'Menciptakan ekosistem belajar yang inklusif dan kolaboratif.',
-            'misi' => [
-                'Pelatihan kepemimpinan bagi siswa',
-                'Kegiatan kolaborasi lintas jurusan',
-                'Program literasi dan numerasi berkelanjutan',
-            ],
-        ],
-        [
-            'id' => 5,
-            'number' => 5,
-            'name' => 'Prof. Rahmat Hidayat',
-            'photo' => 'https://i.pravatar.cc/256?img=13',
-            'visi' => 'Mendorong lahirnya inovasi dari siswa untuk masyarakat.',
-            'misi' => [
-                'Inkubasi proyek riset siswa',
-                'Kemitraan dengan industri dan komunitas',
-                'Akselerasi kompetensi abad 21',
-            ],
-        ],
-        
-    ];
-
-    return view('elections.voter-dashboard', compact('election', 'candidates'));
-})->name('voter.dashboard');
-
-// Voter Candidate Detail Route
-Route::get('/voter/candidate/{id}', function ($id) {
-    $candidates = [
-        [
-            'id' => 1,
-            'number' => 1,
-            'name' => 'Dr. Ahmad aSantoso',
-            'photo' => 'https://i.pravatar.cc/256?img=12',
-            'visi' => 'Mewujudkan kepemimpinan yang humanis, efektif, dan berintegritas.',
-            'misi' => [
-                'Meningkatkan program pengembangan karakter siswa',
-                'Memperkuat kolaborasi antar organisasi siswa',
-                'Transparansi dalam setiap pengambilan keputusan',
-            ],
-        ],
-        [
-            'id' => 2,
-            'number' => 2,
-            'name' => 'Prof. Dr. Siti Nurhaliza, M.Pd.',
-            'photo' => 'https://i.pravatar.cc/256?img=47',
-            'visi' => 'Mewujudkan institusi pendidikan berkelas dunia.',
-            'misi' => [
-                'Meningkatkan kualitas pembelajaran melalui digitalisasi',
-                'Mendorong budaya riset dan publikasi ilmiah',
-                'Memperkuat jaringan alumni dan stakeholder',
-                'Mengembangkan program pengabdian masyarakat berdampak',
-            ],
-        ],
-        [
-            'id' => 3,
-            'number' => 3,
-            'name' => 'Ir. Budi Pratama',
-            'photo' => 'https://i.pravatar.cc/256?img=15',
-            'visi' => 'Membangun budaya kerja yang disiplin dan berprestasi.',
-            'misi' => [
-                'Optimalisasi fasilitas dan sumber daya',
-                'Program efisiensi dan tata kelola modern',
-                'Kompetisi akademik dan non-akademik rutin',
-            ],
-        ],
-        [
-            'id' => 4,
-            'number' => 4,
-            'name' => 'Dr. Maya Kusuma',
-            'photo' => 'https://i.pravatar.cc/256?img=49',
-            'visi' => 'Menciptakan ekosistem belajar yang inklusif dan kolaboratif.',
-            'misi' => [
-                'Pelatihan kepemimpinan bagi siswa',
-                'Kegiatan kolaborasi lintas jurusan',
-                'Program literasi dan numerasi berkelanjutan',
-            ],
-        ],
-        [
-            'id' => 5,
-            'number' => 5,
-            'name' => 'Prof. Rahmat Hidayat',
-            'photo' => 'https://i.pravatar.cc/256?img=13',
-            'visi' => 'Mendorong lahirnya inovasi dari siswa untuk masyarakat.',
-            'misi' => [
-                'Inkubasi proyek riset siswa',
-                'Kemitraan dengan industri dan komunitas',
-                'Akselerasi kompetensi abad 21',
-            ],
-        ],
-        [
-            'id' => 6,
-            'number' => 6,
-            'name' => 'Dr. Dewi Lestari',
-            'photo' => 'https://i.pravatar.cc/256?img=32',
-            'visi' => 'Mewujudkan lingkungan belajar yang sehat dan ramah.',
-            'misi' => [
-                'Program kesehatan mental dan fisik siswa',
-                'Gerakan sekolah hijau dan ramah lingkungan',
-                'Peningkatan layanan konseling',
-            ],
-        ],
-    ];
-
-    $candidate = collect($candidates)->firstWhere('id', $id);
-    
-    if (!$candidate) {
-        abort(404);
-    }
-
-    return view('elections.candidate-detail', compact('candidate'));
-})->name('voter.candidate');
+    return redirect('/')->with('info', 'Silakan masukkan kode akses pemilu untuk melanjutkan.');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

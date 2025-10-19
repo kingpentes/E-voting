@@ -34,13 +34,26 @@ class AuthenticatedSessionController extends Controller
         if ($user->role === 'organizer') {
             return redirect()->intended(route('admin.dashboard', absolute: false));
         } elseif ($user->role === 'voter') {
-            return redirect()->intended(route('voter.dashboard', absolute: false));
+            // Voter diarahkan ke election terakhir yang mereka ikuti
+            $lastElection = $user->participatingElections()
+                ->where('is_published', true)
+                ->latest('election_user.joined_at')
+                ->first();
+            
+            if ($lastElection) {
+                return redirect()->intended(route('voter.election', ['code' => $lastElection->access_code], absolute: false))
+                    ->with('success', 'Login berhasil! Selamat datang kembali di pemilu: ' . $lastElection->title);
+            }
+            
+            // Jika voter belum terdaftar di election manapun, redirect ke home
+            return redirect()->intended('/')
+                ->with('info', 'Silakan masukkan kode akses pemilu untuk melanjutkan.');
         } elseif ($user->role === 'admin') {
             return redirect()->intended(route('admin.dashboard', absolute: false));
         }
 
         // Default redirect (seharusnya tidak sampai sini)
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended('/');
     }
 
     /**

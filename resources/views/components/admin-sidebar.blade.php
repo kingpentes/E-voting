@@ -36,13 +36,13 @@
                 <span class="font-medium">Kelola Kandidat</span>
             </a>
 
-            <!-- Link Pemilu -->
-            <a href="{{ route('admin.elections.link') }}" 
-               class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 {{ $active === 'link' ? 'bg-pink-600 text-white shadow-lg' : 'text-indigo-200 hover:bg-white/10' }}">
+            <!-- Daftar Voter -->
+            <a href="{{ route('admin.voters.index') }}" 
+               class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 {{ $active === 'voters' ? 'bg-pink-600 text-white shadow-lg' : 'text-indigo-200 hover:bg-white/10' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
-                <span class="font-medium">Daftar Voter (pake kah jit?)</span>
+                <span class="font-medium">Daftar Voter</span>
             </a>
 
             <!-- Judul & Peraturan -->
@@ -54,28 +54,9 @@
                 <span class="font-medium">Judul & Peraturan</span>
             </a>
         </nav>
-
-        <!-- Publish Button -->
-        <div class="mt-8 px-4">
-            <button onclick="confirmPublish()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 px-6 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>Publish Pemilu</span>
-            </button>
-        </div>
     </div>
 
-    <!-- Footer -->
+   
     
 </aside>
 
-<script>
-    function confirmPublish() {
-        if (confirm('Apakah Anda yakin ingin mempublikasikan pemilu ini?\n\nSetelah dipublikasikan, pemilih dapat mulai memberikan suara.')) {
-            alert('Pemilu berhasil dipublikasikan!');
-            // Add your publish logic here
-            // window.location.href = '/admin/elections/publish';
-        }
-    }
-</script>

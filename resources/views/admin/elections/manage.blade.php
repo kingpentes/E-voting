@@ -8,10 +8,16 @@
                     <h1 class="text-3xl font-bold text-gray-900">Kelola Judul & Peraturan</h1>
                     <p class="text-gray-600 mt-1">{{ $elections->count() }} pemilu Anda</p>
                 </div>
-                <a href="{{ route('admin.elections.create') }}" 
-                   class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl">
-                    <span>+ Buat Pemilu Baru</span>
-                </a>
+                @if($elections->isEmpty())
+                    <a href="{{ route('admin.elections.create') }}" 
+                       class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all">
+                        <span>+ Buat Pemilu Baru</span>
+                    </a>
+                @else
+                    <div class="px-6 py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed" title="Anda sudah memiliki pemilu">
+                        <span>Limit 1 Pemilu Tercapai</span>
+                    </div>
+                @endif
             </div>
         </header>
         
@@ -48,12 +54,18 @@
                                     <h2 class="text-2xl font-bold text-gray-900">{{ $election->title }}</h2>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <form action="{{ route('admin.elections.toggle-publish', $election->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="px-5 py-2.5 {{ $election->is_published ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }} text-white font-semibold rounded-lg transition-colors">
-                                            {{ $election->is_published ? 'Unpublish' : 'Publish' }}
+                                    @if(!$election->is_published && $election->candidates_count === 0)
+                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed" title="Tambahkan kandidat terlebih dahulu untuk publish">
+                                            Publish (Perlu Kandidat)
                                         </button>
-                                    </form>
+                                    @else
+                                        <form action="{{ route('admin.elections.toggle-publish', $election->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="px-5 py-2.5 {{ $election->is_published ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }} text-white font-semibold rounded-lg transition-colors">
+                                                {{ $election->is_published ? 'Unpublish' : 'Publish' }}
+                                            </button>
+                                        </form>
+                                    @endif
                                     
                                     @if($election->is_published)
                                         <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed" title="Tidak dapat edit pemilu yang sudah dipublish">
@@ -79,7 +91,12 @@
                             </div>
                             
                             <div class="flex space-x-6 mt-3 text-sm">
-                                <span class="text-gray-700">{{ $election->candidates_count }} Kandidat</span>
+                                <span class="text-gray-700 {{ $election->candidates_count === 0 ? 'text-red-600 font-bold' : '' }}">
+                                    {{ $election->candidates_count }} Kandidat
+                                    @if($election->candidates_count === 0 && !$election->is_published)
+                                        <span class="text-xs">(⚠️ Diperlukan untuk publish)</span>
+                                    @endif
+                                </span>
                                 <span class="text-gray-700">{{ $election->votes_count }} Suara</span>
                             </div>
                         </div>

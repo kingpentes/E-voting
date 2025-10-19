@@ -47,12 +47,6 @@
                                         </div>
                                         <div class="flex items-center space-x-4 mt-2">
                                             <div class="flex items-center space-x-2">
-                                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                                <span class="text-sm font-semibold text-purple-600">{{ $candidate->votes_count }} Suara</span>
-                                            </div>
-                                            <div class="flex items-center space-x-2">
                                                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                                                 </svg>
@@ -88,25 +82,6 @@
                         </div>
                         
                         <div class="p-8">
-                            <!-- Vote Statistics -->
-                            @php
-                                $totalVotes = $candidate->election->votes()->count();
-                                $percentage = $totalVotes > 0 ? round(($candidate->votes_count / $totalVotes) * 100, 1) : 0;
-                            @endphp
-                            
-                            <div class="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm font-semibold text-gray-700">Perolehan Suara</span>
-                                    <span class="text-2xl font-bold text-purple-600">{{ $candidate->votes_count }} / {{ $totalVotes }}</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 h-4 rounded-full transition-all duration-500" style="width: {{ $percentage }}%"></div>
-                                </div>
-                                <div class="mt-2 text-right">
-                                    <span class="text-lg font-bold text-purple-700">{{ $percentage }}%</span>
-                                </div>
-                            </div>
-
                             <div class="grid grid-cols-3 gap-6">
                                 <div>
                                     @if($candidate->photo)
