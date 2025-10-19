@@ -52,6 +52,81 @@
                 </div>
             @endif
 
+            <!-- Election Schedule Info -->
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-lg p-6 mb-8 text-white">
+                <div class="flex items-center mb-4">
+                    <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <h3 class="text-2xl font-bold">Waktu Pelaksanaan Pemilu</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Start Date & Time -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                        <div class="flex items-center mb-2">
+                            <svg class="w-5 h-5 mr-2 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-sm font-semibold text-green-200">Mulai</p>
+                        </div>
+                        <p class="text-2xl font-bold">{{ \Carbon\Carbon::parse($election->start_date)->format('d M Y') }}</p>
+                        <p class="text-lg mt-1">Pukul {{ $election->start_time ?? '00:00' }} WIB</p>
+                    </div>
+                    
+                    <!-- End Date & Time -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                        <div class="flex items-center mb-2">
+                            <svg class="w-5 h-5 mr-2 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-sm font-semibold text-red-200">Berakhir</p>
+                        </div>
+                        <p class="text-2xl font-bold">{{ \Carbon\Carbon::parse($election->end_date)->format('d M Y') }}</p>
+                        <p class="text-lg mt-1">Pukul {{ $election->end_time ?? '23:59' }} WIB</p>
+                    </div>
+                </div>
+                
+                <!-- Status Badge -->
+                @php
+                    $now = now();
+                    
+                    // Create start datetime from date and time
+                    $startDate = $election->start_date instanceof \Carbon\Carbon 
+                        ? $election->start_date->format('Y-m-d') 
+                        : $election->start_date;
+                    $start = \Carbon\Carbon::parse($startDate . ' ' . ($election->start_time ?? '00:00:00'));
+                    
+                    // Create end datetime from date and time
+                    $endDate = $election->end_date instanceof \Carbon\Carbon 
+                        ? $election->end_date->format('Y-m-d') 
+                        : $election->end_date;
+                    $end = \Carbon\Carbon::parse($endDate . ' ' . ($election->end_time ?? '23:59:59'));
+                    
+                    if ($now->lt($start)) {
+                        $statusText = 'Belum Dimulai';
+                        $statusColor = 'bg-yellow-500';
+                        $statusIcon = 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z';
+                    } elseif ($now->between($start, $end)) {
+                        $statusText = 'Sedang Berlangsung';
+                        $statusColor = 'bg-green-500';
+                        $statusIcon = 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
+                    } else {
+                        $statusText = 'Telah Berakhir';
+                        $statusColor = 'bg-red-500';
+                        $statusIcon = 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z';
+                    }
+                @endphp
+                
+                <div class="mt-4 flex items-center justify-center">
+                    <div class="{{ $statusColor }} px-6 py-2 rounded-full flex items-center shadow-lg">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $statusIcon }}"></path>
+                        </svg>
+                        <span class="font-bold text-lg">{{ $statusText }}</span>
+                    </div>
+                </div>
+            </div>
+
            
 
             <!-- Election Rules -->
