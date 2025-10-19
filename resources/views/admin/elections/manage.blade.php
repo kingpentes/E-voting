@@ -92,12 +92,12 @@
                             
                             <div class="flex space-x-6 mt-3 text-sm">
                                 <span class="text-gray-700 {{ $election->candidates_count === 0 ? 'text-red-600 font-bold' : '' }}">
-                                    {{ $election->candidates_count }} Kandidat
+                                    {{ $election->candidates_count }} 
                                     @if($election->candidates_count === 0 && !$election->is_published)
                                         <span class="text-xs">(⚠️ Diperlukan untuk publish)</span>
                                     @endif
                                 </span>
-                                <span class="text-gray-700">{{ $election->votes_count }} Suara</span>
+                                
                             </div>
                         </div>
                         
