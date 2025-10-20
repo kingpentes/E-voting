@@ -61,7 +61,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             'participation_rate' => 0,
         ];
         
-        $candidateStats = [];
+        $candidateStats = collect([]);
         
         if ($election) {
             // Get all voters who joined this election
