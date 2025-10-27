@@ -1,0 +1,111 @@
+# ============================================
+# Quorum Private Blockchain (GoQuorum IBFT)
+# 5-node setup: 4 validator + 1 member node
+# ============================================
+services:
+  validator1:
+    image: quorum/goquorum:24.7.0
+    container_name: quorum-validator1
+    command: [
+      "geth",
+      "--datadir", "/data",
+      "--networkid", "1337",
+      "--http", "--http.addr", "0.0.0.0", "--http.port", "8545",
+      "--http.api", "admin,eth,net,web3,txpool,ibft",
+      "--port", "30311",
+      "--syncmode", "full",
+      "--mine", "--miner.threads", "1",
+      "--verbosity", "3"
+    ]
+    ports:
+      - "8541:8545"
+      - "30311:30311"
+    volumes:
+      - ./quorum/validator1/data:/data
+      - ./genesis.json:/config/genesis.json:ro
+
+  validator2:
+    image: quorum/goquorum:24.7.0
+    container_name: quorum-validator2
+    command: [
+      "geth",
+      "--datadir", "/data",
+      "--networkid", "1337",
+      "--http", "--http.addr", "0.0.0.0", "--http.port", "8545",
+      "--http.api", "admin,eth,net,web3,txpool,ibft",
+      "--port", "30312",
+      "--syncmode", "full",
+      "--mine", "--miner.threads", "1",
+      "--verbosity", "3"
+    ]
+    ports:
+      - "8542:8545"
+      - "30312:30312"
+    volumes:
+      - ./quorum/validator2/data:/data
+      - ./genesis.json:/config/genesis.json:ro
+
+  validator3:
+    image: quorum/goquorum:24.7.0
+    container_name: quorum-validator3
+    command: [
+      "geth",
+      "--datadir", "/data",
+      "--networkid", "1337",
+      "--http", "--http.addr", "0.0.0.0", "--http.port", "8545",
+      "--http.api", "admin,eth,net,web3,txpool,ibft",
+      "--port", "30313",
+      "--syncmode", "full",
+      "--mine", "--miner.threads", "1",
+      "--verbosity", "3"
+    ]
+    ports:
+      - "8543:8545"
+      - "30313:30313"
+    volumes:
+      - ./quorum/validator3/data:/data
+      - ./genesis.json:/config/genesis.json:ro
+
+  validator4:
+    image: quorum/goquorum:24.7.0
+    container_name: quorum-validator4
+    command: [
+      "geth",
+      "--datadir", "/data",
+      "--networkid", "1337",
+      "--http", "--http.addr", "0.0.0.0", "--http.port", "8545",
+      "--http.api", "admin,eth,net,web3,txpool,ibft",
+      "--port", "30314",
+      "--syncmode", "full",
+      "--mine", "--miner.threads", "1",
+      "--verbosity", "3"
+    ]
+    ports:
+      - "8544:8545"
+      - "30314:30314"
+    volumes:
+      - ./quorum/validator4/data:/data
+      - ./genesis.json:/config/genesis.json:ro
+
+  member:
+    image: quorum/goquorum:24.7.0
+    container_name: quorum-member
+    command: [
+      "geth",
+      "--datadir", "/data",
+      "--networkid", "1337",
+      "--http", "--http.addr", "0.0.0.0", "--http.port", "8545",
+      "--http.api", "admin,eth,net,web3,txpool,ibft",
+      "--ws", "--ws.addr", "0.0.0.0", "--ws.port", "8546",
+      "--ws.api", "admin,eth,net,web3,txpool,ibft",
+      "--port", "30315",
+      "--syncmode", "full",
+      "--verbosity", "3"
+    ]
+    ports:
+      - "8545:8545"
+      - "8546:8546"
+      - "30315:30315"
+    volumes:
+      - ./quorum/member/data:/data
+      - ./genesis.json:/config/genesis.json:ro
