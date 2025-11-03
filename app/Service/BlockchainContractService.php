@@ -1,0 +1,129 @@
+<?php
+
+namespace App\Service;
+
+use Web3\Contract;
+use Web3\Web3;
+
+class BlockchainContractService
+{
+    private Web3 $web3;
+    private Contract $contract;
+
+    public function __construct()
+    {
+        $rpc = \env('BLOCKCHAIN_RPC');
+        $abiPath = \env('CONTRACT_ABI_PATH');
+        $address = \env('CONTRACT_ADDRESS');
+        if (!$rpc) {
+            throw new \RuntimeException('BLOCKCHAIN_RPC is not set.');
+        }
+        if (!$abiPath || !is_file($abiPath)) {
+            throw new \RuntimeException('CONTRACT_ABI_PATH is not set or file not found: ' . $abiPath);
+        }
+        if (!$address) {
+            throw new \RuntimeException('CONTRACT_ADDRESS is not set.');
+        }
+        $this->web3 = new Web3($rpc);
+        $abiJson = file_get_contents($abiPath);
+        $abi = json_decode($abiJson, true);
+        if (!is_array($abi)) {
+            throw new \RuntimeException('Invalid ABI JSON at ' . $abiPath);
+        }
+        $this->contract = new Contract($this->web3->provider, $abi);
+        $this->contract->at($address);
+    }
+
+    public static function b64ToHex(string $b64): string
+    {
+        $raw = base64_decode($b64, true);
+        if ($raw === false) {
+            throw new \InvalidArgumentException('Invalid base64: ' . $b64);
+        }
+        return '0x' . bin2hex($raw);
+    }
+
+    public static function hex32(string $hex): string
+    {
+        $hex = strtolower($hex);
+        $hex = ltrim($hex, '0x');
+        return '0x' . str_pad($hex, 64, '0', STR_PAD_LEFT);
+    }
+
+    public function storeEncryptedVote(string $cipherB64, string $nonceB64, string $tagB64, string $hashHex32, string $electionId, string $voterId): string
+    {
+        $from = \env('BLOCKCHAIN_FROM');
+        $gas = \env('BLOCKCHAIN_GAS', '0x6691b7');
+        $txOpts = [
+            'from' => $from,
+            'gas' => $gas,
+        ];
+        $cipherHex = self::b64ToHex($cipherB64);
+        $nonceHex = self::b64ToHex($nonceB64);
+        $tagHex = self::b64ToHex($tagB64);
+        $hash32 = self::hex32($hashHex32);
+
+        $txHash = null;
+        $this->contract->send('storeVote', $cipherHex, $nonceHex, $tagHex, $hash32, $electionId, $voterId, $txOpts, function ($err, $result) use (&$txHash) {
+            if ($err !== null) {
+                throw new \RuntimeException('Contract send failed: ' . $err->getMessage());
+            }
+            $txHash = is_string($result) ? $result : ($result['transactionHash'] ?? null);
+        });
+        if (!$txHash) {
+            throw new \RuntimeException('No transaction hash returned.');
+        }
+        return $txHash;
+    }
+
+    public function getVoteCount(string $electionId): int
+    {
+        $result = null;
+        $this->contract->call('getVoteCount', $electionId, function ($err, $res) use (&$result) {
+            if ($err !== null) {
+                throw new \RuntimeException('Contract call failed: ' . $err->getMessage());
+            }
+            if (is_array($res) && count($res) > 0) {
+                $val = $res[0];
+                $result = (int) (method_exists($val, 'toString') ? $val->toString() : (string)$val);
+            } else {
+                $result = 0;
+            }
+        });
+        return (int)$result;
+    }
+
+    public function getVote(string $electionId, int $index): array
+    {
+        $out = [];
+        $this->contract->call('getVote', $electionId, $index, function ($err, $res) use (&$out) {
+            if ($err !== null) {
+                throw new \RuntimeException('Contract call failed: ' . $err->getMessage());
+            }
+            $cipher = isset($res[0]) ? (string)$res[0] : '';
+            $nonce = isset($res[1]) ? (string)$res[1] : '';
+            $tag = isset($res[2]) ? (string)$res[2] : '';
+            $hash = isset($res[3]) ? (string)$res[3] : '';
+            $voterId = isset($res[4]) ? (string)$res[4] : '';
+            $timestamp = isset($res[5]) ? (method_exists($res[5], 'toString') ? (int)$res[5]->toString() : (int)$res[5]) : 0;
+
+            $out = [
+                'ciphertext' => $this->toBase64FromHex($cipher),
+                'nonce' => $this->toBase64FromHex($nonce),
+                'tag' => $this->toBase64FromHex($tag),
+                'hash' => $hash,
+                'voterId' => $voterId,
+                'timestamp' => $timestamp,
+            ];
+        });
+        return $out;
+    }
+
+    private function toBase64FromHex(string $hex): string
+    {
+        $hex = strtolower($hex);
+        $hex = ltrim($hex, '0x');
+        if ($hex === '') return base64_encode('');
+        return base64_encode(hex2bin($hex));
+    }
+}
