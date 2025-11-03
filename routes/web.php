@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\OrganizerRegisterController;
 use App\Http\Controllers\Auth\VoterRegisterController;
 use App\Http\Controllers\Admin\ElectionController;
 use App\Http\Controllers\Admin\CandidateController;
+use App\Http\Controllers\Admin\BlockchainController;
 use App\Http\Controllers\VoterElectionController;
 use Illuminate\Support\Facades\Route;
 
@@ -118,6 +119,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::delete('/elections/{id}', [ElectionController::class, 'destroy'])->name('elections.delete');
     Route::post('/elections/{id}/toggle-publish', [ElectionController::class, 'togglePublish'])->name('elections.toggle-publish');
     Route::post('/elections/{id}/close', [ElectionController::class, 'closeElection'])->name('elections.close');
+
+    // Blockchain admin
+    Route::get('/blockchain', [BlockchainController::class, 'index'])->name('blockchain.index');
+    Route::post('/blockchain/deploy', [BlockchainController::class, 'deploy'])->name('blockchain.deploy');
     
     // Election Link Management
     Route::get('/elections/link', function () {
