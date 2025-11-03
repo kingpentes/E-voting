@@ -141,23 +141,7 @@
                                 </ul>
                             </div>
                             
-                            @if($election->settings)
-                            <div class="mb-4">
-                                <h3 class="font-bold text-gray-900 mb-2">Pengaturan:</h3>
-                                <div class="flex flex-wrap gap-2">
-                                    @if($election->settings->allow_abstain)
-                                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Izinkan Golput</span>
-                                    @endif
-                                    @if($election->settings->show_results_after_vote)
-                                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Tampilkan Hasil</span>
-                                    @endif
-                                    @if($election->settings->require_confirmation)
-                                        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">Butuh Konfirmasi</span>
-                                    @endif
-                                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">Max {{ $election->settings->max_votes_per_voter }} suara</span>
-                                </div>
-                            </div>
-                            @endif
+                            <!-- Pengaturan Lanjutan display removed -->
                             
                             <div class="mt-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl">
                                 <div class="flex items-center justify-between">

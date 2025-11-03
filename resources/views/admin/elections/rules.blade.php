@@ -98,70 +98,7 @@
                         </button>
                     </div>
 
-                    <!-- Pengaturan Lanjutan -->
-                    <div class="bg-white rounded-2xl shadow-md p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-7 h-7 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            Pengaturan Lanjutan
-                        </h2>
-                        
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Izinkan Golput</h3>
-                                    <p class="text-sm text-gray-600">Pemilih dapat memilih untuk tidak memilih (abstain)</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="allow_abstain" value="1" class="sr-only peer">
-                                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
-                                </label>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Tampilkan Hasil Setelah Vote</h3>
-                                    <p class="text-sm text-gray-600">Pemilih dapat melihat hasil setelah mereka memilih</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="show_results_after_vote" value="1" class="sr-only peer">
-                                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
-                                </label>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Butuh Konfirmasi</h3>
-                                    <p class="text-sm text-gray-600">Pemilih harus konfirmasi pilihan sebelum submit</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="require_confirmation" value="1" checked class="sr-only peer">
-                                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
-                                </label>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900">Izinkan Ubah Pilihan</h3>
-                                    <p class="text-sm text-gray-600">Pemilih dapat mengubah pilihan mereka</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="allow_vote_change" value="1" class="sr-only peer">
-                                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
-                                </label>
-                            </div>
-                            
-                            <div class="p-4 bg-gray-50 rounded-xl">
-                                <label for="max_votes_per_voter" class="block font-semibold text-gray-900 mb-2">
-                                    Maksimal Suara Per Pemilih
-                                </label>
-                                <input type="number" id="max_votes_per_voter" name="max_votes_per_voter" value="1" min="1" max="10"
-                                       class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Pengaturan Lanjutan removed (not used) -->
 
                     <!-- Action Buttons -->
                     <div class="flex items-center space-x-4">
