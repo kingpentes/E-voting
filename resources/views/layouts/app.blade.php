@@ -12,7 +12,11 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @if (!app()->environment('testing'))
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @else
+            <!-- Vite disabled in testing to avoid manifest lookup -->
+        @endif
         <title>Smart Voting</title>
     </head>
     <body class="font-sans antialiased">

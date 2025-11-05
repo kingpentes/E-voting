@@ -6,13 +6,15 @@ use App\Models\Election;
 use App\Models\Candidate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class VoterElectionController extends Controller
 {
     /**
      * Show election by access code
      */
-    public function show(string $code)
+    public function show(string $code): View
     {
         // Find election by access code
         $election = Election::with(['candidates.missions', 'rules', 'settings'])
@@ -29,7 +31,9 @@ class VoterElectionController extends Controller
         // Check if user already voted
         $hasVoted = false;
         if (Auth::check()) {
-            $hasVoted = Auth::user()->hasVotedIn($election->id);
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            $hasVoted = $user->hasVotedIn($election->id);
         }
 
         return view('voter.election', compact('election', 'candidates', 'hasVoted'));
@@ -38,7 +42,7 @@ class VoterElectionController extends Controller
     /**
      * Show candidate detail
      */
-    public function candidateDetail(string $code, int $candidateId)
+    public function candidateDetail(string $code, int $candidateId): View
     {
         // Find election by access code
         $election = Election::where('access_code', strtoupper($code))
@@ -57,14 +61,21 @@ class VoterElectionController extends Controller
     /**
      * Submit vote
      */
-    public function vote(Request $request, string $code)
+    public function vote(Request $request, string $code): RedirectResponse
     {
+        // Ensure user is authenticated
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login untuk memberikan suara.');
+        }
+
         $election = Election::where('access_code', strtoupper($code))
             ->where('is_published', true)
             ->firstOrFail();
 
         // Check if user already voted
-        if (Auth::user()->hasVotedIn($election->id)) {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if ($user->hasVotedIn($election->id)) {
             return back()->with('error', 'Anda sudah memberikan suara di pemilu ini.');
         }
 
@@ -78,7 +89,7 @@ class VoterElectionController extends Controller
             ->firstOrFail();
 
         // Create vote
-        Auth::user()->votes()->create([
+        $user->votes()->create([
             'election_id' => $election->id,
             'candidate_id' => $candidate->id,
         ]);
