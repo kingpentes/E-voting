@@ -1,0 +1,42 @@
+version: "3.6"
+# Local copy of the evote stack for this repo (forked from quorum-examples)
+services:
+  node-penyelenggara:
+    image: quorumengineering/quorum:23.4.0
+    hostname: node-penyelenggara
+    ports: ["18545:8545"]
+    volumes:
+      - ./examples/7nodes:/examples:ro
+      - vol-penyelenggara:/qdata
+    environment:
+      - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+      - NODE_ID=1
+    depends_on: [txmanager-penyelenggara]
+    entrypoint: ["/bin/sh","-c","/examples/istanbul-start.sh"]
+
+  txmanager-penyelenggara:
+    image: quorumengineering/tessera:22.1.2
+    hostname: txmanager-penyelenggara
+    ports: ["19081:9080"]
+    volumes:
+      - ./examples/7nodes:/examples:ro
+      - vol-penyelenggara:/qdata
+    environment:
+      - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+    entrypoint: ["/bin/sh","-c","/examples/tessera-start.sh"]
+
+  rpc-proxy:
+    image: nginx:stable-alpine
+    hostname: rpc-proxy
+    depends_on: [node-penyelenggara]
+    ports: ["18443:443"]
+    volumes:
+      - ./reverse-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
+    command: >
+      /bin/sh -c "set -e; mkdir -p /etc/nginx/certs; apk add --no-cache openssl >/dev/null; \
+      if [ ! -f /etc/nginx/certs/server.crt ]; then openssl req -x509 -nodes -newkey rsa:2048 \
+      -keyout /etc/nginx/certs/server.key -out /etc/nginx/certs/server.crt -subj '/CN=localhost' -days 3650; fi; \
+      nginx -g 'daemon off;'"
+
+volumes:
+  vol-penyelenggara:
