@@ -12,7 +12,11 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @if (!app()->environment('testing'))
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @else
+            <!-- Vite disabled in testing to avoid manifest lookup -->
+        @endif
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">

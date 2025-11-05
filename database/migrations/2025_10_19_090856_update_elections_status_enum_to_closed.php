@@ -17,8 +17,14 @@ return new class extends Migration
             ->where('status', 'completed')
             ->update(['status' => 'draft']); // Temporarily set to draft to avoid constraint violation
 
-        // Alter the enum to change 'completed' to 'closed'
-        DB::statement("ALTER TABLE elections MODIFY COLUMN status ENUM('draft', 'active', 'closed') DEFAULT 'draft'");
+        // Alter the enum to change 'completed' to 'closed' (MySQL only)
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE elections MODIFY COLUMN status ENUM('draft', 'active', 'closed') DEFAULT 'draft'");
+        } else {
+            // SQLite/PostgreSQL: skip enum alteration; the column should already be TEXT/VARCHAR.
+            // Optionally, ensure values are within the expected set elsewhere via validation.
+        }
     }
 
     /**
@@ -31,6 +37,11 @@ return new class extends Migration
             ->where('status', 'closed')
             ->update(['status' => 'draft']); // Temporarily set to draft
 
-        DB::statement("ALTER TABLE elections MODIFY COLUMN status ENUM('draft', 'active', 'completed') DEFAULT 'draft'");
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE elections MODIFY COLUMN status ENUM('draft', 'active', 'completed') DEFAULT 'draft'");
+        } else {
+            // Non-MySQL: skip
+        }
     }
 };
