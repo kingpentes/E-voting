@@ -12,10 +12,10 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
-
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    // Override generic register: show role choice page instead of default registration form
+    Route::get('register', function () {
+        return view('auth.register-choice');
+    })->name('register');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

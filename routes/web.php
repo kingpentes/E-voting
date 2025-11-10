@@ -17,8 +17,21 @@ Route::get('/', function () {
         if (in_array($user->role, ['organizer', 'admin'])) {
             return redirect()->route('admin.dashboard');
         }
-        // Default untuk voter atau role lain
-        return redirect()->route('dashboard');
+        // Voter diarahkan ke election terakhir yang diikuti (berdasarkan invite code)
+        $lastElection = method_exists($user, 'participatingElections')
+            ? $user->participatingElections()
+                ->where('is_published', true)
+                ->latest('election_user.joined_at')
+                ->first()
+            : null;
+
+        if ($lastElection && $lastElection->access_code) {
+            return redirect()->route('voter.election', ['code' => $lastElection->access_code]);
+        }
+
+    // Jika belum punya election, tampilkan halaman awal (tanpa redirect-loop) dengan pesan untuk memasukkan kode akses
+    session()->flash('info', 'Silakan masukkan kode akses pemilu dari tautan undangan.');
+    return view('auth.register-choice');
     }
 
     // Guest melihat pilihan register/login
@@ -51,15 +64,25 @@ Route::prefix('election')->name('voter.')->group(function () {
 });
 
 Route::get('/dashboard', function () {
-    // Satu titik masuk dashboard: penyelenggara/admin diarahkan ke admin dashboard,
-    // voter tetap menggunakan tampilan dashboard lama.
-    if (Auth::check()) {
-        $role = Auth::user()->role;
-        if (in_array($role, ['organizer', 'admin'])) {
-            return redirect()->route('admin.dashboard');
-        }
+    // Satu titik masuk dashboard: organizer/admin -> admin dashboard; voter -> election terakhir berdasarkan invite code
+    $user = Auth::user();
+    if (in_array($user->role, ['organizer', 'admin'])) {
+        return redirect()->route('admin.dashboard');
     }
-    return view('dashboard');
+
+    $lastElection = method_exists($user, 'participatingElections')
+        ? $user->participatingElections()
+            ->where('is_published', true)
+            ->latest('election_user.joined_at')
+            ->first()
+        : null;
+
+    if ($lastElection && $lastElection->access_code) {
+        return redirect()->route('voter.election', ['code' => $lastElection->access_code]);
+    }
+
+    // Tidak ada election: arahkan ke beranda dengan instruksi
+    return redirect('/')->with('info', 'Anda belum terdaftar pada pemilu apa pun. Silakan gunakan tautan undangan (kode akses).');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Admin Routes - Protected by organizer middleware
