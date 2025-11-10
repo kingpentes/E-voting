@@ -52,8 +52,8 @@ class AuthenticatedSessionController extends Controller
                     ->with('success', 'Login berhasil! Selamat datang kembali di pemilu: ' . $lastElection->title);
             }
             
-            // Jika voter belum terdaftar di election manapun, redirect ke home
-            return redirect()->intended('/')
+            // Jika voter belum terdaftar di election manapun, arahkan ke dashboard umum
+            return redirect()->intended(route('dashboard', absolute: false))
                 ->with('info', 'Silakan masukkan kode akses pemilu untuk melanjutkan.');
         } elseif ($user->role === 'admin') {
             return redirect()->intended(route('admin.dashboard', absolute: false));

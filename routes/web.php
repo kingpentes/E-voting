@@ -8,15 +8,24 @@ use App\Http\Controllers\Admin\CandidateController;
 use App\Http\Controllers\Admin\BlockchainController;
 use App\Http\Controllers\VoterElectionController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
+    // Jika sudah login, arahkan sesuai peran agar tidak kembali ke halaman register
+    if (Auth::check()) {
+        $user = Auth::user();
+        if (in_array($user->role, ['organizer', 'admin'])) {
+            return redirect()->route('admin.dashboard');
+        }
+        // Default untuk voter atau role lain
+        return redirect()->route('dashboard');
+    }
+
+    // Guest melihat pilihan register/login
     return view('auth.register-choice');
 });
 
-// Registration Routes
-Route::get('/register', function () {
-    return view('auth.register-choice');
-})->name('register');
+// Registration Routes (use Breeze default /register; custom choices are under /register/organizer and /register/voter)
 
 Route::get('/register/organizer', [OrganizerRegisterController::class, 'create'])
     ->middleware('guest')
@@ -42,6 +51,14 @@ Route::prefix('election')->name('voter.')->group(function () {
 });
 
 Route::get('/dashboard', function () {
+    // Satu titik masuk dashboard: penyelenggara/admin diarahkan ke admin dashboard,
+    // voter tetap menggunakan tampilan dashboard lama.
+    if (Auth::check()) {
+        $role = Auth::user()->role;
+        if (in_array($role, ['organizer', 'admin'])) {
+            return redirect()->route('admin.dashboard');
+        }
+    }
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 

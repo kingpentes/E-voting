@@ -21,7 +21,7 @@ class EnsureUserIsOrganizer
         }
 
         if (Auth::user()->role !== 'organizer') {
-            return redirect()->route('/')
+            return redirect()->route('dashboard')
                 ->with('error', 'Anda tidak memiliki akses ke halaman ini. Halaman admin hanya untuk penyelenggara.');
         }
 
