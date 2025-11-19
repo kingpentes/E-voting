@@ -14,7 +14,8 @@ class ContractDeploymentService
             throw new \RuntimeException('Missing BLOCKCHAIN_RPC or BLOCKCHAIN_FROM in environment');
         }
 
-        $workdir = base_path('..\\quorum-network\\quorum-examples\\evote-deploy');
+        // Use the vendored evote-deploy folder inside this repo
+        $workdir = base_path('..\\quorum-network\\evote\\evote-deploy');
         if (!is_dir($workdir)) {
             throw new \RuntimeException('Deploy folder not found: ' . $workdir);
         }
@@ -44,24 +45,7 @@ class ContractDeploymentService
             throw new \RuntimeException('Could not find contractAddress in deploy output: ' . $output);
         }
 
-        $this->updateEnv('CONTRACT_ADDRESS', $address);
+        // Let callers decide where to persist the address (per-election, not global)
         return ['address' => $address, 'log' => $output];
-    }
-
-    private function updateEnv(string $key, string $value): void
-    {
-        $envPath = base_path('.env');
-        if (!is_file($envPath) || !is_writable($envPath)) {
-            return;
-        }
-        $contents = file_get_contents($envPath);
-        $pattern = "/^" . preg_quote($key, '/') . "=.*/m";
-        $line = $key . '=' . $value;
-        if (preg_match($pattern, $contents)) {
-            $contents = preg_replace($pattern, $line, $contents);
-        } else {
-            $contents = rtrim($contents) . "\n" . $line . "\n";
-        }
-        @file_put_contents($envPath, $contents);
     }
 }

@@ -10,11 +10,11 @@ class BlockchainContractService
     private Web3 $web3;
     private Contract $contract;
 
-    public function __construct()
+    public function __construct(string $contractAddress, ?string $contractAbiPath = null)
     {
         $rpc = \env('BLOCKCHAIN_RPC');
-        $abiPath = \env('CONTRACT_ABI_PATH');
-        $address = \env('CONTRACT_ADDRESS');
+        $abiPath = $contractAbiPath ?: \env('CONTRACT_ABI_PATH');
+        $address = $contractAddress;
         if (!$rpc) {
             throw new \RuntimeException('BLOCKCHAIN_RPC is not set.');
         }
@@ -22,7 +22,7 @@ class BlockchainContractService
             throw new \RuntimeException('CONTRACT_ABI_PATH is not set or file not found: ' . $abiPath);
         }
         if (!$address) {
-            throw new \RuntimeException('CONTRACT_ADDRESS is not set.');
+            throw new \RuntimeException('Contract address is not set.');
         }
         $this->web3 = new Web3($rpc);
         $abiJson = file_get_contents($abiPath);
@@ -30,7 +30,9 @@ class BlockchainContractService
         if (!is_array($abi)) {
             throw new \RuntimeException('Invalid ABI JSON at ' . $abiPath);
         }
-        $this->contract = new Contract($this->web3->provider, $abi);
+
+        // Web3 provider property is protected; pass the RPC endpoint directly
+        $this->contract = new Contract($rpc, $abi);
         $this->contract->at($address);
     }
 

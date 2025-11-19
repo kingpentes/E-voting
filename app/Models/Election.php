@@ -22,6 +22,8 @@ class Election extends Model
         'status',
         'is_published',
         'access_code',
+        'contract_address',
+        'contract_abi_path',
     ];
 
     protected $casts = [

@@ -81,6 +81,15 @@
                                             </button>
                                         </form>
                                     @endif
+
+                                    <!-- Deploy Smart Contract Button -->
+                                    <form action="{{ route('admin.elections.deploy-contract', $election->id) }}" method="POST"
+                                          onsubmit="return confirm('Deploy smart contract khusus untuk pemilu ini?');">
+                                        @csrf
+                                        <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors">
+                                            {{ $election->contract_address ? 'Kontrak Terdeploy' : 'Deploy Smart Contract' }}
+                                        </button>
+                                    </form>
                                     
                                     <!-- Edit/Delete Buttons (Only for Draft or Closed cannot edit) -->
                                     @if($election->is_published || $election->status === 'closed')
@@ -152,6 +161,13 @@
                                     <code class="px-4 py-2 bg-white border-2 border-purple-300 rounded-lg font-mono text-xl font-bold text-purple-900">{{ $election->access_code }}</code>
                                 </div>
                             </div>
+
+                            @if($election->contract_address)
+                                <div class="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl">
+                                    <h3 class="text-sm font-bold text-gray-700 mb-1">Alamat Smart Contract</h3>
+                                    <code class="block mt-1 px-3 py-2 bg-white border border-green-300 rounded-lg font-mono text-xs text-green-900 break-all">{{ $election->contract_address }}</code>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     @endforeach
