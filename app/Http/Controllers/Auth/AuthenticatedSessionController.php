@@ -50,8 +50,15 @@ class AuthenticatedSessionController extends Controller
                 return redirect()->intended(route('voter.election', ['code' => $election->access_code], false))
                     ->with('success', 'Login berhasil! Anda telah bergabung ke pemilu: ' . $election->title);
             }
-            // If code invalid, add a clear session message so the user sees why joining failed
-            session()->flash('error', 'Kode undangan tidak valid atau pemilu belum dipublikasikan. Silakan hubungi penyelenggara.');
+            
+            // If code invalid, logout user and redirect back to login with error
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('login')
+                ->withInput(['email' => $request->email, 'invite_code' => $code])
+                ->withErrors(['invite_code' => 'Kode undangan tidak valid atau pemilu belum dipublikasikan. Silakan hubungi penyelenggara atau login tanpa kode undangan.']);
         }
         // In testing, keep Breeze's default redirect to satisfy framework tests
         if (app()->environment('testing')) {
@@ -76,9 +83,14 @@ class AuthenticatedSessionController extends Controller
                     ->with('success', 'Login berhasil! Selamat datang kembali di pemilu: ' . $lastElection->title);
             }
             
-            // Jika voter belum terdaftar di election manapun, arahkan ke dashboard umum
-            return redirect()->intended(route('dashboard', absolute: false))
-                ->with('info', 'Silakan masukkan kode akses pemilu untuk melanjutkan.');
+            // Jika voter belum terdaftar di election manapun, logout dan redirect ke login dengan pesan
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('login')
+                ->withInput(['email' => $user->email])
+                ->withErrors(['invite_code' => 'Anda belum terdaftar di pemilu manapun. Silakan masukkan kode undangan yang Anda terima dari penyelenggara saat login.']);
         } elseif ($user->role === 'admin') {
             return redirect()->intended(route('admin.dashboard', absolute: false));
         }

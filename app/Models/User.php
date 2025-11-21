@@ -24,6 +24,7 @@ class User extends Authenticatable
         'role',
         'id_number',
         'face_photo',
+        'id_card',
         'organization',
     ];
 

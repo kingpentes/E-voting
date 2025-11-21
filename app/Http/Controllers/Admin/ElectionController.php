@@ -59,7 +59,9 @@ class ElectionController extends Controller
             'max_votes_per_voter' => ['integer', 'min:1'],
         ]);
 
-        DB::transaction(function () use ($validated, $request) {
+        /** @var Election|null $election */
+        $election = null;
+        DB::transaction(function () use ($validated, $request, &$election) {
             // Create Election
             $election = Election::create([
                 'user_id' => Auth::id(),
@@ -93,8 +95,9 @@ class ElectionController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.elections.manage')
-            ->with('success', '✓ Pengaturan pemilu berhasil dibuat!');
+        // Redirect to add candidate page for the newly created election
+        return redirect()->route('admin.candidates.create', ['election_id' => $election->id])
+            ->with('success', '✓ Pengaturan pemilu berhasil dibuat! Silakan tambahkan kandidat.');
     }
 
     /**

@@ -84,6 +84,7 @@ class VoterRegisterController extends Controller
             'id_number' => null, // Tidak digunakan untuk voter (nullable)
             'organization' => $election ? $election->title : null, // Simpan nama pemilu yang diikuti jika ada
             'face_photo' => $facePhotoPath,
+            'id_card' => $idCardPath,
         ]);
 
         event(new Registered($user));
