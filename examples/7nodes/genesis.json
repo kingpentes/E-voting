@@ -15,7 +15,7 @@
     "istanbulBlock": 0,
     "chainId": 1337,
     "ibft": { "policy": 0, "epoch": 30000 },
-    "isMPS": true,
+    "isMPS": false,
     "eip150Block": 0,
     "eip155Block": 0,
     "eip150Hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
