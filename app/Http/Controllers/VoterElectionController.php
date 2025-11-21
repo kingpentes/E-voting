@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Election;
 use App\Models\Candidate;
+use App\Service\VoteOnChainService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
@@ -61,7 +62,7 @@ class VoterElectionController extends Controller
     /**
      * Submit vote
      */
-    public function vote(Request $request, string $code): RedirectResponse
+    public function vote(Request $request, string $code, VoteOnChainService $onchain): RedirectResponse
     {
         // Ensure user is authenticated
         if (!Auth::check()) {
@@ -88,11 +89,21 @@ class VoterElectionController extends Controller
             ->where('election_id', $election->id)
             ->firstOrFail();
 
-        // Create vote
+        // Create vote in database first
         $user->votes()->create([
             'election_id' => $election->id,
             'candidate_id' => $candidate->id,
         ]);
+
+        // Optionally mirror vote to blockchain if contract is deployed
+        if ($election->contract_address) {
+            try {
+                $onchain->submit($election, (string) $user->id, (string) $candidate->id);
+            } catch (\Throwable $e) {
+                // Jangan menggagalkan vote hanya karena blockchain error; log saja nanti
+                // dan tetap anggap vote sah di database.
+            }
+        }
 
         return redirect()->route('voter.election', ['code' => $code])
             ->with('success', '✓ Suara Anda berhasil dicatat! Terima kasih telah berpartisipasi.');

@@ -159,6 +159,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::delete('/elections/{id}', [ElectionController::class, 'destroy'])->name('elections.delete');
     Route::post('/elections/{id}/toggle-publish', [ElectionController::class, 'togglePublish'])->name('elections.toggle-publish');
     Route::post('/elections/{id}/close', [ElectionController::class, 'closeElection'])->name('elections.close');
+    Route::post('/elections/{id}/deploy-contract', [ElectionController::class, 'deployContract'])->name('elections.deploy-contract');
+    Route::get('/elections/sync-status', [ElectionController::class, 'syncStatus'])->name('elections.sync-status');
 
     // Blockchain admin
     Route::get('/blockchain', [BlockchainController::class, 'index'])->name('blockchain.index');

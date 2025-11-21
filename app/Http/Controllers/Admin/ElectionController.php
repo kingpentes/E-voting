@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Election;
 use App\Models\ElectionRule;
 use App\Models\ElectionSetting;
+use App\Service\ElectionSyncStatusService;
+use App\Service\ContractDeploymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -260,5 +262,49 @@ class ElectionController extends Controller
 
         return redirect()->back()
             ->with('success', "✓ Pemilu berhasil ditutup! Hasil voting sekarang dapat dilihat oleh voter.");
+    }
+
+    /**
+     * Show on-chain vs DB sync status for the organizer's election.
+     */
+    public function syncStatus(ElectionSyncStatusService $syncService)
+    {
+        $election = Election::forOrganizer(Auth::id())
+            ->with(['votes'])
+            ->first();
+
+        $status = null;
+        if ($election) {
+            $status = $syncService->getStatusForElection($election);
+        }
+
+        return view('admin.elections.sync-status', compact('election', 'status'));
+    }
+
+    /**
+     * Deploy a dedicated smart contract for this election and store address.
+     */
+    public function deployContract(string $id, ContractDeploymentService $deploymentService)
+    {
+        $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+
+        // Optional: prevent deploying if election already has a contract
+        if ($election->contract_address) {
+            return redirect()->back()
+                ->with('error', '✗ Kontrak untuk pemilu ini sudah tersedia.');
+        }
+
+        try {
+            $result = $deploymentService->deploy();
+            $election->contract_address = $result['address'] ?? null;
+            // Reuse global ABI path setting if present
+            $election->contract_abi_path = config('services.blockchain.contract_abi_path')
+                ?? env('CONTRACT_ABI_PATH');
+            $election->save();
+
+            return redirect()->back()->with('success', '✓ Smart contract berhasil dideploy untuk pemilu ini. Alamat: ' . $election->contract_address);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', '✗ Gagal deploy smart contract: ' . $e->getMessage());
+        }
     }
 }
