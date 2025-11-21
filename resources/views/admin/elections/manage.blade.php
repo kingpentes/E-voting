@@ -8,16 +8,11 @@
                     <h1 class="text-3xl font-bold text-gray-900">Kelola Judul & Peraturan</h1>
                     <p class="text-gray-600 mt-1">{{ $elections->count() }} pemilu Anda</p>
                 </div>
-                @if($elections->isEmpty())
-                    <a href="{{ route('admin.elections.create') }}" 
-                       class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all">
-                        <span>+ Buat Pemilu Baru</span>
-                    </a>
-                @else
-                    <div class="px-6 py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed" title="Anda sudah memiliki pemilu">
-                        <span>Limit 1 Pemilu Tercapai</span>
-                    </div>
-                @endif
+                <!-- Selalu tampilkan tombol buat pemilu baru (izinkan multiple pemilu per organizer) -->
+                <a href="{{ route('admin.elections.create') }}" 
+                   class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all">
+                    <span>+ Buat Pemilu Baru</span>
+                </a>
             </div>
         </header>
         

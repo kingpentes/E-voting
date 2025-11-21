@@ -98,24 +98,41 @@
                     </div>
                 </div>
 
-                <!-- Search -->
+                <!-- Search & Election filter -->
                 <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                    <form method="GET" action="{{ route('admin.voters.index') }}" class="flex flex-col md:flex-row gap-4">
-                        <div class="flex-1">
+                    <form method="GET" action="{{ route('admin.voters.index') }}" class="flex flex-col md:flex-row gap-4 items-center">
+                        <div class="w-full md:w-1/2">
                             <input type="text" 
                                    name="search" 
                                    value="{{ request('search') }}"
                                    placeholder="Cari nama, email, ID number, atau organisasi..." 
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                         </div>
-                        <button type="submit" class="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors">
-                            Cari
-                        </button>
-                        @if(request('search'))
-                            <a href="{{ route('admin.voters.index') }}" class="px-6 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 transition-colors">
-                                Reset
-                            </a>
-                        @endif
+
+                        <div class="w-full md:w-1/4">
+                            <select name="election_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                @if(isset($elections) && $elections->isNotEmpty())
+                                    @foreach($elections as $opt)
+                                        <option value="{{ $opt->id }}" {{ request('election_id', optional($election)->id) == $opt->id ? 'selected' : '' }}>
+                                            {{ $opt->title }}
+                                        </option>
+                                    @endforeach
+                                @else
+                                    <option value="">-- Tidak ada pemilu --</option>
+                                @endif
+                            </select>
+                        </div>
+
+                        <div class="flex items-center space-x-2">
+                            <button type="submit" class="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors">
+                                Cari
+                            </button>
+                            @if(request()->query())
+                                <a href="{{ route('admin.voters.index') }}" class="px-6 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 transition-colors">
+                                    Reset
+                                </a>
+                            @endif
+                        </div>
                     </form>
                 </div>
             @endif

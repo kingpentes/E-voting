@@ -90,9 +90,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Dashboard
     Route::get('/dashboard', function () {
         $user = \Illuminate\Support\Facades\Auth::user();
-        $election = \App\Models\Election::forOrganizer(\Illuminate\Support\Facades\Auth::id())
+
+        // Get all elections for this organizer so dashboard can select which election to show
+        $elections = \App\Models\Election::forOrganizer(\Illuminate\Support\Facades\Auth::id())
             ->with(['candidates', 'votes'])
-            ->first();
+            ->latest()
+            ->get();
+
+        // Determine selected election from query param or default to first
+        $selectedId = (int) request()->get('election_id', 0);
+        $election = $selectedId ? $elections->firstWhere('id', $selectedId) : $elections->first();
         
         // Initialize stats
         $stats = [
@@ -138,7 +145,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             });
         }
 
-        return view('admin.dashboard', compact('user', 'election', 'stats', 'candidateStats'));
+        return view('admin.dashboard', compact('user', 'election', 'stats', 'candidateStats', 'elections'));
     })->name('dashboard');
     
     // Candidates Resource Routes

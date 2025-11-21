@@ -96,19 +96,19 @@
 
                         <!-- Registration Steps Indicator -->
                         <div class="flex items-center justify-center mb-8">
-                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center space-x-4">
                                 <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">1</div>
+                                    <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold" data-step="1">1</div>
                                     <span class="ml-2 text-sm font-medium text-gray-700">Basic Info</span>
                                 </div>
                                 <div class="w-8 h-0.5 bg-gray-300"></div>
                                 <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold">2</div>
+                                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold" data-step="2">2</div>
                                     <span class="ml-2 text-sm font-medium text-gray-500">ID Verification</span>
                                 </div>
                                 <div class="w-8 h-0.5 bg-gray-300"></div>
                                 <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold">3</div>
+                                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold" data-step="3">3</div>
                                     <span class="ml-2 text-sm font-medium text-gray-500">Face Scan</span>
                                 </div>
                             </div>
@@ -130,28 +130,9 @@
                                     </h3>
 
                                     <div class="grid grid-cols-1 gap-6">
-                                        <!-- Invite Code -->
-                                        <div class="group">
-                                            <label for="invite_code" class="block text-sm font-semibold text-gray-700 mb-3">
-                                                <span class="flex items-center">
-                                                    <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                                                    </svg>
-                                                    Invitation Code <span class="text-red-500">*</span>
-                                                </span>
-                                            </label>
-                                            <input 
-                                                id="invite_code" 
-                                                type="text" 
-                                                name="invite_code" 
-                                                value="{{ old('invite_code') }}" 
-                                                required
-                                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white group-hover:bg-white placeholder-gray-400 uppercase tracking-wider"
-                                                placeholder="Enter invitation code from organizer"
-                                                maxlength="8"
-                                            />
-                                            <p class="text-xs text-gray-500 mt-1">Get this code from your election organizer</p>
-                                            <x-input-error :messages="$errors->get('invite_code')" class="mt-2" />
+                                        <!-- Invite code removed from registration; voters can enter it during login -->
+                                        <div class="mb-4">
+                                            <p class="text-sm text-gray-600">If you already have an invitation code, enter it on the login page after creating your account. You can also provide the code during registration, but it's optional.</p>
                                         </div>
 
                                         <!-- Full Name -->
@@ -473,11 +454,19 @@
 
             function validateStep(step) {
                 if (step === 1) {
-                    const required = ['invite_code', 'name', 'email', 'password', 'password_confirmation'];
-                    return required.every(field => document.getElementById(field).value.trim() !== '');
+                    // Basic info required fields. 'invite_code' was made optional and may not exist.
+                    const required = ['name', 'email', 'password', 'password_confirmation'];
+                    for (const field of required) {
+                        const el = document.getElementById(field);
+                        if (!el || el.value.trim() === '') {
+                            return false;
+                        }
+                    }
+                    return true;
                 }
                 if (step === 2) {
-                    return document.getElementById('id_card').files.length > 0;
+                    const input = document.getElementById('id_card');
+                    return input && input.files && input.files.length > 0;
                 }
                 return true;
             }

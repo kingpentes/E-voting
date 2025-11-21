@@ -15,21 +15,36 @@ class VoterController extends Controller
      */
     public function index(Request $request)
     {
-        // Get organizer's election
-        $election = Election::forOrganizer(Auth::id())->first();
-        
-        // If no election, show empty state
-        if (!$election) {
+        // Get all elections for this organizer so user can choose which election to view
+        $elections = Election::forOrganizer(Auth::id())
+            ->withCount('participants')
+            ->latest()
+            ->get();
+
+        // If no elections, show empty state
+        if ($elections->isEmpty()) {
             $voters = collect();
             $stats = [
                 'total_voters' => 0,
                 'voted' => 0,
                 'not_voted' => 0,
             ];
-            return view('admin.voters.index', compact('voters', 'election', 'stats'));
+            $election = null;
+            return view('admin.voters.index', compact('voters', 'election', 'stats', 'elections'));
         }
-        
-        // Default: Only show voters who joined this election (using invite code)
+
+        // Determine selected election: from query param or default to first
+        $selectedElectionId = $request->get('election_id');
+        $election = $selectedElectionId
+            ? $elections->firstWhere('id', (int) $selectedElectionId)
+            : $elections->first();
+
+        // If selected election ID was invalid, fallback to first
+        if (!$election) {
+            $election = $elections->first();
+        }
+
+        // Only show voters who joined the selected election (using invite code)
         $query = User::where('role', 'voter')
             ->whereHas('participatingElections', function($q) use ($election) {
                 $q->where('election_id', $election->id);
@@ -60,7 +75,7 @@ class VoterController extends Controller
             'not_voted' => $election->participants()->count() - $election->votes()->distinct('voter_id')->count(),
         ];
         
-        return view('admin.voters.index', compact('voters', 'election', 'stats'));
+        return view('admin.voters.index', compact('voters', 'election', 'stats', 'elections'));
     }
     
     /**
