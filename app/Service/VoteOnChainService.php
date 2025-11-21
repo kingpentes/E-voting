@@ -6,10 +6,7 @@ use App\Models\Election;
 
 class VoteOnChainService
 {
-    public function __construct(
-        private readonly VoteCryptoService $crypto,
-        private readonly BlockchainContractService $contract
-    ) {}
+    public function __construct(private readonly VoteCryptoService $crypto) {}
 
     /**
      * Encrypts choice and submits to blockchain for a specific election.
