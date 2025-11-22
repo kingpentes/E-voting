@@ -4,6 +4,8 @@ namespace App\Service;
 
 use Web3\Contract;
 use Web3\Web3;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class BlockchainContractService
 {
@@ -80,19 +82,53 @@ class BlockchainContractService
 
     public function getVoteCount(string $electionId): int
     {
-        $result = null;
-        $this->contract->call('getVoteCount', $electionId, function ($err, $res) use (&$result) {
-            if ($err !== null) {
-                throw new \RuntimeException('Contract call failed: ' . $err->getMessage());
-            }
-            if (is_array($res) && count($res) > 0) {
-                $val = $res[0];
-                $result = (int) (method_exists($val, 'toString') ? $val->toString() : (string)$val);
-            } else {
-                $result = 0;
-            }
-        });
-        return (int)$result;
+        // Use Node.js web3 to avoid PHP Web3 library issues
+        
+        // Get contract address from the contract instance
+        $reflection = new \ReflectionClass($this->contract);
+        $property = $reflection->getProperty('toAddress');
+        $property->setAccessible(true);
+        $contractAddress = $property->getValue($this->contract);
+        
+        if (!$contractAddress) {
+            throw new \RuntimeException('Contract address not set');
+        }
+        
+        // Call Node.js script to get vote count
+        $scriptPath = base_path('..\\quorum-network\\evote\\evote-deploy\\getVoteCount.js');
+        
+        if (!file_exists($scriptPath)) {
+            throw new \RuntimeException('getVoteCount.js script not found at: ' . $scriptPath);
+        }
+        
+        $command = sprintf(
+            'node %s %s %s',
+            escapeshellarg($scriptPath),
+            escapeshellarg($contractAddress),
+            escapeshellarg($electionId)
+        );
+        
+        $process = new \Symfony\Component\Process\Process(
+            ['node', $scriptPath, $contractAddress, $electionId],
+            null,
+            null,
+            null,
+            30
+        );
+        
+        $process->run();
+        
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException('Node.js call failed: ' . $process->getErrorOutput());
+        }
+        
+        $output = trim($process->getOutput());
+        
+        if (!is_numeric($output)) {
+            throw new \RuntimeException('Invalid vote count returned: ' . $output);
+        }
+        
+        return (int)$output;
     }
 
     public function getVote(string $electionId, int $index): array
