@@ -57,7 +57,11 @@
                         <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition duration-300 overflow-hidden {{ $election->pivot->approval_status !== 'approved' ? 'opacity-75' : '' }}">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-4">
-                                    @if($election->pivot->approval_status === 'approved')
+                                    @if($election->status === 'closed')
+                                        <span class="px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">
+                                            Ditutup
+                                        </span>
+                                    @elseif($election->pivot->approval_status === 'approved')
                                         <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
                                             Aktif
                                         </span>
@@ -82,12 +86,6 @@
                                 @endif
 
                                 <div class="space-y-2 mb-6">
-                                    <div class="flex items-center text-sm text-gray-600">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                        </svg>
-                                        {{ $election->candidates_count ?? 0 }} Kandidat
-                                    </div>
                                     <div class="flex items-center text-sm text-gray-600">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>

@@ -44,6 +44,12 @@ class VoterVerificationController extends Controller
             'invite_code' => ['required', 'string', 'max:8'],
             'id_card' => ['required', 'image', 'max:2048'],
             'face_image' => ['required', 'string'], // Base64
+        ], [
+            'id_card.required' => 'Foto KTP wajib diunggah.',
+            'id_card.image' => 'File KTP harus berupa gambar.',
+            'id_card.max' => 'Ukuran file KTP maksimal 2MB.',
+            'face_image.required' => 'Foto wajah wajib diambil.',
+            'invite_code.required' => 'Kode undangan wajib diisi.',
         ]);
 
         /** @var \App\Models\User $user */
