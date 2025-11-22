@@ -56,6 +56,12 @@ Route::post('/register/voter', [VoterRegisterController::class, 'store'])
     ->middleware('guest')
     ->name('register.voter.store');
 
+// Voter Verification Routes
+Route::middleware(['auth'])->prefix('voter')->name('voter.')->group(function () {
+    Route::get('/verification', [\App\Http\Controllers\VoterVerificationController::class, 'show'])->name('verification');
+    Route::post('/verification', [\App\Http\Controllers\VoterVerificationController::class, 'store'])->name('verification.store');
+});
+
 // Voter Election Routes - Access by invite code
 Route::prefix('election')->name('voter.')->group(function () {
     Route::get('/{code}', [VoterElectionController::class, 'show'])->name('election');
@@ -152,6 +158,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Custom route MUST be before resource route to avoid being overridden
     Route::get('/candidates/manage', [CandidateController::class, 'index'])->name('candidates.manage');
     Route::resource('candidates', CandidateController::class)->except(['show']);
+    
+    // Voter Approval Routes (must be before /voters/{id} to avoid route conflict)
+    Route::get('/voters/approval', [\App\Http\Controllers\Admin\VoterApprovalController::class, 'index'])->name('voters.approval');
+    Route::post('/voters/{id}/approve', [\App\Http\Controllers\Admin\VoterApprovalController::class, 'approve'])->name('voters.approve');
+    Route::post('/voters/{id}/reject', [\App\Http\Controllers\Admin\VoterApprovalController::class, 'reject'])->name('voters.reject');
     
     // Voters Routes
     Route::get('/voters', [\App\Http\Controllers\Admin\VoterController::class, 'index'])->name('voters.index');

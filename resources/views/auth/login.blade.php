@@ -128,31 +128,6 @@
                                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                 </div>
 
-                                    <!-- Invite Code (optional for voters) -->
-                                    <div class="group">
-                                        <label for="invite_code" class="block text-sm font-semibold text-gray-700 mb-3">
-                                            <span class="flex items-center">
-                                                <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                                </svg>
-                                                Invitation Code (optional)
-                                            </span>
-                                        </label>
-                                        <div class="relative">
-                                            <input 
-                                                id="invite_code"
-                                                type="text"
-                                                name="invite_code"
-                                                value="{{ old('invite_code') }}"
-                                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white group-hover:bg-white placeholder-gray-400 uppercase tracking-wider"
-                                                placeholder="Masukkan kode undangan (jika ada)"
-                                                maxlength="8"
-                                            />
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-1">Jika Anda pemilih yang menerima kode undangan, masukkan kode di sini saat login untuk otomatis bergabung ke pemilu.</p>
-                                        <x-input-error :messages="$errors->get('invite_code')" class="mt-2" />
-                                    </div>
-
                                 <!-- Password -->
                                 <div class="group">
                                     <label for="password" class="block text-sm font-semibold text-gray-700 mb-3">

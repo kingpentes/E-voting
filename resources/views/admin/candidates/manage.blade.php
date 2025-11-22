@@ -3,15 +3,28 @@
     
     <div class="flex-1 flex flex-col overflow-hidden">
         <header class="bg-white shadow-sm z-10">
-            <div class="px-8 py-6 flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Kelola Kandidat</h1>
-                    <p class="text-gray-600 mt-1">{{ $candidates->count() }} kandidat dari pemilu Anda</p>
+            <div class="px-8 py-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Kelola Kandidat</h1>
+                        <p class="text-gray-600 mt-1">{{ $candidates->count() }} kandidat dari pemilu Anda</p>
+                    </div>
+                    <a href="{{ route('admin.candidates.create') }}" 
+                       class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl">
+                        <span>+ Tambah Kandidat Baru</span>
+                    </a>
                 </div>
-                <a href="{{ route('admin.candidates.create') }}" 
-                   class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl">
-                    <span>+ Tambah Kandidat Baru</span>
-                </a>
+                
+                <!-- Filter Pemilu -->
+                <form method="GET" action="{{ route('admin.candidates.index') }}" id="candidateFilterForm" class="flex items-center gap-4">
+                    <label for="election_id" class="text-sm font-medium text-gray-700">Filter Pemilu:</label>
+                    <select id="election_id" name="election_id" class="px-4 py-2 border border-gray-300 rounded-lg w-80" onchange="document.getElementById('candidateFilterForm').submit()">
+                        <option value="">Semua Pemilu</option>
+                        @foreach($elections as $election)
+                            <option value="{{ $election->id }}" {{ $electionId == $election->id ? 'selected' : '' }}>{{ $election->title }}</option>
+                        @endforeach
+                    </select>
+                </form>
             </div>
         </header>
         

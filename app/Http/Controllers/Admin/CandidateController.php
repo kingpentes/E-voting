@@ -16,17 +16,28 @@ class CandidateController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Get all candidates from organizer's elections
-        $elections = Election::forOrganizer(Auth::id())->pluck('id');
-        $candidates = Candidate::whereIn('election_id', $elections)
-            ->with(['election', 'missions'])
-            ->orderBy('election_id')
+        // Get organizer's elections for filter dropdown
+        $elections = Election::forOrganizer(Auth::id())->get();
+        
+        // Get election_id from request (for filter)
+        $electionId = $request->get('election_id');
+        
+        // Build candidates query
+        $query = Candidate::whereIn('election_id', $elections->pluck('id'))
+            ->with(['election', 'missions']);
+        
+        // Apply filter if election is selected
+        if ($electionId) {
+            $query->where('election_id', $electionId);
+        }
+        
+        $candidates = $query->orderBy('election_id')
             ->orderBy('number')
             ->get();
 
-        return view('admin.candidates.manage', compact('candidates'));
+        return view('admin.candidates.manage', compact('candidates', 'elections', 'electionId'));
     }
 
     /**

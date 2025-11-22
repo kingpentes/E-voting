@@ -42,9 +42,9 @@
             <!-- Election selector + Stats Grid -->
             <div class="mb-6">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <form method="GET" action="{{ route('admin.dashboard') }}" class="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-4">
+                    <form method="GET" action="{{ route('admin.dashboard') }}" id="electionFilterForm" class="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-4">
                         <label for="election_id" class="text-sm font-medium text-gray-700 self-start md:self-center">Pilih Pemilu:</label>
-                        <select id="election_id" name="election_id" class="px-4 py-2 border border-gray-300 rounded-lg w-full md:w-80">
+                        <select id="election_id" name="election_id" class="px-4 py-2 border border-gray-300 rounded-lg w-full md:w-80" onchange="document.getElementById('electionFilterForm').submit()">
                             @if(isset($elections) && $elections->isNotEmpty())
                                 @foreach($elections as $opt)
                                     <option value="{{ $opt->id }}" {{ optional($election)->id == $opt->id ? 'selected' : '' }}>{{ $opt->title }}</option>
@@ -53,9 +53,6 @@
                                 <option value="">-- Tidak ada pemilu --</option>
                             @endif
                         </select>
-                        <div class="flex items-center">
-                            <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg">Tampilkan</button>
-                        </div>
                     </form>
 
                     <div class="text-sm text-gray-500">Menampilkan statistik untuk pemilu terpilih</div>

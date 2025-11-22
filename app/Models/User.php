@@ -26,6 +26,10 @@ class User extends Authenticatable
         'face_photo',
         'id_card',
         'organization',
+        'verification_status',
+        'rejection_reason',
+        'verified_at',
+        'verified_by',
     ];
 
     /**

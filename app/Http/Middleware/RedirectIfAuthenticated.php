@@ -22,10 +22,9 @@ class RedirectIfAuthenticated
             if (Auth::guard($guard)->check()) {
                 $user = Auth::user();
                 
-                // Redirect berdasarkan role dengan pesan
+                // Redirect berdasarkan role
                 if ($user->role === 'organizer') {
-                    return redirect()->route('admin.dashboard')
-                        ->with('error', 'Anda sudah login! Klik tombol KELUAR terlebih dahulu jika ingin registrasi akun baru.');
+                    return redirect()->route('admin.dashboard');
                 } elseif ($user->role === 'voter') {
                     // Redirect voter ke election terakhir mereka
                     $lastElection = $user->participatingElections()
@@ -34,18 +33,15 @@ class RedirectIfAuthenticated
                         ->first();
                     
                     if ($lastElection) {
-                        return redirect()->route('voter.election', ['code' => $lastElection->access_code])
-                            ->with('info', 'Anda sudah login! Klik tombol KELUAR jika ingin registrasi akun baru.');
+                        return redirect()->route('voter.election', ['code' => $lastElection->access_code]);
                     }
                     
                     // Jika tidak ada election, redirect ke home
-                    return redirect('/')
-                        ->with('info', 'Anda sudah login. Silakan masukkan kode akses pemilu untuk melanjutkan.');
+                    return redirect('/');
                 }
                 
                 // Default redirect
-                return redirect('/')
-                    ->with('error', 'Anda sudah login! Logout terlebih dahulu untuk registrasi akun baru.');
+                return redirect('/');
             }
         }
 
