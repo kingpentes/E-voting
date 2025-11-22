@@ -56,7 +56,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2">ID Number</h3>
-                                <p class="text-lg font-mono text-gray-900">{{ $voter->id_number ?? '-' }}</p>
+                                <p class="text-lg font-mono text-gray-900">-</p>
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2">Organisasi</h3>

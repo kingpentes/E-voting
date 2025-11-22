@@ -222,7 +222,7 @@ class ElectionSeeder extends Seeder
                 'email' => "voter$i@example.com",
                 'password' => Hash::make('password'),
                 'role' => 'voter',
-                'id_number' => '123456789' . $i,
+
                 'organization' => 'SMA Negeri 1',
             ]);
         }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('election_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('access_code_used', 8); // Code yang digunakan saat registrasi
-            $table->timestamp('joined_at')->useCurrent(); // Kapan voter join
+            $table->timestamp('joined_at')->nullable(); // Kapan voter join
             $table->timestamps();
             
             // Unique constraint: satu voter hanya bisa join satu election dengan code yang sama sekali
