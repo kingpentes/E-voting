@@ -254,20 +254,21 @@ class ElectionController extends Controller
     }
 
     /**
-     * Show on-chain vs DB sync status for the organizer's election.
+     * Show on-chain vs DB sync status for all organizer's elections.
      */
     public function syncStatus(ElectionSyncStatusService $syncService)
     {
-        $election = Election::forOrganizer(Auth::id())
+        $elections = Election::forOrganizer(Auth::id())
             ->with(['votes'])
-            ->first();
+            ->latest()
+            ->get();
 
-        $status = null;
-        if ($election) {
-            $status = $syncService->getStatusForElection($election);
+        $statuses = [];
+        foreach ($elections as $election) {
+            $statuses[$election->id] = $syncService->getStatusForElection($election);
         }
 
-        return view('admin.elections.sync-status', compact('election', 'status'));
+        return view('admin.elections.sync-status', compact('elections', 'statuses'));
     }
 
     /**

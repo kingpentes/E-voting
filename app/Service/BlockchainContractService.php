@@ -57,7 +57,12 @@ class BlockchainContractService
     public function storeEncryptedVote(string $cipherB64, string $nonceB64, string $tagB64, string $hashHex32, string $electionId, string $voterId): string
     {
         // Use Node.js web3 to avoid PHP Web3 library issues with string parameter encoding
-        $contractAddress = \env('CONTRACT_ADDRESS');
+        // Get contract address from the contract instance
+        $reflection = new \ReflectionClass($this->contract);
+        $property = $reflection->getProperty('toAddress');
+        $property->setAccessible(true);
+        $contractAddress = $property->getValue($this->contract);
+        
         $workdir = base_path('..\\quorum-network\\evote\\evote-deploy');
         
         // Ensure hash has 0x prefix and is 66 chars (0x + 64 hex chars)

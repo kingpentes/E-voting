@@ -54,15 +54,6 @@
                 <span class="font-medium">Judul & Peraturan</span>
             </a>
 
-            <!-- Blockchain -->
-            <a href="{{ route('admin.blockchain.index') }}" 
-               class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 {{ $active === 'blockchain' ? 'bg-pink-600 text-white shadow-lg' : 'text-indigo-200 hover:bg-white/10' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7a2 2 0 012-2h3a2 2 0 012 2v0a2 2 0 01-2 2H6a2 2 0 01-2-2v0zm0 10a2 2 0 012-2h3a2 2 0 012 2v0a2 2 0 01-2 2H6a2 2 0 01-2-2v0zm9-10a2 2 0 012-2h3a2 2 0 012 2v0a2 2 0 01-2 2h-3a2 2 0 01-2-2v0zm0 10a2 2 0 012-2h3a2 2 0 012 2v0a2 2 0 01-2 2h-3a2 2 0 01-2-2v0z"/>
-                </svg>
-                <span class="font-medium">Blockchain</span>
-            </a>
-
             <!-- Status Sinkronisasi -->
             <a href="{{ route('admin.elections.sync-status') }}" 
                class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 {{ $active === 'sync-status' ? 'bg-pink-600 text-white shadow-lg' : 'text-indigo-200 hover:bg-white/10' }}">

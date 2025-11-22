@@ -1,5 +1,5 @@
 <x-admin-layout title="Status Sinkronisasi Pemilu">
-    <x-admin-sidebar active="rules" />
+    <x-admin-sidebar active="sync-status" />
 
     <div class="flex-1 flex flex-col overflow-hidden">
         <header class="bg-white shadow-sm z-10">
@@ -12,18 +12,22 @@
         </header>
 
         <main class="flex-1 overflow-y-auto p-8">
-            @if(!$election)
+            @if($elections->isEmpty())
                 <div class="bg-white rounded-2xl shadow-md p-8 text-center">
                     <h3 class="text-2xl font-bold text-gray-700 mb-2">Belum Ada Pemilu</h3>
                     <p class="text-gray-500">Buat pemilu terlebih dahulu untuk melihat status sinkronisasi.</p>
                 </div>
             @else
                 <div class="space-y-6">
+                    @foreach($elections as $election)
+                    @php
+                        $status = $statuses[$election->id] ?? null;
+                    @endphp
                     <div class="bg-white rounded-2xl shadow-md p-6">
                         <h2 class="text-xl font-bold text-gray-900 mb-2">{{ $election->title }}</h2>
                         <p class="text-gray-600 mb-4">ID Pemilu: {{ $election->id }}</p>
 
-                        @if(!$status['has_contract'])
+                        @if(!$status || !$status['has_contract'])
                             <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
                                 <p class="text-yellow-800 font-medium">Smart contract belum dideploy untuk pemilu ini.</p>
                             </div>
@@ -40,7 +44,7 @@
                                     </p>
                                 </div>
                                 <div class="p-4 rounded-xl border {{ $status['is_synced'] ? 'bg-green-50 border-green-400' : 'bg-red-50 border-red-400' }}">
-                                    <p class="text-sm text-gray-500">Status Sinkronisasi</p>
+                                    <p class="text-sm {{ $status['is_synced'] ? 'text-green-600' : 'text-red-600' }}">Status Sinkronisasi</p>
                                     <p class="mt-2 text-xl font-bold {{ $status['is_synced'] ? 'text-green-700' : 'text-red-700' }}">
                                         @if($status['is_synced'] === null)
                                             Tidak Diketahui
@@ -60,6 +64,7 @@
                             @endif
                         @endif
                     </div>
+                    @endforeach
                 </div>
             @endif
         </main>
