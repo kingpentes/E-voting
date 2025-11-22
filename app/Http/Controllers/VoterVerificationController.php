@@ -17,6 +17,9 @@ class VoterVerificationController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
         
+        // Load participating elections
+        $user->load('participatingElections');
+        
         // Show election selection if user has any elections (approved or pending)
         if ($user->participatingElections()->exists() && !$request->has('add_new')) {
             // Get all elections (approved and pending)

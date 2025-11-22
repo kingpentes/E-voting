@@ -42,7 +42,7 @@
                 <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     @if($election->status === 'closed')
-                                        <span class="px-4 py-1.5 bg-red-500 text-white text-sm font-bold rounded-full">DITUTUP</span>
+                                        <span class="px-3 py-1 bg-gray-500 text-white text-sm font-bold rounded-full">DITUTUP</span>
                                     @elseif($election->is_published)
                                         <span class="px-4 py-1.5 bg-green-500 text-white text-sm font-bold rounded-full">AKTIF</span>
                                     @else
