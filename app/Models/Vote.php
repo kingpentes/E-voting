@@ -15,6 +15,7 @@ class Vote extends Model
         'voter_id',
         'candidate_id',
         'vote_hash',
+        'blockchain_tx_hash',
         'ip_address',
         'user_agent',
         'voted_at',
