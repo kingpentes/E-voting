@@ -7,6 +7,7 @@ use App\Models\Candidate;
 use App\Service\VoteOnChainService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -107,7 +108,7 @@ class VoterElectionController extends Controller
                 // Optional: save tx hash to vote record
                 $vote->update(['blockchain_tx_hash' => $txHash]);
                 
-                \Log::info('Vote mirrored to blockchain', [
+                Log::info('Vote mirrored to blockchain', [
                     'vote_id' => $vote->id,
                     'election_id' => $election->id,
                     'tx_hash' => $txHash,
@@ -115,7 +116,7 @@ class VoterElectionController extends Controller
             } catch (\Throwable $e) {
                 // Log error tapi jangan gagalkan vote
                 $blockchainError = $e->getMessage();
-                \Log::error('Failed to mirror vote to blockchain', [
+                Log::error('Failed to mirror vote to blockchain', [
                     'vote_id' => $vote->id,
                     'election_id' => $election->id,
                     'error' => $blockchainError,
