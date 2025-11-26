@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
+use App\Models\Election;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,20 +42,34 @@ class AuthenticatedSessionController extends Controller
         if ($user->role === 'organizer') {
             return redirect()->intended(route('admin.dashboard', absolute: false));
         } elseif ($user->role === 'voter') {
-            // Voter diarahkan ke election terakhir yang mereka ikuti
-            $lastElection = $user->participatingElections()
-                ->where('is_published', true)
-                ->latest('election_user.joined_at')
-                ->first();
-            
-            if ($lastElection) {
-                return redirect()->intended(route('voter.election', ['code' => $lastElection->access_code], absolute: false))
-                    ->with('success', 'Login berhasil! Selamat datang kembali di pemilu: ' . $lastElection->title);
+            // Check verification status first
+            if ($user->verification_status === 'pending' && !$user->id_card) {
+                // Voter belum submit verifikasi, redirect ke halaman verifikasi
+                return redirect()->route('voter.verification')
+                    ->with('info', 'Silakan lengkapi verifikasi identitas Anda untuk melanjutkan.');
             }
             
-            // Jika voter belum terdaftar di election manapun, arahkan ke dashboard umum
-            return redirect()->intended(route('dashboard', absolute: false))
-                ->with('info', 'Silakan masukkan kode akses pemilu untuk melanjutkan.');
+            if ($user->verification_status === 'pending' && $user->id_card) {
+                // Voter sudah submit, tunggu approval
+                return redirect()->route('voter.verification')
+                    ->with('info', 'Verifikasi Anda sedang ditinjau oleh admin. Mohon tunggu persetujuan.');
+            }
+            
+            if ($user->verification_status === 'rejected') {
+                // Verifikasi ditolak, minta submit ulang
+                return redirect()->route('voter.verification')
+                    ->with('error', 'Verifikasi Anda ditolak. Silakan kirim ulang data yang benar.');
+            }
+            
+            // Jika sudah approved, redirect ke halaman pemilihan pemilu
+            if ($user->verification_status === 'approved') {
+                return redirect()->route('voter.verification')
+                    ->with('success', 'Selamat datang! Silakan pilih pemilu yang ingin Anda ikuti.');
+            }
+            
+            // Jika belum punya election, redirect ke dashboard
+            return redirect()->route('dashboard')
+                ->with('info', 'Anda belum bergabung di pemilu manapun.');
         } elseif ($user->role === 'admin') {
             return redirect()->intended(route('admin.dashboard', absolute: false));
         }

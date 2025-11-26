@@ -13,9 +13,19 @@
         <header class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-3xl font-bold text-white">{{ $election->title }}</h1>
-                        <p class="text-blue-100 mt-1">{{ $election->description }}</p>
+                    <div class="flex items-center space-x-4">
+                        @auth
+                            <a href="{{ route('voter.verification') }}" class="text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg hover:bg-white/10 transition duration-200 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                                Kembali
+                            </a>
+                        @endauth
+                        <div>
+                            <h1 class="text-3xl font-bold text-white">{{ $election->title }}</h1>
+                            <p class="text-blue-100 mt-1">{{ $election->description }}</p>
+                        </div>
                     </div>
                     @auth
                     <div class="flex items-center space-x-4">
@@ -46,13 +56,14 @@
                 </div>
             @endif
 
-            @if(Auth::check() && $hasVoted)
+            @if(Auth::check() && $hasVoted && $election->status !== 'closed')
                 <div class="mb-6 bg-blue-50 border-l-4 border-blue-400 text-blue-700 px-4 py-3 rounded shadow-md">
                     <p class="font-semibold">✓ Anda sudah memberikan suara pada pemilu ini</p>
                 </div>
             @endif
 
             <!-- Election Schedule Info -->
+            @if($election->status !== 'closed')
             <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-lg p-6 mb-8 text-white">
                 <div class="flex items-center mb-4">
                     <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,11 +137,10 @@
                     </div>
                 </div>
             </div>
-
-           
+            @endif
 
             <!-- Election Rules -->
-            @if($election->rules && $election->rules->count() > 0)
+            @if($election->status !== 'closed' && $election->rules && $election->rules->count() > 0)
             <div class="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-gray-100">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                     <svg class="w-7 h-7 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +163,7 @@
 
             <!-- Voting Results (shown when election is closed) -->
             @if($election->status === 'closed')
-            <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-xl p-8 mb-8 text-white">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl p-8 mb-8 text-white">
                 <div class="flex items-center justify-center mb-6">
                     <svg class="w-10 h-10 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -185,14 +195,12 @@
                         <div class="bg-white rounded-xl p-5 {{ $isWinner ? 'ring-4 ring-yellow-400 shadow-2xl' : 'shadow-lg' }}">
                             <div class="flex items-center justify-between mb-3">
                                 <div class="flex items-center space-x-4">
-                                    @if($isWinner)
-                                        <div class="flex-shrink-0">
-                                            <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                            </svg>
+                                    <div class="flex-shrink-0">
+                                        <div class="w-10 h-10 rounded-full {{ $loop->iteration === 1 ? 'bg-yellow-500' : ($loop->iteration === 2 ? 'bg-gray-400' : ($loop->iteration === 3 ? 'bg-orange-600' : 'bg-gray-300')) }} flex items-center justify-center shadow-lg">
+                                            <span class="text-white font-bold text-lg">{{ $loop->iteration }}</span>
                                         </div>
-                                    @endif
-                                    <img src="{{ $candidate->photo_url }}" alt="{{ $candidate->name }}" class="w-12 h-12 rounded-full object-cover border-2 border-purple-200">
+                                    </div>
+                                    <img src="{{ $candidate->photo_url }}" alt="{{ $candidate->name }}" class="w-12 h-12 rounded-full object-cover border-2 border-blue-200">
                                     <div>
                                         <div class="flex items-center space-x-2">
                                             <span class="font-bold text-gray-900 text-lg">{{ $candidate->name }}</span>
@@ -204,14 +212,14 @@
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="text-2xl font-bold text-purple-600">{{ $voteCount }}</div>
+                                    <div class="text-2xl font-bold text-blue-600">{{ $voteCount }}</div>
                                     <div class="text-sm text-gray-600">suara</div>
                                 </div>
                             </div>
                             
                             <!-- Progress Bar -->
                             <div class="relative w-full bg-gray-200 rounded-full h-6 overflow-hidden">
-                                <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500 flex items-center justify-end px-3" 
+                                <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-indigo-700 rounded-full transition-all duration-500 flex items-center justify-end px-3" 
                                      style="width: {{ $percentage }}%">
                                     <span class="text-xs font-bold text-white">{{ number_format($percentage, 1) }}%</span>
                                 </div>

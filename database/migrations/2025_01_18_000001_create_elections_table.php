@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('end_date')->nullable();
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
-            $table->enum('status', ['draft', 'active', 'completed'])->default('draft');
+            $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
             $table->boolean('is_published')->default(false);
             $table->string('access_code')->unique()->nullable(); // Kode akses untuk voter
             $table->timestamps();

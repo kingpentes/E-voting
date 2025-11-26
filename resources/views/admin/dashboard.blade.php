@@ -28,6 +28,37 @@
                 </div>
             </div>
 
+            <!-- Flash Messages -->
+            @if(session('error'))
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">{{ session('error') }}</div>
+            @endif
+            @if(session('info'))
+                <div class="mb-6 p-4 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg">{{ session('info') }}</div>
+            @endif
+            @if(session('success'))
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">{{ session('success') }}</div>
+            @endif
+
+            <!-- Election selector + Stats Grid -->
+            <div class="mb-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <form method="GET" action="{{ route('admin.dashboard') }}" id="electionFilterForm" class="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-4">
+                        <label for="election_id" class="text-sm font-medium text-gray-700 self-start md:self-center">Pilih Pemilu:</label>
+                        <select id="election_id" name="election_id" class="px-4 py-2 border border-gray-300 rounded-lg w-full md:w-80" onchange="document.getElementById('electionFilterForm').submit()">
+                            @if(isset($elections) && $elections->isNotEmpty())
+                                @foreach($elections as $opt)
+                                    <option value="{{ $opt->id }}" {{ optional($election)->id == $opt->id ? 'selected' : '' }}>{{ $opt->title }}</option>
+                                @endforeach
+                            @else
+                                <option value="">-- Tidak ada pemilu --</option>
+                            @endif
+                        </select>
+                    </form>
+
+                    <div class="text-sm text-gray-500">Menampilkan statistik untuk pemilu terpilih</div>
+                </div>
+            </div>
+
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <!-- Total Pemilih -->

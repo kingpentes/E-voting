@@ -27,7 +27,9 @@
                                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
                                 <option value="">-- Pilih Pemilu --</option>
                                 @foreach($elections as $election)
-                                    <option value="{{ $election->id }}" {{ $election->is_published ? 'disabled' : '' }}>
+                                    <option value="{{ $election->id }}" 
+                                        {{ old('election_id', request('election_id')) == $election->id ? 'selected' : '' }}
+                                        {{ $election->is_published ? 'disabled' : '' }}>
                                         {{ $election->title }} 
                                         {{ $election->is_published ? '(Sudah Dipublish - Tidak Dapat Ditambah)' : '' }}
                                     </option>

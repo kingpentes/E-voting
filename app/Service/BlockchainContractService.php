@@ -4,6 +4,8 @@ namespace App\Service;
 
 use Web3\Contract;
 use Web3\Web3;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class BlockchainContractService
 {
@@ -54,45 +56,87 @@ class BlockchainContractService
 
     public function storeEncryptedVote(string $cipherB64, string $nonceB64, string $tagB64, string $hashHex32, string $electionId, string $voterId): string
     {
-        $from = \env('BLOCKCHAIN_FROM');
-        $gas = \env('BLOCKCHAIN_GAS', '0x6691b7');
-        $txOpts = [
-            'from' => $from,
-            'gas' => $gas,
-        ];
-        $cipherHex = self::b64ToHex($cipherB64);
-        $nonceHex = self::b64ToHex($nonceB64);
-        $tagHex = self::b64ToHex($tagB64);
+        // Use Node.js web3 to avoid PHP Web3 library issues with string parameter encoding
+        // Get contract address from the contract instance
+        $reflection = new \ReflectionClass($this->contract);
+        $property = $reflection->getProperty('toAddress');
+        $property->setAccessible(true);
+        $contractAddress = $property->getValue($this->contract);
+        
+        $workdir = base_path('..\\quorum-network\\evote\\evote-deploy');
+        
+        // Ensure hash has 0x prefix and is 66 chars (0x + 64 hex chars)
         $hash32 = self::hex32($hashHex32);
-
-        $txHash = null;
-        $this->contract->send('storeVote', $cipherHex, $nonceHex, $tagHex, $hash32, $electionId, $voterId, $txOpts, function ($err, $result) use (&$txHash) {
-            if ($err !== null) {
-                throw new \RuntimeException('Contract send failed: ' . $err->getMessage());
-            }
-            $txHash = is_string($result) ? $result : ($result['transactionHash'] ?? null);
-        });
-        if (!$txHash) {
-            throw new \RuntimeException('No transaction hash returned.');
+        
+        $cmd = "cd " . escapeshellarg($workdir) . " && node storeVote.js "
+            . escapeshellarg($contractAddress) . " "
+            . escapeshellarg($cipherB64) . " "
+            . escapeshellarg($nonceB64) . " "
+            . escapeshellarg($tagB64) . " "
+            . escapeshellarg($hash32) . " "
+            . escapeshellarg($electionId) . " "
+            . escapeshellarg($voterId);
+        
+        $output = shell_exec($cmd . " 2>&1");
+        $output = trim($output ?? '');
+        
+        // Transaction hash format: 0x[64 hex chars]
+        if (!preg_match('/^0x[0-9a-fA-F]{64}$/', $output)) {
+            throw new \RuntimeException('storeVote.js failed: ' . $output);
         }
-        return $txHash;
+        
+        return $output;
     }
 
     public function getVoteCount(string $electionId): int
     {
-        $result = null;
-        $this->contract->call('getVoteCount', $electionId, function ($err, $res) use (&$result) {
-            if ($err !== null) {
-                throw new \RuntimeException('Contract call failed: ' . $err->getMessage());
-            }
-            if (is_array($res) && count($res) > 0) {
-                $val = $res[0];
-                $result = (int) (method_exists($val, 'toString') ? $val->toString() : (string)$val);
-            } else {
-                $result = 0;
-            }
-        });
-        return (int)$result;
+        // Use Node.js web3 to avoid PHP Web3 library issues
+        
+        // Get contract address from the contract instance
+        $reflection = new \ReflectionClass($this->contract);
+        $property = $reflection->getProperty('toAddress');
+        $property->setAccessible(true);
+        $contractAddress = $property->getValue($this->contract);
+        
+        if (!$contractAddress) {
+            throw new \RuntimeException('Contract address not set');
+        }
+        
+        // Call Node.js script to get vote count
+        $scriptPath = base_path('..\\quorum-network\\evote\\evote-deploy\\getVoteCount.js');
+        
+        if (!file_exists($scriptPath)) {
+            throw new \RuntimeException('getVoteCount.js script not found at: ' . $scriptPath);
+        }
+        
+        $command = sprintf(
+            'node %s %s %s',
+            escapeshellarg($scriptPath),
+            escapeshellarg($contractAddress),
+            escapeshellarg($electionId)
+        );
+        
+        $process = new \Symfony\Component\Process\Process(
+            ['node', $scriptPath, $contractAddress, $electionId],
+            null,
+            null,
+            null,
+            30
+        );
+        
+        $process->run();
+        
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException('Node.js call failed: ' . $process->getErrorOutput());
+        }
+        
+        $output = trim($process->getOutput());
+        
+        if (!is_numeric($output)) {
+            throw new \RuntimeException('Invalid vote count returned: ' . $output);
+        }
+        
+        return (int)$output;
     }
 
     public function getVote(string $electionId, int $index): array

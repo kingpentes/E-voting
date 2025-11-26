@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\OrganizerRegisterController;
 use App\Http\Controllers\Auth\VoterRegisterController;
 use App\Http\Controllers\Admin\ElectionController;
 use App\Http\Controllers\Admin\CandidateController;
-use App\Http\Controllers\Admin\BlockchainController;
+
 use App\Http\Controllers\VoterElectionController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -56,6 +56,12 @@ Route::post('/register/voter', [VoterRegisterController::class, 'store'])
     ->middleware('guest')
     ->name('register.voter.store');
 
+// Voter Verification Routes
+Route::middleware(['auth'])->prefix('voter')->name('voter.')->group(function () {
+    Route::get('/verification', [\App\Http\Controllers\VoterVerificationController::class, 'show'])->name('verification');
+    Route::post('/verification', [\App\Http\Controllers\VoterVerificationController::class, 'store'])->name('verification.store');
+});
+
 // Voter Election Routes - Access by invite code
 Route::prefix('election')->name('voter.')->group(function () {
     Route::get('/{code}', [VoterElectionController::class, 'show'])->name('election');
@@ -90,9 +96,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Dashboard
     Route::get('/dashboard', function () {
         $user = \Illuminate\Support\Facades\Auth::user();
-        $election = \App\Models\Election::forOrganizer(\Illuminate\Support\Facades\Auth::id())
+
+        // Get all elections for this organizer so dashboard can select which election to show
+        $elections = \App\Models\Election::forOrganizer(\Illuminate\Support\Facades\Auth::id())
             ->with(['candidates', 'votes'])
-            ->first();
+            ->latest()
+            ->get();
+
+        // Determine selected election from query param or default to first
+        $selectedId = (int) request()->get('election_id', 0);
+        $election = $selectedId ? $elections->firstWhere('id', $selectedId) : $elections->first();
         
         // Initialize stats
         $stats = [
@@ -138,13 +151,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             });
         }
 
-        return view('admin.dashboard', compact('user', 'election', 'stats', 'candidateStats'));
+        return view('admin.dashboard', compact('user', 'election', 'stats', 'candidateStats', 'elections'));
     })->name('dashboard');
     
     // Candidates Resource Routes
     // Custom route MUST be before resource route to avoid being overridden
     Route::get('/candidates/manage', [CandidateController::class, 'index'])->name('candidates.manage');
     Route::resource('candidates', CandidateController::class)->except(['show']);
+    
+    // Voter Approval Routes (must be before /voters/{id} to avoid route conflict)
+    Route::get('/voters/approval', [\App\Http\Controllers\Admin\VoterApprovalController::class, 'index'])->name('voters.approval');
+    Route::post('/voters/{id}/approve', [\App\Http\Controllers\Admin\VoterApprovalController::class, 'approve'])->name('voters.approve');
+    Route::post('/voters/{id}/reject', [\App\Http\Controllers\Admin\VoterApprovalController::class, 'reject'])->name('voters.reject');
     
     // Voters Routes
     Route::get('/voters', [\App\Http\Controllers\Admin\VoterController::class, 'index'])->name('voters.index');
@@ -161,10 +179,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('/elections/{id}/close', [ElectionController::class, 'closeElection'])->name('elections.close');
     Route::post('/elections/{id}/deploy-contract', [ElectionController::class, 'deployContract'])->name('elections.deploy-contract');
     Route::get('/elections/sync-status', [ElectionController::class, 'syncStatus'])->name('elections.sync-status');
-
-    // Blockchain admin
-    Route::get('/blockchain', [BlockchainController::class, 'index'])->name('blockchain.index');
-    Route::post('/blockchain/deploy', [BlockchainController::class, 'deploy'])->name('blockchain.deploy');
     
     // Election Link Management
     Route::get('/elections/link', function () {

@@ -74,10 +74,10 @@
                             </label>
                             <div class="flex items-center space-x-6">
                                 <div class="flex-shrink-0">
-                                    <img id="photoPreview" 
-                                         src="{{ $candidate->photo_url ? asset('storage/' . $candidate->photo_url) : 'https://ui-avatars.com/api/?name=' . urlencode($candidate->name) . '&size=256&background=random' }}" 
+                                     <img id="photoPreview" 
+                                         src="{{ $candidate->photo_url ?? ('https://ui-avatars.com/api/?name=' . urlencode($candidate->name) . '&size=256&background=random') }}" 
                                          alt="{{ $candidate->name }}" 
-                                         class="w-32 h-32 rounded-full object-cover border-4 border-gray-200">
+                                         class="w-32 h-32 rounded-full object-cover border-4 border-gray-200"> 
                                 </div>
                                 <div class="flex-1">
                                     <input type="file" id="photo" name="photo" accept="image/*"

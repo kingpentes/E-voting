@@ -7,6 +7,7 @@ use App\Models\Candidate;
 use App\Service\VoteOnChainService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -90,22 +91,46 @@ class VoterElectionController extends Controller
             ->firstOrFail();
 
         // Create vote in database first
-        $user->votes()->create([
+        $vote = $user->votes()->create([
             'election_id' => $election->id,
             'candidate_id' => $candidate->id,
         ]);
 
         // Optionally mirror vote to blockchain if contract is deployed
+        $blockchainSuccess = false;
+        $blockchainError = null;
+        
         if ($election->contract_address) {
             try {
-                $onchain->submit($election, (string) $user->id, (string) $candidate->id);
+                $txHash = $onchain->submit($election, (string) $user->id, (string) $candidate->id);
+                $blockchainSuccess = true;
+                
+                // Optional: save tx hash to vote record
+                $vote->update(['blockchain_tx_hash' => $txHash]);
+                
+                Log::info('Vote mirrored to blockchain', [
+                    'vote_id' => $vote->id,
+                    'election_id' => $election->id,
+                    'tx_hash' => $txHash,
+                ]);
             } catch (\Throwable $e) {
-                // Jangan menggagalkan vote hanya karena blockchain error; log saja nanti
-                // dan tetap anggap vote sah di database.
+                // Log error tapi jangan gagalkan vote
+                $blockchainError = $e->getMessage();
+                Log::error('Failed to mirror vote to blockchain', [
+                    'vote_id' => $vote->id,
+                    'election_id' => $election->id,
+                    'error' => $blockchainError,
+                    'trace' => $e->getTraceAsString(),
+                ]);
             }
         }
 
+        $message = '✓ Suara Anda berhasil dicatat! Terima kasih telah berpartisipasi.';
+        if ($election->contract_address && !$blockchainSuccess) {
+            $message .= ' (Catatan: Vote tersimpan di database, namun belum tersinkronisasi ke blockchain)';
+        }
+
         return redirect()->route('voter.election', ['code' => $code])
-            ->with('success', '✓ Suara Anda berhasil dicatat! Terima kasih telah berpartisipasi.');
+            ->with('success', $message);
     }
 }

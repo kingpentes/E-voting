@@ -87,6 +87,15 @@
 
                         <!-- Session Status -->
                         <x-auth-session-status class="mb-4" :status="session('status')" />
+                        @if(session('error'))
+                            <div class="mb-4 text-sm text-red-600">{{ session('error') }}</div>
+                        @endif
+                        @if(session('info'))
+                            <div class="mb-4 text-sm text-indigo-600">{{ session('info') }}</div>
+                        @endif
+                        @if(session('success'))
+                            <div class="mb-4 text-sm text-green-600">{{ session('success') }}</div>
+                        @endif
 
                         <!-- Login Form -->
                         <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl p-8 border border-white/20">

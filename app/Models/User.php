@@ -22,9 +22,13 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'id_number',
         'face_photo',
+        'id_card',
         'organization',
+        'verification_status',
+        'rejection_reason',
+        'verified_at',
+        'verified_by',
     ];
 
     /**

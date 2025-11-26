@@ -33,14 +33,7 @@ class ElectionController extends Controller
      */
     public function create()
     {
-        // Check if user already has an election
-        $existingElection = Election::forOrganizer(Auth::id())->first();
-        
-        if ($existingElection) {
-            return redirect()->route('admin.elections.manage')
-                ->with('error', '✗ Anda sudah memiliki pemilu. Setiap organizer hanya dapat membuat 1 pemilu.');
-        }
-        
+        // Show form to create a new election (allow multiple elections per organizer)
         return view('admin.elections.rules');
     }
 
@@ -49,14 +42,7 @@ class ElectionController extends Controller
      */
     public function store(Request $request)
     {
-        // Check if user already has an election
-        $existingElection = Election::forOrganizer(Auth::id())->first();
-        
-        if ($existingElection) {
-            return redirect()->route('admin.elections.manage')
-                ->with('error', '✗ Anda sudah memiliki pemilu. Setiap organizer hanya dapat membuat 1 pemilu.');
-        }
-        
+        // Allow creating multiple elections per organizer
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -73,7 +59,9 @@ class ElectionController extends Controller
             'max_votes_per_voter' => ['integer', 'min:1'],
         ]);
 
-        DB::transaction(function () use ($validated, $request) {
+        /** @var Election|null $election */
+        $election = null;
+        DB::transaction(function () use ($validated, $request, &$election) {
             // Create Election
             $election = Election::create([
                 'user_id' => Auth::id(),
@@ -107,8 +95,9 @@ class ElectionController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.elections.manage')
-            ->with('success', '✓ Pengaturan pemilu berhasil dibuat!');
+        // Redirect to add candidate page for the newly created election
+        return redirect()->route('admin.candidates.create', ['election_id' => $election->id])
+            ->with('success', '✓ Pengaturan pemilu berhasil dibuat! Silakan tambahkan kandidat.');
     }
 
     /**
@@ -265,20 +254,21 @@ class ElectionController extends Controller
     }
 
     /**
-     * Show on-chain vs DB sync status for the organizer's election.
+     * Show on-chain vs DB sync status for all organizer's elections.
      */
     public function syncStatus(ElectionSyncStatusService $syncService)
     {
-        $election = Election::forOrganizer(Auth::id())
+        $elections = Election::forOrganizer(Auth::id())
             ->with(['votes'])
-            ->first();
+            ->latest()
+            ->get();
 
-        $status = null;
-        if ($election) {
-            $status = $syncService->getStatusForElection($election);
+        $statuses = [];
+        foreach ($elections as $election) {
+            $statuses[$election->id] = $syncService->getStatusForElection($election);
         }
 
-        return view('admin.elections.sync-status', compact('election', 'status'));
+        return view('admin.elections.sync-status', compact('elections', 'statuses'));
     }
 
     /**

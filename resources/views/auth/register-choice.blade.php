@@ -33,6 +33,17 @@
                         <p class="text-xl text-gray-600 max-w-2xl mx-auto">Choose your role to get started with our secure, transparent voting platform</p>
                     </div>
 
+                    <!-- Flash messages -->
+                    @if(session('error'))
+                        <div class="max-w-2xl mx-auto mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">{{ session('error') }}</div>
+                    @endif
+                    @if(session('info'))
+                        <div class="max-w-2xl mx-auto mb-6 p-4 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg">{{ session('info') }}</div>
+                    @endif
+                    @if(session('success'))
+                        <div class="max-w-2xl mx-auto mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">{{ session('success') }}</div>
+                    @endif
+
                     <!-- Registration Options -->
                     <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                         <!-- Organizer Registration -->

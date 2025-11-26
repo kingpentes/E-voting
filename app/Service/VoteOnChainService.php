@@ -8,7 +8,6 @@ class VoteOnChainService
 {
     public function __construct(
         private readonly VoteCryptoService $crypto,
-        private readonly BlockchainContractService $contract
     ) {}
 
     /**
