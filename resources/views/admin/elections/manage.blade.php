@@ -1,4 +1,4 @@
-﻿<x-admin-layout title="Kelola Judul & Peraturan">
+<x-admin-layout title="Kelola Judul & Peraturan">
     <x-admin-sidebar active="rules" />
     
     <div class="flex-1 flex flex-col overflow-hidden">
@@ -10,7 +10,7 @@
                 </div>
                 <!-- Selalu tampilkan tombol buat pemilu baru (izinkan multiple pemilu per organizer) -->
                 <a href="{{ route('admin.elections.create') }}" 
-                   class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all">
+                   class="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all">
                     <span>+ Buat Pemilu Baru</span>
                 </a>
             </div>
@@ -58,7 +58,7 @@
                                         </button>
                                     @elseif(!$election->is_published)
                                         <form action="{{ route('admin.elections.toggle-publish', $election->id) }}" method="POST" 
-                                              onsubmit="return confirm('⚠️ PERINGATAN!\n\nSetelah dipublish, Anda TIDAK DAPAT:\n- Mengubah data pemilu\n- Mengedit atau menghapus kandidat\n- Unpublish pemilu\n\nAnda hanya dapat menutup pemilu untuk menampilkan hasil.\n\nApakah Anda yakin ingin mempublish pemilu ini?')">
+                                              onsubmit="return confirm('?? PERINGATAN!\n\nSetelah dipublish, Anda TIDAK DAPAT:\n- Mengubah data pemilu\n- Mengedit atau menghapus kandidat\n- Unpublish pemilu\n\nAnda hanya dapat menutup pemilu untuk menampilkan hasil.\n\nApakah Anda yakin ingin mempublish pemilu ini?')">
                                             @csrf
                                             <button type="submit" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
                                                 Publish Pemilu
@@ -114,7 +114,7 @@
                                 <span class="text-gray-700 {{ $election->candidates_count === 0 ? 'text-red-600 font-bold' : '' }}">
                                     {{ $election->candidates_count }} 
                                     @if($election->candidates_count === 0 && !$election->is_published)
-                                        <span class="text-xs">(⚠️ Diperlukan untuk publish)</span>
+                                        <span class="text-xs">(?? Diperlukan untuk publish)</span>
                                     @endif
                                 </span>
                                 
@@ -147,7 +147,7 @@
                             
                             <!-- Pengaturan Lanjutan display removed -->
                             
-                            <div class="mt-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl">
+                            <div class="mt-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h3 class="text-sm font-bold text-gray-700 mb-1">Kode Akses Pemilu</h3>

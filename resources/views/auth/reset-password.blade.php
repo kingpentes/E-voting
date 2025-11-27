@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-cyan-500 to-blue-600 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full">
             <!-- Card Container -->
             <div class="bg-white rounded-2xl shadow-2xl p-8">
@@ -16,7 +16,7 @@
                     <p class="mt-2 text-sm text-gray-600">
                         Buat password baru untuk akun
                     </p>
-                    <p class="mt-1 text-sm font-semibold text-indigo-600">
+                    <p class="mt-1 text-sm font-semibold text-blue-600">
                         {{ $email }}
                     </p>
                 </div>

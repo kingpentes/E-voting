@@ -10,7 +10,7 @@
 <body class="font-sans antialiased bg-gradient-to-br from-blue-50 via-white to-indigo-50">
     <div class="min-h-screen">
         <!-- Header -->
-        <header class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg">
+        <header class="bg-gradient-to-r from-blue-600 to-cyan-700 shadow-lg">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
@@ -64,7 +64,7 @@
 
             <!-- Election Schedule Info -->
             @if($election->status !== 'closed')
-            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-lg p-6 mb-8 text-white">
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-2xl shadow-lg p-6 mb-8 text-white">
                 <div class="flex items-center mb-4">
                     <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -163,7 +163,7 @@
 
             <!-- Voting Results (shown when election is closed) -->
             @if($election->status === 'closed')
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl p-8 mb-8 text-white">
+            <div class="bg-gradient-to-r from-blue-600 to-cyan-700 rounded-2xl shadow-xl p-8 mb-8 text-white">
                 <div class="flex items-center justify-center mb-6">
                     <svg class="w-10 h-10 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -219,7 +219,7 @@
                             
                             <!-- Progress Bar -->
                             <div class="relative w-full bg-gray-200 rounded-full h-6 overflow-hidden">
-                                <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-indigo-700 rounded-full transition-all duration-500 flex items-center justify-end px-3" 
+                                <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-cyan-700 rounded-full transition-all duration-500 flex items-center justify-end px-3" 
                                      style="width: {{ $percentage }}%">
                                     <span class="text-xs font-bold text-white">{{ number_format($percentage, 1) }}%</span>
                                 </div>
@@ -241,7 +241,7 @@
                                     <img src="{{ $candidate->photo_url }}" 
                                          alt="{{ $candidate->name }}"
                                          class="w-32 h-32 rounded-full object-cover border-4 border-blue-100 group-hover:border-blue-300 transition-all shadow-lg">
-                                    <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold px-4 py-1 rounded-full shadow-lg">
+                                    <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-sm font-bold px-4 py-1 rounded-full shadow-lg">
                                         #{{ $candidate->number }}
                                     </span>
                                 </div>

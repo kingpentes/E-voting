@@ -10,7 +10,7 @@
 <body class="font-sans antialiased bg-gradient-to-br from-blue-50 via-white to-indigo-50">
     <div class="min-h-screen pb-12">
         <!-- Header with Gradient -->
-        <header class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg">
+        <header class="bg-gradient-to-r from-blue-600 to-cyan-700 shadow-lg">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <a href="{{ route('voter.election', ['code' => $election->access_code]) }}" 
                    class="inline-flex items-center text-white hover:text-blue-100 font-semibold mb-4 transition-colors group">
@@ -32,7 +32,7 @@
                         <img src="{{ $candidate->photo_url }}" 
                              alt="{{ $candidate->name }}"
                              class="w-40 h-40 rounded-full object-cover border-4 border-blue-100 shadow-xl mx-auto">
-                        <span class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold px-6 py-2 rounded-full shadow-lg">
+                        <span class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-lg font-bold px-6 py-2 rounded-full shadow-lg">
                             #{{ $candidate->number }}
                         </span>
                     </div>
@@ -62,7 +62,7 @@
                     <div class="mb-10">
                         <div class="flex items-center mb-4">
                             <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
-                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                                 </svg>
                             </div>
@@ -71,7 +71,7 @@
                         <div class="space-y-4">
                             @foreach($candidate->missions->sortBy('order') as $mission)
                             <div class="flex items-start bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all">
-                                <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-lg flex items-center justify-center font-bold shadow-md mr-4">
+                                <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 text-white rounded-lg flex items-center justify-center font-bold shadow-md mr-4">
                                     {{ $loop->iteration }}
                                 </div>
                                 <p class="flex-1 text-gray-800 text-base pt-2 leading-relaxed">{{ $mission->mission }}</p>
@@ -91,7 +91,7 @@
                             @csrf
                             <input type="hidden" name="candidate_id" value="{{ $candidate->id }}">
                             <button type="submit" 
-                                    class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-5 px-8 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-200 shadow-xl hover:shadow-2xl">
+                                    class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-5 px-8 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-200 shadow-xl hover:shadow-2xl">
                                 <span class="flex items-center justify-center text-lg">
                                     <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>

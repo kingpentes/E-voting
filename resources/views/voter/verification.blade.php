@@ -9,7 +9,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gradient-to-br from-purple-50 via-white to-pink-50">
+<body class="font-sans antialiased bg-gradient-to-br from-blue-50 via-white to-cyan-50">
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
         <header class="shadow-lg" style="background: linear-gradient(to right, #3b24cc, #6a4cff);">
@@ -71,7 +71,7 @@
                         </label>
                         <input type="text" id="invite_code" name="invite_code" required maxlength="8"
                                value="{{ old('invite_code') }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent uppercase"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
                                placeholder="Masukkan kode undangan dari penyelenggara">
                         @error('invite_code')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -83,14 +83,14 @@
                         <label for="id_card" class="block text-sm font-semibold text-gray-700 mb-2">
                             Upload KTP/ID Card <span class="text-red-500">*</span>
                         </label>
-                        <div class="border-2 border-dashed border-purple-300 rounded-xl p-6 text-center bg-purple-50">
+                        <div class="border-2 border-dashed border-blue-300 rounded-xl p-6 text-center bg-purple-50">
                             <input type="file" id="id_card" name="id_card" accept="image/*" required
                                    onchange="previewIdCard(event)" class="hidden">
                             <label for="id_card" class="cursor-pointer">
-                                <svg class="w-12 h-12 mx-auto mb-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-12 h-12 mx-auto mb-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                                 </svg>
-                                <p class="text-sm text-purple-600 font-semibold">Klik untuk upload KTP/ID Card</p>
+                                <p class="text-sm text-blue-600 font-semibold">Klik untuk upload KTP/ID Card</p>
                                 <p class="text-xs text-gray-500 mt-1">PNG, JPG - Max 2MB</p>
                             </label>
                             <div id="idCardPreview" class="mt-4 hidden">
@@ -116,7 +116,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                                 <p class="text-gray-400 mb-4">Posisikan wajah Anda di kamera</p>
-                                <button type="button" onclick="startCamera()" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+                                <button type="button" onclick="startCamera()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
                                     Aktifkan Kamera
                                 </button>
                             </div>

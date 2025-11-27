@@ -1,11 +1,11 @@
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-cyan-500 to-blue-600 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full">
             <!-- Card Container -->
             <div class="bg-white rounded-2xl shadow-2xl p-8">
                 <!-- Header -->
                 <div class="text-center mb-8">
-                    <div class="mx-auto h-16 w-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mb-4">
+                    <div class="mx-auto h-16 w-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-full flex items-center justify-center mb-4">
                         <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
@@ -16,7 +16,7 @@
                     <p class="mt-2 text-sm text-gray-600">
                         Masukkan 6 digit kode yang telah dikirim ke
                     </p>
-                    <p class="mt-1 text-sm font-semibold text-indigo-600">
+                    <p class="mt-1 text-sm font-semibold text-blue-600">
                         {{ $email }}
                     </p>
                 </div>
@@ -69,7 +69,7 @@
                                pattern="[0-9]{6}"
                                required
                                value="{{ old('otp') }}"
-                               class="appearance-none block w-full px-4 py-4 border border-gray-300 rounded-lg placeholder-gray-400 text-center text-2xl font-bold letter-spacing-wide focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-150 @error('otp') border-red-500 @enderror"
+                               class="appearance-none block w-full px-4 py-4 border border-gray-300 rounded-lg placeholder-gray-400 text-center text-2xl font-bold letter-spacing-wide focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 @error('otp') border-red-500 @enderror"
                                placeholder="000000"
                                autocomplete="off">
                         @error('otp')
@@ -80,7 +80,7 @@
                     <!-- Submit Button -->
                     <div>
                         <button type="submit" 
-                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150">
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150">
                             Verifikasi Kode
                         </button>
                     </div>
@@ -95,7 +95,7 @@
                         @csrf
                         <input type="hidden" name="email" value="{{ $email }}">
                         <button type="submit" 
-                                class="mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-500 transition duration-150 underline">
+                                class="mt-2 text-sm font-medium text-blue-600 hover:text-indigo-500 transition duration-150 underline">
                             Kirim ulang OTP
                         </button>
                     </form>

@@ -1,4 +1,4 @@
-﻿<x-admin-layout title="Kelola Kandidat">
+<x-admin-layout title="Kelola Kandidat">
     <x-admin-sidebar active="manage" />
     
     <div class="flex-1 flex flex-col overflow-hidden">
@@ -10,7 +10,7 @@
                         <p class="text-gray-600 mt-1">{{ $candidates->count() }} kandidat dari pemilu Anda</p>
                     </div>
                     <a href="{{ route('admin.candidates.create') }}" 
-                       class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl">
+                       class="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl">
                         <span>+ Tambah Kandidat Baru</span>
                     </a>
                 </div>
@@ -116,7 +116,7 @@
                                         @else
                                             <ul class="space-y-2">
                                                 @foreach($candidate->missions as $mission)
-                                                    <li class="flex space-x-2 bg-purple-50 p-3 rounded-lg">
+                                                    <li class="flex space-x-2 bg-blue-50 p-3 rounded-lg">
                                                         <span class="font-bold">{{ $loop->iteration }}.</span>
                                                         <p>{{ $mission->mission }}</p>
                                                     </li>

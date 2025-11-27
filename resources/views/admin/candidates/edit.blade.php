@@ -82,7 +82,7 @@
                                 <div class="flex-1">
                                     <input type="file" id="photo" name="photo" accept="image/*"
                                            onchange="previewPhoto(event)"
-                                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all cursor-pointer">
+                                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all cursor-pointer">
                                     <p class="text-sm text-gray-500 mt-2">Kosongkan jika tidak ingin mengubah foto. Format: JPG, PNG, atau GIF. Maksimal 2MB</p>
                                 </div>
                             </div>
@@ -107,7 +107,7 @@
                             <div id="misiContainer" class="space-y-3">
                                 @foreach($candidate->missions->sortBy('order') as $index => $mission)
                                 <div class="flex items-start space-x-2 misi-item">
-                                    <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">{{ $index + 1 }}</span>
+                                    <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">{{ $index + 1 }}</span>
                                     <input type="text" name="misi[]" required 
                                            value="{{ old('misi.' . $index, $mission->mission) }}"
                                            class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
@@ -124,7 +124,7 @@
                                 @endforeach
                             </div>
                             <button type="button" onclick="addMisi()" 
-                                    class="mt-4 inline-flex items-center px-4 py-2 bg-purple-100 text-purple-700 font-semibold rounded-lg hover:bg-purple-200 transition-all">
+                                    class="mt-4 inline-flex items-center px-4 py-2 bg-purple-100 text-blue-700 font-semibold rounded-lg hover:bg-purple-200 transition-all">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -174,7 +174,7 @@
             const newMisi = document.createElement('div');
             newMisi.className = 'flex items-start space-x-2 misi-item';
             newMisi.innerHTML = `
-                <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">${misiCount}</span>
+                <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">${misiCount}</span>
                 <input type="text" name="misi[]" required
                        class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                        placeholder="Masukkan misi ke-${misiCount}">

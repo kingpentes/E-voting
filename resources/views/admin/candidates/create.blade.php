@@ -72,7 +72,7 @@
                                 <div class="flex-1">
                                     <input type="file" id="photo" name="photo" accept="image/*" required
                                            onchange="previewPhoto(event)"
-                                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all cursor-pointer">
+                                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all cursor-pointer">
                                     <p class="text-sm text-gray-500 mt-2">Format: JPG, PNG, atau GIF. Maksimal 2MB</p>
                                 </div>
                             </div>
@@ -96,14 +96,14 @@
                             </label>
                             <div id="misiContainer" class="space-y-3">
                                 <div class="flex items-start space-x-2 misi-item">
-                                    <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">1</span>
+                                    <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">1</span>
                                     <input type="text" name="misi[]" required
                                            class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                                            placeholder="Masukkan misi ke-1">
                                 </div>
                             </div>
                             <button type="button" onclick="addMisi()" 
-                                    class="mt-4 inline-flex items-center px-4 py-2 bg-purple-100 text-purple-700 font-semibold rounded-lg hover:bg-purple-200 transition-all">
+                                    class="mt-4 inline-flex items-center px-4 py-2 bg-purple-100 text-blue-700 font-semibold rounded-lg hover:bg-purple-200 transition-all">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -115,7 +115,7 @@
                         <!-- Action Buttons -->
                         <div class="flex items-center space-x-4 pt-6 border-t border-gray-200">
                             <button type="submit"
-                                    class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                    class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-4 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
                                 <span class="flex items-center justify-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -154,7 +154,7 @@
             const newMisi = document.createElement('div');
             newMisi.className = 'flex items-start space-x-2 misi-item';
             newMisi.innerHTML = `
-                <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">${misiCount}</span>
+                <span class="flex-shrink-0 w-8 h-8 bg-purple-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm mt-2">${misiCount}</span>
                 <input type="text" name="misi[]" required
                        class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                        placeholder="Masukkan misi ke-${misiCount}">

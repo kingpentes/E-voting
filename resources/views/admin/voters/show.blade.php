@@ -24,7 +24,7 @@
             <div class="max-w-5xl mx-auto space-y-6">
                 <!-- Voter Profile Card -->
                 <div class="bg-white rounded-2xl shadow-md overflow-hidden">
-                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-6">
+                    <div class="bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-6">
                         <div class="flex items-center space-x-6">
                             <div class="flex-shrink-0">
                                 @if($voter->face_photo)
@@ -32,7 +32,7 @@
                                          src="{{ asset('storage/' . $voter->face_photo) }}" 
                                          alt="{{ $voter->name }}">
                                 @else
-                                    <div class="h-24 w-24 rounded-full bg-white flex items-center justify-center text-purple-600 font-bold text-3xl shadow-lg">
+                                    <div class="h-24 w-24 rounded-full bg-white flex items-center justify-center text-blue-600 font-bold text-3xl shadow-lg">
                                         {{ strtoupper(substr($voter->name, 0, 1)) }}
                                     </div>
                                 @endif

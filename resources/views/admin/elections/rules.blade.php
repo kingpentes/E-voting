@@ -82,7 +82,7 @@
                         
                         <div id="rulesContainer" class="space-y-4">
                             <div class="flex items-start space-x-3 rule-item bg-gray-50 p-4 rounded-xl">
-                                <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">1</div>
+                                <div class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mt-1">1</div>
                                 <input type="text" name="rules[]" required
                                        class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                                        placeholder="Contoh: Setiap pemilih hanya dapat memberikan satu suara">
@@ -90,7 +90,7 @@
                         </div>
                         
                         <button type="button" onclick="addRule()" 
-                                class="mt-6 inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 font-semibold rounded-xl hover:from-purple-200 hover:to-pink-200 transition-all shadow-sm">
+                                class="mt-6 inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 font-semibold rounded-xl hover:from-purple-200 hover:to-pink-200 transition-all shadow-sm">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
@@ -103,7 +103,7 @@
                     <!-- Action Buttons -->
                     <div class="flex items-center space-x-4">
                         <button type="submit"
-                                class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-4 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
                             <span class="flex items-center justify-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -130,7 +130,7 @@
             const newRule = document.createElement('div');
             newRule.className = 'flex items-start space-x-3 rule-item bg-gray-50 p-4 rounded-xl';
             newRule.innerHTML = `
-                <div class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mt-1">${ruleCount}</div>
+                <div class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mt-1">${ruleCount}</div>
                 <input type="text" name="rules[]" required
                        class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                        placeholder="Masukkan peraturan...">

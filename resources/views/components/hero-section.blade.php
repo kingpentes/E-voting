@@ -1,6 +1,6 @@
 @props(['title', 'description'])
 
-<div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16 px-4">
+<div class="bg-gradient-to-r from-blue-600 to-cyan-700 text-white py-16 px-4">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-bold mb-6">{{ $title }}</h1>
