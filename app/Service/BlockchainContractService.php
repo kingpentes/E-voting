@@ -63,22 +63,38 @@ class BlockchainContractService
         $property->setAccessible(true);
         $contractAddress = $property->getValue($this->contract);
         
-        $workdir = base_path('..\\quorum-network\\evote\\evote-deploy');
+        $workdir = env('CONTRACT_DEPLOY_PATH', base_path('..\\blockchain\\evote-deploy'));
+        $scriptPath = $workdir . '\\storeVote.js';
         
         // Ensure hash has 0x prefix and is 66 chars (0x + 64 hex chars)
         $hash32 = self::hex32($hashHex32);
         
-        $cmd = "cd " . escapeshellarg($workdir) . " && node storeVote.js "
-            . escapeshellarg($contractAddress) . " "
-            . escapeshellarg($cipherB64) . " "
-            . escapeshellarg($nonceB64) . " "
-            . escapeshellarg($tagB64) . " "
-            . escapeshellarg($hash32) . " "
-            . escapeshellarg($electionId) . " "
-            . escapeshellarg($voterId);
+        // Build environment variables
+        $env = [
+            'RPC' => env('BLOCKCHAIN_RPC', 'http://127.0.0.1:18545'),
+            'BLOCKCHAIN_RPC' => env('BLOCKCHAIN_RPC', 'http://127.0.0.1:18545'),
+            'DEPLOY_FROM' => env('BLOCKCHAIN_FROM'),
+            'ABI_OUTPUT_PATH' => env('CONTRACT_ABI_PATH'),
+            'CONTRACT_ABI_PATH' => env('CONTRACT_ABI_PATH'),
+            'PATH' => getenv('PATH'),
+            'SystemRoot' => getenv('SystemRoot') ?: 'C:\\Windows',
+        ];
         
-        $output = shell_exec($cmd . " 2>&1");
-        $output = trim($output ?? '');
+        $process = new \Symfony\Component\Process\Process(
+            ['node', $scriptPath, $contractAddress, $cipherB64, $nonceB64, $tagB64, $hash32, $electionId, $voterId],
+            null,
+            $env,
+            null,
+            60
+        );
+        
+        $process->run();
+        
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException('storeVote.js failed: ' . $process->getErrorOutput());
+        }
+        
+        $output = trim($process->getOutput());
         
         // Transaction hash format: 0x[64 hex chars]
         if (!preg_match('/^0x[0-9a-fA-F]{64}$/', $output)) {
@@ -103,23 +119,28 @@ class BlockchainContractService
         }
         
         // Call Node.js script to get vote count
-        $scriptPath = base_path('..\\quorum-network\\evote\\evote-deploy\\getVoteCount.js');
+        $deployPath = env('CONTRACT_DEPLOY_PATH', base_path('..\\blockchain\\evote-deploy'));
+        $scriptPath = $deployPath . '\\getVoteCount.js';
+
         
         if (!file_exists($scriptPath)) {
             throw new \RuntimeException('getVoteCount.js script not found at: ' . $scriptPath);
         }
         
-        $command = sprintf(
-            'node %s %s %s',
-            escapeshellarg($scriptPath),
-            escapeshellarg($contractAddress),
-            escapeshellarg($electionId)
-        );
+        // Build environment variables for Node.js
+        $env = [
+            'RPC' => env('BLOCKCHAIN_RPC', 'http://127.0.0.1:18545'),
+            'BLOCKCHAIN_RPC' => env('BLOCKCHAIN_RPC', 'http://127.0.0.1:18545'),
+            'ABI_OUTPUT_PATH' => env('CONTRACT_ABI_PATH'),
+            'CONTRACT_ABI_PATH' => env('CONTRACT_ABI_PATH'),
+            'PATH' => getenv('PATH'),
+            'SystemRoot' => getenv('SystemRoot') ?: 'C:\\Windows',
+        ];
         
         $process = new \Symfony\Component\Process\Process(
             ['node', $scriptPath, $contractAddress, $electionId],
             null,
-            null,
+            $env,
             null,
             30
         );
