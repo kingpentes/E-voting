@@ -12,8 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Update existing joined_at values to use application timezone
-        DB::statement("UPDATE election_user SET joined_at = datetime(joined_at, 'localtime') WHERE joined_at IS NOT NULL");
+        // Update existing joined_at values to use application timezone (MySQL compatible)
+        DB::statement("UPDATE election_user SET joined_at = CONVERT_TZ(joined_at, '+00:00', @@session.time_zone) WHERE joined_at IS NOT NULL");
     }
 
     /**

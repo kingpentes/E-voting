@@ -30,7 +30,10 @@ class User extends Authenticatable
         'rejection_reason',
         'verified_at',
         'verified_by',
-        'email_verified_at',
+        'google_id',
+        'google_token',
+        'google_refresh_token',
+        'avatar',
     ];
 
     /**
@@ -98,5 +101,17 @@ class User extends Authenticatable
     public function hasVotedIn($electionId)
     {
         return $this->votes()->where('election_id', $electionId)->exists();
+    }
+
+    // Helper: Check if user needs verification
+    public function needsVerification()
+    {
+        return !$this->face_photo || !$this->id_card || in_array($this->verification_status, ['pending', 'rejected', null]);
+    }
+
+    // Helper: Check if user is verified
+    public function isVerified()
+    {
+        return $this->verification_status === 'approved' && $this->face_photo && $this->id_card;
     }
 }

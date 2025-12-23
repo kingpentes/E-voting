@@ -4,6 +4,8 @@
 .env
 .env.backup
 .env.production
+.env.local
+*.env.local
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -42,6 +44,18 @@ Thumbs.db
 !/storage/app/public/.gitkeep
 /storage/app/private/*
 !/storage/app/private/.gitkeep
+
+# Google OAuth Credentials (SENSITIVE - DO NOT COMMIT)
+client_secret_*.json
+gmail_token.json
+
+# Testing Scripts
+generate_gmail_token.php
+get_auth_url.php
+quick_token_gen.php
+test_gmail_send.php
+pentest_suite.php
+pentest_output.log
 
 # Bootstrap Cache
 /bootstrap/cache/*
