@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class CandidateController extends Controller
 {
@@ -63,7 +64,14 @@ class CandidateController extends Controller
     {
         $validated = $request->validate([
             'election_id' => ['required', 'exists:elections,id'],
-            'number' => ['required', 'integer', 'min:1'],
+            'number' => [
+                'required', 
+                'integer', 
+                'min:1',
+                Rule::unique('candidates', 'number')
+                    ->where('election_id', $request->election_id)
+                    ->whereNull('deleted_at') // Ignore soft deleted candidates
+            ],
             'name' => ['required', 'string', 'max:255'],
             'photo' => ['nullable', 'image', 'max:2048'], // Max 2MB
             'visi' => ['required', 'string'],
@@ -90,6 +98,12 @@ class CandidateController extends Controller
                 ->withInput()
                 ->withErrors(['number' => "Nomor urut {$validated['number']} sudah digunakan di pemilu ini."]);
         }
+
+        // Clean up soft-deleted candidates with same number to avoid unique constraint violation
+        Candidate::onlyTrashed()
+            ->where('election_id', $election->id)
+            ->where('number', $validated['number'])
+            ->forceDelete();
 
         DB::transaction(function () use ($validated, $request) {
             // Handle photo upload
@@ -164,7 +178,15 @@ class CandidateController extends Controller
 
         $validated = $request->validate([
             'election_id' => ['required', 'exists:elections,id'],
-            'number' => ['required', 'integer', 'min:1'],
+            'number' => [
+                'required', 
+                'integer', 
+                'min:1',
+                Rule::unique('candidates', 'number')
+                    ->where('election_id', $request->election_id)
+                    ->whereNull('deleted_at')
+                    ->ignore($id) // Ignore current candidate being edited
+            ],
             'name' => ['required', 'string', 'max:255'],
             'photo' => ['nullable', 'image', 'max:2048'],
             'visi' => ['required', 'string'],
