@@ -8,20 +8,30 @@ class ContractDeploymentService
 {
     public function deploy(): array
     {
-        $rpc = \env('BLOCKCHAIN_RPC');
-        $from = \env('BLOCKCHAIN_FROM');
+        $rpc = env('BLOCKCHAIN_RPC');
+        $from = env('BLOCKCHAIN_FROM');
         if (!$rpc || !$from) {
             throw new \RuntimeException('Missing BLOCKCHAIN_RPC or BLOCKCHAIN_FROM in environment');
         }
 
-        // Use the vendored evote-deploy folder inside this repo
-        $workdir = base_path('..\\quorum-network\\evote\\evote-deploy');
-        if (!is_dir($workdir)) {
-            throw new \RuntimeException('Deploy folder not found: ' . $workdir);
+        // Use the evote-deploy folder from environment variable
+        $workdir = env('CONTRACT_DEPLOY_PATH');
+        if (!$workdir || !is_dir($workdir)) {
+            throw new \RuntimeException('Deploy folder not found: ' . ($workdir ?: 'CONTRACT_DEPLOY_PATH not set'));
         }
 
-        $env = [ 'RPC' => $rpc, 'DEPLOY_FROM' => $from ];
-        $cmd = ['node', 'deploy.js'];
+        $abiPath = env('CONTRACT_ABI_PATH') ?: storage_path('contract/evote_abi.json');
+        
+        // Build environment array to pass to Process
+        $env = [
+            'RPC' => $rpc,
+            'DEPLOY_FROM' => $from,
+            'ABI_OUTPUT_PATH' => $abiPath,
+            'PATH' => getenv('PATH'),
+            'SystemRoot' => getenv('SystemRoot') ?: 'C:\\Windows',
+        ];
+        
+        $cmd = ['cmd', '/c', 'node', 'deploy.js'];
         $process = new Process($cmd, $workdir, $env, null, 600);
         $process->run();
 

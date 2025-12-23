@@ -278,7 +278,6 @@ class ElectionController extends Controller
     {
         $election = Election::forOrganizer(Auth::id())->findOrFail($id);
 
-        // Optional: prevent deploying if election already has a contract
         if ($election->contract_address) {
             return redirect()->back()
                 ->with('error', '✗ Kontrak untuk pemilu ini sudah tersedia.');
