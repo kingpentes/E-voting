@@ -12,6 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // If elections table does not exist, nothing to migrate (fresh install)
+        if (!Schema::hasTable('elections')) {
+            return;
+        }
+
+        // Ensure any previous backup is removed to avoid rename errors in dev
+        if (Schema::hasTable('elections_backup')) {
+            Schema::drop('elections_backup');
+        }
+
         // Backup election_user data
         $electionUsers = DB::table('election_user')->get()->toArray();
         
@@ -65,8 +75,10 @@ return new class extends Migration
             DB::table('election_user')->insert((array)$eu);
         }
         
-        // Drop backup table
-        Schema::drop('elections_backup');
+        // Drop backup table if exists
+        if (Schema::hasTable('elections_backup')) {
+            Schema::drop('elections_backup');
+        }
     }
 
     /**
