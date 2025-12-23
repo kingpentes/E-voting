@@ -20,6 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'google_id',
         'password',
         'role',
         'face_photo',
@@ -29,6 +30,7 @@ class User extends Authenticatable
         'rejection_reason',
         'verified_at',
         'verified_by',
+        'email_verified_at',
     ];
 
     /**
