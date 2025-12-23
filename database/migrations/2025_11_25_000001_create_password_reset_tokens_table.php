@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('password_reset_tokens')) {
+            return; // table already exists
+        }
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->index();
             $table->string('token', 6); // 6 digit OTP

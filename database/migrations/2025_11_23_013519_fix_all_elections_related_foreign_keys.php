@@ -12,8 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Disable foreign key checks
-        DB::statement('PRAGMA foreign_keys = OFF');
+        // Disable foreign key checks depending on driver
+        $driver = DB::connection()->getDriverName();
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        } else {
+            DB::statement('PRAGMA foreign_keys = OFF');
+        }
         
         // Backup candidates data
         $candidates = DB::table('candidates')->get()->toArray();
@@ -77,6 +82,7 @@ return new class extends Migration
             $table->foreignId('voter_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('candidate_id')->nullable()->constrained('candidates')->onDelete('cascade');
             $table->string('vote_hash')->unique();
+            $table->string('blockchain_tx_hash', 66)->nullable();
             $table->ipAddress('ip_address')->nullable();
             $table->string('user_agent')->nullable();
             $table->timestamp('voted_at');
@@ -90,7 +96,11 @@ return new class extends Migration
         }
         
         // Re-enable foreign key checks
-        DB::statement('PRAGMA foreign_keys = ON');
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        } else {
+            DB::statement('PRAGMA foreign_keys = ON');
+        }
     }
 
     /**
