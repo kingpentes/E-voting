@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -44,7 +45,20 @@ Route::middleware('guest')->group(function () {
 
     Route::post('resend-otp', [ForgotPasswordController::class, 'resendOTP'])
         ->name('password.resend-otp');
+
+    // Google OAuth Routes - redirect only
+    Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle'])
+        ->name('auth.google');
+    
+    // Google OAuth for Registration with specific role
+    Route::get('auth/google/register/{role}', [GoogleAuthController::class, 'redirectToGoogleRegister'])
+        ->name('auth.google.register')
+        ->where('role', 'organizer|voter');
 });
+
+// Google OAuth Callback - outside middleware to allow processing
+Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])
+    ->name('auth.google.callback');
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
