@@ -17,9 +17,13 @@ return new class extends Migration
             return;
         }
 
-        // Ensure any previous backup is removed to avoid rename errors in dev
+        // If a previous backup already exists, assume this migration ran before.
+        // If the new elections table also exists, skip.
         if (Schema::hasTable('elections_backup')) {
-            Schema::drop('elections_backup');
+            if (Schema::hasTable('elections')) {
+                return; // nothing to do
+            }
+            // else: continue to recreate elections from existing backup
         }
 
         // Backup election_user data
@@ -75,10 +79,10 @@ return new class extends Migration
             DB::table('election_user')->insert((array)$eu);
         }
         
-        // Drop backup table if exists
-        if (Schema::hasTable('elections_backup')) {
-            Schema::drop('elections_backup');
-        }
+        // NOTE: Do not drop the backup here to avoid FK conflicts.
+        // Later migrations (fix_*_foreign_key) will recreate the referencing tables
+        // to point back to the new `elections` table. Keeping the backup ensures
+        // smooth migration in environments with existing foreign keys.
     }
 
     /**

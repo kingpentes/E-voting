@@ -12,8 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Disable foreign key checks
-        DB::statement('PRAGMA foreign_keys = OFF');
+        // Disable foreign key checks depending on driver
+        $driver = DB::connection()->getDriverName();
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        } else {
+            DB::statement('PRAGMA foreign_keys = OFF');
+        }
         
         // Backup election_user data
         $electionUsers = [];
@@ -48,7 +53,11 @@ return new class extends Migration
         }
         
         // Re-enable foreign key checks
-        DB::statement('PRAGMA foreign_keys = ON');
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        } else {
+            DB::statement('PRAGMA foreign_keys = ON');
+        }
     }
 
     /**
