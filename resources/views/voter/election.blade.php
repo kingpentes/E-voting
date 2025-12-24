@@ -170,11 +170,49 @@
                     </svg>
                     <h3 class="text-3xl font-bold">Hasil Voting</h3>
                 </div>
+
+                <!-- Blockchain Indicator -->
+                @if($usingBlockchain ?? false)
+                <div class="mb-6 bg-white/10 backdrop-blur-sm rounded-xl p-4 border-2 border-white/30">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <div class="flex-1">
+                            <p class="font-bold text-lg">Hasil dari Blockchain</p>
+                            <p class="text-sm text-white/80">Data diambil langsung dari smart contract untuk transparansi maksimal</p>
+                            @if($election->contract_address)
+                                <p class="text-xs text-white/60 mt-1 font-mono">{{ Str::limit($election->contract_address, 30) }}</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @else
+                <div class="mb-6 bg-yellow-500/20 backdrop-blur-sm rounded-xl p-4 border-2 border-yellow-300/50">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <div class="flex-1">
+                            <p class="font-bold">Hasil dari Database</p>
+                            <p class="text-sm text-white/80">Blockchain belum dikonfigurasi untuk pemilu ini</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
                 
                 @php
-                    $totalVotes = $candidates->sum(function($candidate) {
-                        return $candidate->votes->count();
-                    });
+                    // Use blockchain results if available, otherwise use database
+                    $totalVotes = 0;
+                    if ($usingBlockchain ?? false) {
+                        $totalVotes = $candidates->sum(function($candidate) {
+                            return $candidate->blockchain_vote_count ?? 0;
+                        });
+                    } else {
+                        $totalVotes = $candidates->sum(function($candidate) {
+                            return $candidate->votes->count();
+                        });
+                    }
                 @endphp
 
                 <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
@@ -185,9 +223,15 @@
                 </div>
 
                 <div class="space-y-4">
-                    @foreach($candidates->sortByDesc(function($candidate) { return $candidate->votes->count(); }) as $candidate)
+                    @foreach($candidates->sortByDesc(function($candidate) use ($usingBlockchain) { 
+                        return ($usingBlockchain ?? false) 
+                            ? ($candidate->blockchain_vote_count ?? 0) 
+                            : $candidate->votes->count(); 
+                    }) as $candidate)
                         @php
-                            $voteCount = $candidate->votes->count();
+                            $voteCount = ($usingBlockchain ?? false) 
+                                ? ($candidate->blockchain_vote_count ?? 0) 
+                                : $candidate->votes->count();
                             $percentage = $totalVotes > 0 ? ($voteCount / $totalVotes) * 100 : 0;
                             $isWinner = $loop->first && $voteCount > 0;
                         @endphp

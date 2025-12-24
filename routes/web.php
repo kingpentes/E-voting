@@ -109,65 +109,7 @@ Route::get('/dashboard', function () {
 // Admin Routes - Protected by organizer middleware
 Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\EnsureUserIsOrganizer::class])->group(function () {
     // Dashboard
-    Route::get('/dashboard', function () {
-        $user = \Illuminate\Support\Facades\Auth::user();
-
-        // Get all elections for this organizer so dashboard can select which election to show
-        $elections = \App\Models\Election::forOrganizer(\Illuminate\Support\Facades\Auth::id())
-            ->with(['candidates', 'votes'])
-            ->latest()
-            ->get();
-
-        // Determine selected election from query param or default to first
-        $selectedId = (int) request()->get('election_id', 0);
-        $election = $selectedId ? $elections->firstWhere('id', $selectedId) : $elections->first();
-        
-        // Initialize stats
-        $stats = [
-            'total_voters' => 0,
-            'voted' => 0,
-            'not_voted' => 0,
-            'participation_rate' => 0,
-        ];
-        
-        $candidateStats = collect([]);
-        
-        if ($election) {
-            // Get all voters who joined this election
-            $totalVoters = $election->participants()->count();
-            
-            // Get voters who already voted (distinct voter_id)
-            $votedCount = $election->votes()->distinct('voter_id')->count();
-            
-            // Calculate not voted
-            $notVotedCount = $totalVoters - $votedCount;
-            
-            // Calculate participation rate
-            $participationRate = $totalVoters > 0 ? round(($votedCount / $totalVoters) * 100, 1) : 0;
-            
-            $stats = [
-                'total_voters' => $totalVoters,
-                'voted' => $votedCount,
-                'not_voted' => $notVotedCount,
-                'participation_rate' => $participationRate,
-            ];
-            
-            // Get candidate statistics
-            $candidates = $election->candidates()
-                ->withCount('votes')
-                ->orderBy('votes_count', 'desc')
-                ->get();
-            
-            $candidateStats = $candidates->map(function ($candidate) {
-                return [
-                    'name' => $candidate->name,
-                    'votes' => $candidate->votes_count,
-                ];
-            });
-        }
-
-        return view('admin.dashboard', compact('user', 'election', 'stats', 'candidateStats', 'elections'));
-    })->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
     // Candidates Resource Routes
     // Custom route MUST be before resource route to avoid being overridden

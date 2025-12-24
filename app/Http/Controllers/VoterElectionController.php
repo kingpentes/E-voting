@@ -16,7 +16,7 @@ class VoterElectionController extends Controller
     /**
      * Show election by access code
      */
-    public function show(string $code): View
+    public function show(string $code, VoteOnChainService $onchain): View
     {
         // Find election by access code
         $election = Election::with(['candidates.missions', 'rules', 'settings'])
@@ -30,6 +30,33 @@ class VoterElectionController extends Controller
             ->orderBy('number')
             ->get();
 
+        // Get results from blockchain if contract is deployed and election is closed
+        $blockchainResults = [];
+        $usingBlockchain = false;
+        
+        if ($election->contract_address && $election->status === 'closed') {
+            try {
+                $blockchainResults = $onchain->getElectionResults($election);
+                $usingBlockchain = true;
+                
+                // Attach blockchain vote counts to candidates
+                foreach ($candidates as $candidate) {
+                    $candidate->blockchain_vote_count = $blockchainResults[$candidate->id] ?? 0;
+                }
+                
+                Log::info('Election results loaded from blockchain', [
+                    'election_id' => $election->id,
+                    'results' => $blockchainResults,
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('Failed to load results from blockchain, falling back to database', [
+                    'election_id' => $election->id,
+                    'error' => $e->getMessage(),
+                ]);
+                $usingBlockchain = false;
+            }
+        }
+
         // Check if user already voted
         $hasVoted = false;
         if (Auth::check()) {
@@ -38,7 +65,7 @@ class VoterElectionController extends Controller
             $hasVoted = $user->hasVotedIn($election->id);
         }
 
-        return view('voter.election', compact('election', 'candidates', 'hasVoted'));
+        return view('voter.election', compact('election', 'candidates', 'hasVoted', 'usingBlockchain'));
     }
 
     /**
