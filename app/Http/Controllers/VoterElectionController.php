@@ -34,26 +34,37 @@ class VoterElectionController extends Controller
         $blockchainResults = [];
         $usingBlockchain = false;
         
-        if ($election->contract_address && $election->status === 'closed') {
-            try {
-                $blockchainResults = $onchain->getElectionResults($election);
-                $usingBlockchain = true;
-                
-                // Attach blockchain vote counts to candidates
-                foreach ($candidates as $candidate) {
-                    $candidate->blockchain_vote_count = $blockchainResults[$candidate->id] ?? 0;
+        if ($election->status === 'closed') {
+            // WAJIB: Smart contract harus ada untuk menampilkan hasil
+            if (!$election->contract_address) {
+                // Jika tidak ada contract, jangan tampilkan hasil
+                Log::warning('Election closed without smart contract deployed', [
+                    'election_id' => $election->id,
+                ]);
+                // Set flag bahwa tidak bisa tampilkan hasil
+                $election->no_results_available = true;
+            } else {
+                try {
+                    $blockchainResults = $onchain->getElectionResults($election);
+                    $usingBlockchain = true;
+                    
+                    // Attach blockchain vote counts to candidates
+                    foreach ($candidates as $candidate) {
+                        $candidate->blockchain_vote_count = $blockchainResults[$candidate->id] ?? 0;
+                    }
+                    
+                    Log::info('Election results loaded from blockchain', [
+                        'election_id' => $election->id,
+                        'results' => $blockchainResults,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::error('Failed to load results from blockchain', [
+                        'election_id' => $election->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Jika error, tetap tidak tampilkan hasil
+                    $election->no_results_available = true;
                 }
-                
-                Log::info('Election results loaded from blockchain', [
-                    'election_id' => $election->id,
-                    'results' => $blockchainResults,
-                ]);
-            } catch (\Throwable $e) {
-                Log::error('Failed to load results from blockchain, falling back to database', [
-                    'election_id' => $election->id,
-                    'error' => $e->getMessage(),
-                ]);
-                $usingBlockchain = false;
             }
         }
 

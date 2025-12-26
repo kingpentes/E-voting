@@ -123,21 +123,28 @@
                             <p class="text-gray-600">Perolehan suara masing-masing kandidat</p>
                         </div>
                         
-                        <!-- Blockchain/Database Indicator -->
-                        @if($election && $election->status === 'closed')
-                            @if($usingBlockchain ?? false)
+                        <!-- Blockchain Indicator / Error -->
+                        @if($election)
+                            @if(isset($election->blockchain_error) && $election->blockchain_error)
+                                <div class="flex items-center space-x-2 bg-red-50 border border-red-200 px-4 py-2 rounded-lg">
+                                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-sm font-semibold text-red-700">Error Blockchain</span>
+                                </div>
+                            @elseif(isset($election->no_contract) && $election->no_contract)
+                                <div class="flex items-center space-x-2 bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-lg">
+                                    <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-sm font-semibold text-yellow-700">Smart Contract Belum Deploy</span>
+                                </div>
+                            @elseif($usingBlockchain ?? false)
                                 <div class="flex items-center space-x-2 bg-green-50 border border-green-200 px-4 py-2 rounded-lg">
                                     <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                     </svg>
                                     <span class="text-sm font-semibold text-green-700">Data dari Blockchain</span>
-                                </div>
-                            @else
-                                <div class="flex items-center space-x-2 bg-gray-50 border border-gray-200 px-4 py-2 rounded-lg">
-                                    <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span class="text-sm font-semibold text-gray-700">Data dari Database</span>
                                 </div>
                             @endif
                         @endif
@@ -161,7 +168,39 @@
 
                 <!-- Legend -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                    @if($candidateStats->isNotEmpty())
+                    @if(isset($election->blockchain_error) && $election->blockchain_error)
+                        <div class="col-span-full">
+                            <div class="bg-red-50 border-2 border-red-200 rounded-xl p-8 text-center">
+                                <svg class="w-16 h-16 text-red-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                <h3 class="text-lg font-bold text-red-900 mb-2">Gagal Mengambil Data Blockchain</h3>
+                                <p class="text-red-700 mb-4">Terjadi kesalahan saat mengambil data dari blockchain. Pastikan node blockchain berjalan dan smart contract sudah dideploy dengan benar.</p>
+                                <a href="{{ route('admin.elections.blockchain-status', $election) }}" class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                    </svg>
+                                    Cek Status Blockchain
+                                </a>
+                            </div>
+                        </div>
+                    @elseif(isset($election->no_contract) && $election->no_contract)
+                        <div class="col-span-full">
+                            <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-8 text-center">
+                                <svg class="w-16 h-16 text-yellow-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <h3 class="text-lg font-bold text-yellow-900 mb-2">Smart Contract Belum Dideploy</h3>
+                                <p class="text-yellow-700 mb-4">Pemilu ini belum memiliki smart contract yang dideploy. Deploy smart contract untuk menyimpan hasil suara di blockchain.</p>
+                                <a href="{{ route('admin.elections.manage', $election) }}" class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                    Deploy Smart Contract
+                                </a>
+                            </div>
+                        </div>
+                    @elseif($candidateStats->isNotEmpty())
                         @php
                             $colors = ['bg-pink-600', 'bg-blue-500', 'bg-green-500', 'bg-orange-500', 'bg-purple-500', 'bg-yellow-500', 'bg-red-500', 'bg-indigo-500'];
                         @endphp

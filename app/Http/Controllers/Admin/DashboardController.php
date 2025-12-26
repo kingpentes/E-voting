@@ -57,8 +57,8 @@ class DashboardController extends Controller
             ];
             
             // Get candidate statistics
-            // Try to get from blockchain if available and election is closed
-            if ($election->contract_address && $election->status === 'closed') {
+            // WAJIB: 100% from blockchain for results - no fallback to database
+            if ($election->contract_address) {
                 try {
                     $blockchainResults = $onchain->getElectionResults($election);
                     $usingBlockchain = true;
@@ -72,29 +72,30 @@ class DashboardController extends Controller
                     
                     Log::info('Dashboard results loaded from blockchain', [
                         'election_id' => $election->id,
+                        'status' => $election->status,
                     ]);
                 } catch (\Throwable $e) {
                     Log::error('Failed to load dashboard results from blockchain', [
                         'election_id' => $election->id,
                         'error' => $e->getMessage(),
                     ]);
+                    
+                    // NO FALLBACK - Show error instead
+                    $candidateStats = collect([]);
                     $usingBlockchain = false;
+                    $election->blockchain_error = true;
+                    $election->blockchain_error_message = 'Gagal mengambil data dari blockchain: ' . $e->getMessage();
                 }
-            }
-            
-            // Fallback to database if blockchain not available
-            if (!$usingBlockchain) {
-                $candidates = $election->candidates()
-                    ->withCount('votes')
-                    ->orderBy('votes_count', 'desc')
-                    ->get();
+            } else {
+                // NO CONTRACT - Cannot show results
+                Log::warning('Election has no contract address', [
+                    'election_id' => $election->id,
+                    'status' => $election->status,
+                ]);
                 
-                $candidateStats = $candidates->map(function ($candidate) {
-                    return [
-                        'name' => $candidate->name,
-                        'votes' => $candidate->votes_count,
-                    ];
-                });
+                $candidateStats = collect([]);
+                $usingBlockchain = false;
+                $election->no_contract = true;
             }
         }
 
