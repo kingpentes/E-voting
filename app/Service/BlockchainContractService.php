@@ -160,6 +160,111 @@ class BlockchainContractService
         return (int)$output;
     }
 
+    /**
+     * Get vote count for specific candidate from blockchain
+     */
+    public function getVotesForCandidate(string $electionId, string $candidateId): int
+    {
+        // Get contract address
+        $reflection = new \ReflectionClass($this->contract);
+        $property = $reflection->getProperty('toAddress');
+        $property->setAccessible(true);
+        $contractAddress = $property->getValue($this->contract);
+        
+        if (!$contractAddress) {
+            throw new \RuntimeException('Contract address not set');
+        }
+        
+        // Call Node.js script to get votes for candidate
+        $deployPath = env('CONTRACT_DEPLOY_PATH', base_path('..\\blockchain\\evote-deploy'));
+        $scriptPath = $deployPath . '\\getVotesForCandidate.js';
+        
+        if (!file_exists($scriptPath)) {
+            // If script doesn't exist, fallback to counting votes manually
+            return $this->countVotesForCandidateManually($electionId, $candidateId);
+        }
+        
+        // Build environment variables for Node.js
+        $env = [
+            'RPC' => env('BLOCKCHAIN_RPC', 'http://127.0.0.1:18545'),
+            'BLOCKCHAIN_RPC' => env('BLOCKCHAIN_RPC', 'http://127.0.0.1:18545'),
+            'ABI_OUTPUT_PATH' => env('CONTRACT_ABI_PATH'),
+            'CONTRACT_ABI_PATH' => env('CONTRACT_ABI_PATH'),
+            'VOTE_ENC_KEY' => env('VOTE_ENC_KEY'),
+            'APP_KEY' => env('APP_KEY'),
+            'PATH' => getenv('PATH'),
+            'SystemRoot' => getenv('SystemRoot') ?: 'C:\\Windows',
+        ];
+        
+        $process = new \Symfony\Component\Process\Process(
+            ['node', $scriptPath, $contractAddress, $electionId, $candidateId],
+            null,
+            $env,
+            null,
+            60 // Increase timeout for decryption process
+        );
+        
+        $process->run();
+        
+        if (!$process->isSuccessful()) {
+            Log::error('getVotesForCandidate.js failed: ' . $process->getErrorOutput());
+            // Fallback to manual counting
+            return $this->countVotesForCandidateManually($electionId, $candidateId);
+        }
+        
+        $output = trim($process->getOutput());
+        
+        if (!is_numeric($output)) {
+            Log::error('Invalid vote count returned: ' . $output);
+            return 0;
+        }
+        
+        $count = (int)$output;
+        Log::info("Blockchain vote count for candidate {$candidateId}: {$count}");
+        
+        return $count;
+    }
+
+    /**
+     * Fallback method to count votes by iterating through all votes
+     */
+    private function countVotesForCandidateManually(string $electionId, string $candidateId): int
+    {
+        try {
+            $totalVotes = $this->getVoteCount($electionId);
+            $count = 0;
+            
+            // Get the crypto service to decrypt votes
+            $crypto = app(VoteCryptoService::class);
+            
+            for ($i = 0; $i < $totalVotes; $i++) {
+                try {
+                    $vote = $this->getVote($electionId, $i);
+                    
+                    // Decrypt the vote to get candidate ID
+                    $decrypted = $crypto->decrypt(
+                        $vote['ciphertext'],
+                        $vote['nonce'],
+                        $vote['tag']
+                    );
+                    
+                    // Check if this vote is for the target candidate
+                    if ($decrypted === $candidateId) {
+                        $count++;
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning("Failed to process vote {$i}: " . $e->getMessage());
+                    continue;
+                }
+            }
+            
+            return $count;
+        } catch (\Throwable $e) {
+            Log::error("Failed to count votes manually: " . $e->getMessage());
+            return 0;
+        }
+    }
+
     public function getVote(string $electionId, int $index): array
     {
         $out = [];

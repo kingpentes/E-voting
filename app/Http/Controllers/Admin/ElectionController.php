@@ -215,6 +215,12 @@ class ElectionController extends Controller
                 ->with('error', '✗ Tidak dapat mempublish pemilu tanpa kandidat. Tambahkan kandidat terlebih dahulu.');
         }
 
+        // WAJIB: Check if smart contract has been deployed
+        if (!$election->is_published && !$election->contract_address) {
+            return redirect()->back()
+                ->with('error', '✗ Smart contract belum di-deploy! Deploy smart contract terlebih dahulu untuk memastikan semua vote tersimpan di blockchain. Ini WAJIB untuk transparansi dan keamanan hasil pemilu.');
+        }
+
         // Once published, cannot unpublish - only can close
         if ($election->is_published) {
             return redirect()->back()
@@ -228,7 +234,7 @@ class ElectionController extends Controller
         ]);
 
         return redirect()->back()
-            ->with('success', "✓ Pemilu berhasil dipublish! Sekarang voter dapat mulai memberikan suara.");
+            ->with('success', "✓ Pemilu berhasil dipublish! Sekarang voter dapat mulai memberikan suara. Semua vote akan tersimpan di blockchain.");
     }
 
     /**

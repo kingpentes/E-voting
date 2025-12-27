@@ -17,7 +17,7 @@ class VoterElectionController extends Controller
     /**
      * Show election by access code
      */
-    public function show(string $code): View
+    public function show(string $code, VoteOnChainService $onchain): View
     {
         // Find election by access code
         $election = Election::with(['candidates.missions', 'rules', 'settings'])
@@ -31,6 +31,44 @@ class VoterElectionController extends Controller
             ->orderBy('number')
             ->get();
 
+        // Get results from blockchain if contract is deployed and election is closed
+        $blockchainResults = [];
+        $usingBlockchain = false;
+        
+        if ($election->status === 'closed') {
+            // WAJIB: Smart contract harus ada untuk menampilkan hasil
+            if (!$election->contract_address) {
+                // Jika tidak ada contract, jangan tampilkan hasil
+                Log::warning('Election closed without smart contract deployed', [
+                    'election_id' => $election->id,
+                ]);
+                // Set flag bahwa tidak bisa tampilkan hasil
+                $election->no_results_available = true;
+            } else {
+                try {
+                    $blockchainResults = $onchain->getElectionResults($election);
+                    $usingBlockchain = true;
+                    
+                    // Attach blockchain vote counts to candidates
+                    foreach ($candidates as $candidate) {
+                        $candidate->blockchain_vote_count = $blockchainResults[$candidate->id] ?? 0;
+                    }
+                    
+                    Log::info('Election results loaded from blockchain', [
+                        'election_id' => $election->id,
+                        'results' => $blockchainResults,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::error('Failed to load results from blockchain', [
+                        'election_id' => $election->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Jika error, tetap tidak tampilkan hasil
+                    $election->no_results_available = true;
+                }
+            }
+        }
+
         // Check if user already voted
         $hasVoted = false;
         if (Auth::check()) {
@@ -39,21 +77,7 @@ class VoterElectionController extends Controller
             $hasVoted = $user->hasVotedIn($election->id);
         }
 
-        // Fetch results from blockchain if election is closed
-        $blockchainResults = null;
-        if ($election->status === 'closed' && $election->contract_address) {
-            try {
-                $resultService = app(BlockchainResultService::class);
-                $blockchainResults = $resultService->getElectionResults($election);
-            } catch (\Throwable $e) {
-                Log::error('Failed to fetch blockchain results', [
-                    'election_id' => $election->id,
-                    'error' => $e->getMessage()
-                ]);
-            }
-        }
-
-        return view('voter.election', compact('election', 'candidates', 'hasVoted', 'blockchainResults'));
+        return view('voter.election', compact('election', 'candidates', 'hasVoted', 'usingBlockchain'));
     }
 
     /**

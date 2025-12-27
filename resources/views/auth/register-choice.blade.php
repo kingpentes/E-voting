@@ -90,7 +90,7 @@
                         <div class="group">
                             <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl p-8 border border-white/20 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] cursor-pointer">
                                 <div class="text-center">
-                                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                                    <div class="w-16 h-16 bg-gradient-to-r from-indigo-700 to-purple-800 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                                         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                         </svg>
@@ -119,7 +119,7 @@
                                         </li>
                                     </ul>
 
-                                    <a href="{{ route('register.voter') }}" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transform transition duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl inline-block text-center">
+                                    <a href="{{ route('register.voter') }}" class="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-white font-semibold py-4 px-6 rounded-xl hover:from-indigo-800 hover:to-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-700 focus:ring-offset-2 transform transition duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl inline-block text-center">
                                         Register as Voter
                                     </a>
                                 </div>

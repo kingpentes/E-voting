@@ -191,31 +191,54 @@
                             </path>
                         </svg>
                         <h3 class="text-3xl font-bold">Hasil Voting</h3>
-                        <!-- Blockchain badge -->
-                        <span
-                            class="ml-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            Blockchain
-                        </span>
                     </div>
 
-                    @if (isset($blockchainResults) && $blockchainResults && empty($blockchainResults['error']))
-                        {{-- Results from Blockchain --}}
+                    @if ($election->no_results_available ?? false)
+                        <!-- Error: No blockchain contract -->
+                        <div
+                            class="bg-red-500/20 backdrop-blur-sm rounded-xl p-6 border-2 border-red-300/50 text-center">
+                            <svg class="w-16 h-16 text-red-300 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <h4 class="text-2xl font-bold mb-3">Hasil Tidak Tersedia</h4>
+                            <p class="text-lg mb-2">Smart contract blockchain belum di-deploy untuk pemilu ini.</p>
+                            <p class="text-sm text-white/80">Hubungi penyelenggara untuk informasi lebih lanjut.</p>
+                        </div>
+                    @else
+                        @php
+                            // Use blockchain results if available, otherwise use database
+                            $totalVotes = 0;
+                            if ($usingBlockchain ?? false) {
+                                $totalVotes = $candidates->sum(function ($candidate) {
+                                    return $candidate->blockchain_vote_count ?? 0;
+                                });
+                            } else {
+                                $totalVotes = $candidates->sum(function ($candidate) {
+                                    return $candidate->votes->count();
+                                });
+                            }
+                        @endphp
+
                         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
                             <div class="flex justify-between items-center">
                                 <span class="text-xl font-semibold">Total Suara Masuk:</span>
-                                <span class="text-4xl font-bold">{{ $blockchainResults['total'] }}</span>
+                                <span class="text-4xl font-bold">{{ $totalVotes }}</span>
                             </div>
                         </div>
 
                         <div class="space-y-4">
-                            @foreach ($blockchainResults['candidates'] as $index => $candidateResult)
+                            @foreach ($candidates->sortByDesc(function ($candidate) use ($usingBlockchain) {
+        return $usingBlockchain ?? false ? $candidate->blockchain_vote_count ?? 0 : $candidate->votes->count();
+    }) as $candidate)
                                 @php
-                                    $isWinner = $index === 0 && $candidateResult['vote_count'] > 0;
+                                    $voteCount =
+                                        $usingBlockchain ?? false
+                                            ? $candidate->blockchain_vote_count ?? 0
+                                            : $candidate->votes->count();
+                                    $percentage = $totalVotes > 0 ? ($voteCount / $totalVotes) * 100 : 0;
+                                    $isWinner = $loop->first && $voteCount > 0;
                                 @endphp
 
                                 <div
@@ -224,30 +247,28 @@
                                         <div class="flex items-center space-x-4">
                                             <div class="flex-shrink-0">
                                                 <div
-                                                    class="w-10 h-10 rounded-full {{ $index === 0 ? 'bg-yellow-500' : ($index === 1 ? 'bg-gray-400' : ($index === 2 ? 'bg-orange-600' : 'bg-gray-300')) }} flex items-center justify-center shadow-lg">
+                                                    class="w-10 h-10 rounded-full {{ $loop->iteration === 1 ? 'bg-yellow-500' : ($loop->iteration === 2 ? 'bg-gray-400' : ($loop->iteration === 3 ? 'bg-orange-600' : 'bg-gray-300')) }} flex items-center justify-center shadow-lg">
                                                     <span
-                                                        class="text-white font-bold text-lg">{{ $index + 1 }}</span>
+                                                        class="text-white font-bold text-lg">{{ $loop->iteration }}</span>
                                                 </div>
                                             </div>
-                                            <img src="{{ $candidateResult['photo_url'] }}"
-                                                alt="{{ $candidateResult['name'] }}"
+                                            <img src="{{ $candidate->photo_url }}" alt="{{ $candidate->name }}"
                                                 class="w-12 h-12 rounded-full object-cover border-2 border-blue-200">
                                             <div>
                                                 <div class="flex items-center space-x-2">
                                                     <span
-                                                        class="font-bold text-gray-900 text-lg">{{ $candidateResult['name'] }}</span>
+                                                        class="font-bold text-gray-900 text-lg">{{ $candidate->name }}</span>
                                                     @if ($isWinner)
                                                         <span
                                                             class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">PEMENANG</span>
                                                     @endif
                                                 </div>
                                                 <span class="text-sm text-gray-600">Kandidat
-                                                    #{{ $candidateResult['number'] }}</span>
+                                                    #{{ $candidate->number }}</span>
                                             </div>
                                         </div>
                                         <div class="text-right">
-                                            <div class="text-2xl font-bold text-blue-600">
-                                                {{ $candidateResult['vote_count'] }}</div>
+                                            <div class="text-2xl font-bold text-blue-600">{{ $voteCount }}</div>
                                             <div class="text-sm text-gray-600">suara</div>
                                         </div>
                                     </div>
@@ -255,38 +276,15 @@
                                     <!-- Progress Bar -->
                                     <div class="relative w-full bg-gray-200 rounded-full h-6 overflow-hidden">
                                         <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-indigo-700 rounded-full transition-all duration-500 flex items-center justify-end px-3"
-                                            style="width: {{ $candidateResult['percentage'] }}%">
+                                            style="width: {{ $percentage }}%">
                                             <span
-                                                class="text-xs font-bold text-white">{{ $candidateResult['percentage'] }}%</span>
+                                                class="text-xs font-bold text-white">{{ number_format($percentage, 1) }}%</span>
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
-                    @elseif(isset($blockchainResults) && !empty($blockchainResults['error']))
-                        {{-- Blockchain error --}}
-                        <div class="bg-red-500/20 backdrop-blur-sm rounded-xl p-6 text-center">
-                            <svg class="w-12 h-12 mx-auto mb-3 text-red-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                </path>
-                            </svg>
-                            <p class="text-lg font-semibold">Gagal memuat hasil dari blockchain</p>
-                            <p class="text-sm text-white/70 mt-2">{{ $blockchainResults['error'] }}</p>
-                        </div>
-                    @else
-                        {{-- No blockchain data (contract not deployed) --}}
-                        <div class="bg-yellow-500/20 backdrop-blur-sm rounded-xl p-6 text-center">
-                            <svg class="w-12 h-12 mx-auto mb-3 text-yellow-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <p class="text-lg font-semibold">Smart contract belum dideploy</p>
-                            <p class="text-sm text-white/70 mt-2">Hasil pemilu tidak dapat ditampilkan karena
-                                blockchain belum dikonfigurasi.</p>
-                        </div>
+
                     @endif
                 </div>
             @endif

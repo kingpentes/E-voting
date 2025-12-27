@@ -56,6 +56,10 @@
                                         <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed" title="Tambahkan kandidat terlebih dahulu untuk publish">
                                             Publish (Perlu Kandidat)
                                         </button>
+                                    @elseif(!$election->is_published && !$election->contract_address)
+                                        <button disabled class="px-5 py-2.5 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed" title="Deploy smart contract terlebih dahulu untuk publish. Ini WAJIB agar semua vote tersimpan di blockchain!">
+                                            Publish (Perlu Deploy Contract)
+                                        </button>
                                     @elseif(!$election->is_published)
                                         <form action="{{ route('admin.elections.toggle-publish', $election->id) }}" method="POST" 
                                               onsubmit="return confirm('⚠️ PERINGATAN!\n\nSetelah dipublish, Anda TIDAK DAPAT:\n- Mengubah data pemilu\n- Mengedit atau menghapus kandidat\n- Unpublish pemilu\n\nAnda hanya dapat menutup pemilu untuk menampilkan hasil.\n\nApakah Anda yakin ingin mempublish pemilu ini?')">
