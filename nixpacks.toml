@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["php82", "nodejs_20", "npm-9_x", "libmysqlclient"]
+nixPkgs = ["php82", "php82Packages.composer", "nodejs_20", "npm-9_x", "libmysqlclient"]
 
 [phases.install]
 cmds = [
