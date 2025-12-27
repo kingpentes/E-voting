@@ -46,6 +46,6 @@ class VoterRegisterController extends Controller
         event(new Registered($user));
 
         return redirect()->route('login')
-            ->with('success', '✓ Registrasi berhasil! Silakan login untuk melengkapi verifikasi identitas Anda.');
+            ->with('success', 'Registrasi berhasil! Silakan login untuk melengkapi verifikasi identitas Anda.');
     }
 }

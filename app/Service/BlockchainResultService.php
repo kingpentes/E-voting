@@ -133,17 +133,22 @@ class BlockchainResultService
      */
     private function fetchAllVotesFromBlockchain(Election $election): array
     {
-        $deployPath = env('CONTRACT_DEPLOY_PATH', base_path('..\\quorum-network\\evote\\evote-deploy'));
+        // PENTING: Untuk deployment, kita gunakan script lokal di dalam project
+        $deployPath = base_path('scripts');
         $scriptPath = $deployPath . '\\getAllVotes.js';
 
+        // Validasi path
         if (!file_exists($scriptPath)) {
-            throw new \RuntimeException('getAllVotes.js script not found at: ' . $scriptPath);
+            Log::error("Script not found: " . $scriptPath);
+            throw new \Exception("Blockchain script not found.");
         }
 
         // Environment variables untuk Node.js
         $env = [
             'PATH' => getenv('PATH'),
             'SystemRoot' => getenv('SystemRoot') ?: 'C:\\Windows',
+            'BLOCKCHAIN_RPC' => config('app.blockchain_rpc', env('BLOCKCHAIN_RPC', 'http://127.0.0.1:18545')),
+            'CONTRACT_ABI_PATH' => env('CONTRACT_ABI_PATH'),
         ];
 
         $process = new Process(

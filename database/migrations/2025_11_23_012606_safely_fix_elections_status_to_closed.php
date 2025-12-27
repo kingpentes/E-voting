@@ -28,6 +28,15 @@ return new class extends Migration
 
         // Backup election_user data
         $electionUsers = DB::table('election_user')->get()->toArray();
+
+        // Drop foreign key from elections before renaming to avoid constraint name collision
+        if (Schema::hasTable('elections')) {
+            Schema::table('elections', function (Blueprint $table) {
+                // Check if index exists before dropping to be safe, or just try catch
+                // Standard laravel way:
+                $table->dropForeign(['user_id']); 
+            });
+        }
         
         // Rename old table
         Schema::rename('elections', 'elections_backup');
@@ -35,7 +44,8 @@ return new class extends Migration
         // Create new elections table without enum constraint
         Schema::create('elections', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            // Use a specific, non-conflicting name for the foreign key constraint
+            $table->foreignId('user_id')->constrained('users', 'id', 'elections_user_id_foreign_v2')->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->date('start_date')->nullable();
@@ -47,8 +57,6 @@ return new class extends Migration
             $table->string('access_code')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            $table->string('contract_address')->nullable();
-            $table->string('contract_abi_path')->nullable();
         });
         
         // Copy data, converting 'completed' to 'closed'
@@ -69,8 +77,6 @@ return new class extends Migration
                 'created_at' => $election->created_at,
                 'updated_at' => $election->updated_at,
                 'deleted_at' => $election->deleted_at,
-                'contract_address' => $election->contract_address ?? null,
-                'contract_abi_path' => $election->contract_abi_path ?? null,
             ]);
         }
         

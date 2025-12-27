@@ -135,6 +135,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('/elections/{id}/toggle-publish', [ElectionController::class, 'togglePublish'])->name('elections.toggle-publish');
     Route::post('/elections/{id}/close', [ElectionController::class, 'closeElection'])->name('elections.close');
     Route::post('/elections/{id}/deploy-contract', [ElectionController::class, 'deployContract'])->name('elections.deploy-contract');
+    
+    // Election Fee Payment
+    Route::get('/elections/{id}/payment', [ElectionController::class, 'payment'])->name('elections.payment');
+    Route::post('/elections/{id}/payment', [ElectionController::class, 'processPayment'])->name('elections.process-payment');
+    Route::get('/elections/{id}/payment/success', [ElectionController::class, 'paymentSuccess'])->name('elections.payment-success');
+    
     Route::get('/elections/sync-status', [ElectionController::class, 'syncStatus'])->name('elections.sync-status');
     
     // Election Link Management

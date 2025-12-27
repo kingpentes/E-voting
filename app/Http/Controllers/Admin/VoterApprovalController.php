@@ -87,7 +87,7 @@ class VoterApprovalController extends Controller
             ]);
         }
 
-        return back()->with('success', "✓ Voter {$pivotData->name} untuk pemilu '{$pivotData->title}' berhasil disetujui!");
+        return back()->with('success', "Voter {$pivotData->name} untuk pemilu '{$pivotData->title}' berhasil disetujui!");
     }
 
     /**

@@ -44,6 +44,6 @@ class OrganizerRegisterController extends Controller
         event(new Registered($user));
 
         // Redirect ke halaman login dengan pesan sukses
-        return redirect()->route('login')->with('status', '✓ Registrasi sebagai Penyelenggara berhasil! Silakan login untuk mulai membuat pemilu.');
+        return redirect()->route('login')->with('status', 'Registrasi sebagai Penyelenggara berhasil! Silakan login untuk mulai membuat pemilu.');
     }
 }

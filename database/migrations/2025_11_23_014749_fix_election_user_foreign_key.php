@@ -33,8 +33,8 @@ return new class extends Migration
         
         Schema::create('election_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('election_id')->constrained('elections')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('election_id')->constrained('elections', 'id', 'eu_election_id_fk_v2')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users', 'id', 'eu_user_id_fk_v2')->onDelete('cascade');
             $table->string('access_code_used', 8);
             $table->timestamp('joined_at')->nullable();
             $table->enum('approval_status', ['pending', 'approved', 'rejected'])->default('pending');
@@ -43,8 +43,8 @@ return new class extends Migration
             $table->unsignedBigInteger('approved_by')->nullable();
             $table->timestamps();
             
-            $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
-            $table->unique(['election_id', 'user_id']);
+            $table->foreign('approved_by', 'eu_approved_by_fk_v2')->references('id')->on('users')->onDelete('set null');
+            $table->unique(['election_id', 'user_id'], 'eu_election_user_unique_v2');
         });
         
         // Restore data

@@ -116,6 +116,6 @@ class VoterVerificationController extends Controller
         ]);
 
         return redirect()->route('voter.verification')
-            ->with('success', '✓ Data verifikasi berhasil dikirim! Mohon tunggu persetujuan dari admin.');
+            ->with('success', 'Data verifikasi berhasil dikirim! Mohon tunggu persetujuan dari admin.');
     }
 }

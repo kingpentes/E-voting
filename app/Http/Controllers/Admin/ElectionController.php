@@ -33,8 +33,11 @@ class ElectionController extends Controller
      */
     public function create()
     {
-        // Show form to create a new election (allow multiple elections per organizer)
-        return view('admin.elections.rules');
+        // Check payment logic: First election free, subsequent $5
+        $electionCount = Election::forOrganizer(Auth::id())->count();
+        $fee = $electionCount > 0 ? '$5' : 'Gratis';
+        
+        return view('admin.elections.rules', compact('fee'));
     }
 
     /**
@@ -42,7 +45,7 @@ class ElectionController extends Controller
      */
     public function store(Request $request)
     {
-        // Allow creating multiple elections per organizer
+        // Allow multiple elections (Paid feature implemented in logic)
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -59,9 +62,14 @@ class ElectionController extends Controller
             'max_votes_per_voter' => ['integer', 'min:1'],
         ]);
 
+        // Calculate fee requirements
+        $electionCount = Election::forOrganizer(Auth::id())->count();
+        $isFree = $electionCount === 0;
+        $initialStatus = $isFree ? 'draft' : 'pending_payment';
+
         /** @var Election|null $election */
         $election = null;
-        DB::transaction(function () use ($validated, $request, &$election) {
+        DB::transaction(function () use ($validated, $request, &$election, $initialStatus) {
             // Create Election
             $election = Election::create([
                 'user_id' => Auth::id(),
@@ -71,7 +79,8 @@ class ElectionController extends Controller
                 'end_date' => $validated['end_date'] ?? null,
                 'start_time' => $validated['start_time'] ?? null,
                 'end_time' => $validated['end_time'] ?? null,
-                'status' => 'draft',
+                'end_time' => $validated['end_time'] ?? null,
+                'status' => $initialStatus,
                 'is_published' => false,
             ]);
 
@@ -95,9 +104,18 @@ class ElectionController extends Controller
             ]);
         });
 
-        // Redirect to add candidate page for the newly created election
+
+
+
+
+        if (!$isFree) {
+            return redirect()->route('admin.elections.payment', ['id' => $election->id])
+                ->with('warning', '⚠ Pemilu berhasil dibuat, namun statusnya "Menunggu Pembayaran". Silakan selesaikan pembayaran.');
+        }
+
+        // Free election
         return redirect()->route('admin.candidates.create', ['election_id' => $election->id])
-            ->with('success', '✓ Pengaturan pemilu berhasil dibuat! Silakan tambahkan kandidat.');
+            ->with('success', 'Pengaturan pemilu berhasil dibuat! (Gratis - Pemilu Pertama). Silakan tambahkan kandidat.');
     }
 
     /**
@@ -112,7 +130,12 @@ class ElectionController extends Controller
         // Prevent editing published election
         if ($election->is_published) {
             return redirect()->route('admin.elections.manage')
-                ->with('error', '✗ Tidak dapat mengedit pemilu yang sudah dipublish. Unpublish terlebih dahulu jika perlu melakukan perubahan.');
+                ->with('error', 'Tidak dapat mengedit pemilu yang sudah dipublish. Unpublish terlebih dahulu jika perlu melakukan perubahan.');
+        }
+
+        if ($election->status === 'pending_payment') {
+             return redirect()->route('admin.elections.payment', $election->id)
+                ->with('warning', '⚠ Harap selesaikan pembayaran pemilu terlebih dahulu.');
         }
 
         return view('admin.elections.edit', compact('election'));
@@ -128,7 +151,12 @@ class ElectionController extends Controller
         // Prevent updating published election
         if ($election->is_published) {
             return redirect()->route('admin.elections.manage')
-                ->with('error', '✗ Tidak dapat mengupdate pemilu yang sudah dipublish. Unpublish terlebih dahulu jika perlu melakukan perubahan.');
+                ->with('error', 'Tidak dapat mengupdate pemilu yang sudah dipublish. Unpublish terlebih dahulu jika perlu melakukan perubahan.');
+        }
+
+        if ($election->status === 'pending_payment') {
+             return redirect()->route('admin.elections.payment', $election->id)
+                ->with('warning', '⚠ Harap selesaikan pembayaran pemilu terlebih dahulu.');
         }
 
         $validated = $request->validate([
@@ -179,7 +207,7 @@ class ElectionController extends Controller
         });
 
         return redirect()->route('admin.elections.manage')
-            ->with('success', '✓ Pengaturan pemilu berhasil diupdate!');
+            ->with('success', 'Pengaturan pemilu berhasil diupdate!');
     }
 
     /**
@@ -192,14 +220,19 @@ class ElectionController extends Controller
         // Prevent deleting published election
         if ($election->is_published) {
             return redirect()->route('admin.elections.manage')
-                ->with('error', '✗ Tidak dapat menghapus pemilu yang sudah dipublish. Unpublish terlebih dahulu jika ingin menghapus.');
+                ->with('error', 'Tidak dapat menghapus pemilu yang sudah dipublish. Unpublish terlebih dahulu jika ingin menghapus.');
+        }
+
+        if ($election->status === 'pending_payment') {
+             return redirect()->route('admin.elections.payment', $election->id)
+                ->with('warning', '⚠ Harap selesaikan pembayaran pemilu terlebih dahulu.');
         }
         
         $title = $election->title;
         $election->delete();
 
         return redirect()->route('admin.elections.manage')
-            ->with('success', "✓ Pemilu '$title' berhasil dihapus!");
+            ->with('success', "Pemilu '$title' berhasil dihapus!");
     }
 
     /**
@@ -212,19 +245,24 @@ class ElectionController extends Controller
         // Check if election has candidates before publishing
         if (!$election->is_published && $election->candidates()->count() === 0) {
             return redirect()->back()
-                ->with('error', '✗ Tidak dapat mempublish pemilu tanpa kandidat. Tambahkan kandidat terlebih dahulu.');
+                ->with('error', 'Tidak dapat mempublish pemilu tanpa kandidat. Tambahkan kandidat terlebih dahulu.');
+        }
+
+        if ($election->status === 'pending_payment') {
+             return redirect()->route('admin.elections.payment', $election->id)
+                ->with('warning', '⚠ Harap selesaikan pembayaran pemilu terlebih dahulu.');
         }
 
         // WAJIB: Check if smart contract has been deployed
         if (!$election->is_published && !$election->contract_address) {
             return redirect()->back()
-                ->with('error', '✗ Smart contract belum di-deploy! Deploy smart contract terlebih dahulu untuk memastikan semua vote tersimpan di blockchain. Ini WAJIB untuk transparansi dan keamanan hasil pemilu.');
+                ->with('error', 'Smart contract belum di-deploy! Deploy smart contract terlebih dahulu untuk memastikan semua vote tersimpan di blockchain. Ini WAJIB untuk transparansi dan keamanan hasil pemilu.');
         }
 
         // Once published, cannot unpublish - only can close
         if ($election->is_published) {
             return redirect()->back()
-                ->with('error', '✗ Pemilu yang sudah dipublish tidak dapat di-unpublish. Gunakan tombol "Tutup Pemilu" untuk mengakhiri pemilu.');
+                ->with('error', 'Pemilu yang sudah dipublish tidak dapat di-unpublish. Gunakan tombol "Tutup Pemilu" untuk mengakhiri pemilu.');
         }
 
         // Publish the election
@@ -234,7 +272,7 @@ class ElectionController extends Controller
         ]);
 
         return redirect()->back()
-            ->with('success', "✓ Pemilu berhasil dipublish! Sekarang voter dapat mulai memberikan suara. Semua vote akan tersimpan di blockchain.");
+            ->with('success', "Pemilu berhasil dipublish! Sekarang voter dapat mulai memberikan suara. Semua vote akan tersimpan di blockchain.");
     }
 
     /**
@@ -247,7 +285,7 @@ class ElectionController extends Controller
         // Can only close published elections
         if (!$election->is_published) {
             return redirect()->back()
-                ->with('error', '✗ Hanya pemilu yang sudah dipublish yang dapat ditutup.');
+                ->with('error', 'Hanya pemilu yang sudah dipublish yang dapat ditutup.');
         }
 
         // Close the election
@@ -256,7 +294,7 @@ class ElectionController extends Controller
         ]);
 
         return redirect()->back()
-            ->with('success', "✓ Pemilu berhasil ditutup! Hasil voting sekarang dapat dilihat oleh voter.");
+            ->with('success', "Pemilu berhasil ditutup! Hasil voting sekarang dapat dilihat oleh voter.");
     }
 
     /**
@@ -286,7 +324,7 @@ class ElectionController extends Controller
 
         if ($election->contract_address) {
             return redirect()->back()
-                ->with('error', '✗ Kontrak untuk pemilu ini sudah tersedia.');
+                ->with('error', 'Kontrak untuk pemilu ini sudah tersedia.');
         }
 
         try {
@@ -297,9 +335,115 @@ class ElectionController extends Controller
                 ?? env('CONTRACT_ABI_PATH');
             $election->save();
 
-            return redirect()->back()->with('success', '✓ Smart contract berhasil dideploy untuk pemilu ini. Alamat: ' . $election->contract_address);
+            return redirect()->back()->with('success', 'Smart contract berhasil dideploy untuk pemilu ini. Alamat: ' . $election->contract_address);
         } catch (\Throwable $e) {
-            return redirect()->back()->with('error', '✗ Gagal deploy smart contract: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal deploy smart contract: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Show payment page for an election.
+     */
+
+    /**
+     * Show payment page for an election.
+     */
+    public function payment(string $id)
+    {
+        $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+        
+        // Prevent paying if already active/draft (meaning paid)
+        if ($election->status !== 'pending_payment') {
+             return redirect()->route('admin.candidates.create', ['election_id' => $election->id])
+                ->with('info', 'Pemilu ini sudah lunas atau gratis.');
+        }
+
+        return view('admin.elections.payment', compact('election'));
+    }
+
+    /**
+     * Process payment for an election.
+     */
+    public function processPayment(string $id, \App\Services\PaymentService $paymentService)
+    {
+        $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+        
+        // Amount: $5 converted to IDR (approx 75.000)
+        $amount = 75000; 
+        $orderId = 'ELECTION-' . $election->id . '-' . uniqid();
+        
+        $customerDetails = [
+            'first_name' => Auth::user()->name,
+            'email' => Auth::user()->email,
+        ];
+
+        try {
+            // Updated Redirect URL: Include order_id explicitly for verification
+            $redirectUrl = route('admin.elections.payment-success', ['id' => $election->id, 'order_id_ref' => $orderId]);
+            
+            $paymentUrl = $paymentService->createTransaction($orderId, $amount, $customerDetails, [], $redirectUrl);
+            
+            // Redirect to Midtrans Snap Page
+            return redirect()->away($paymentUrl);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memproses pembayaran: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle payment success callback/redirect.
+     */
+    public function paymentSuccess(Request $request, string $id, \App\Services\PaymentService $paymentService)
+    {
+        $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+
+        if ($election->status === 'pending_payment') {
+            // 1. Get Order ID (Priority: Midtrans param 'order_id' > Our param 'order_id_ref')
+            $orderId = $request->query('order_id') ?? $request->query('order_id_ref');
+
+            if (!$orderId) {
+                return redirect()->route('admin.elections.payment', $election->id)
+                    ->with('error', 'Gagal verifikasi: Order ID tidak ditemukan.');
+            }
+
+            // 2. Verify with Midtrans
+            $status = $paymentService->verifyTransaction($orderId);
+
+            if (!$status) {
+                return redirect()->route('admin.elections.payment', $election->id)
+                    ->with('error', 'Gagal koneksi ke Payment Gateway. Silakan cek status di dashboard Midtrans atau coba lagi.');
+            }
+
+            // 3. Check Transaction Status
+            $transactionStatus = $status->transaction_status;
+            $fraudStatus = $status->fraud_status;
+
+            $isPaid = false;
+            if ($transactionStatus == 'capture') {
+                if ($fraudStatus == 'accept') {
+                    $isPaid = true;
+                }
+            } else if ($transactionStatus == 'settlement') {
+                $isPaid = true;
+            } else if ($transactionStatus == 'pending') {
+                return redirect()->route('admin.elections.payment', $election->id)
+                    ->with('warning', 'Pembayaran tertunda (Pending). Harap selesaikan pembayaran Anda.');
+            } else if ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
+                 return redirect()->route('admin.elections.payment', $election->id)
+                    ->with('error', 'Pembayaran gagal atau dibatalkan.');
+            }
+
+            if ($isPaid) {
+                $election->update(['status' => 'draft']);
+                return redirect()->route('admin.candidates.create', ['election_id' => $election->id])
+                    ->with('success', 'Pembayaran Sukses! Status pemilu sekarang "Draft".');
+            }
+            
+            // Fallback
+            return redirect()->route('admin.elections.payment', $election->id)
+                ->with('error', 'Status pembayaran belum valid: ' . $transactionStatus);
+        }
+
+        return redirect()->route('admin.candidates.create', ['election_id' => $election->id]);
     }
 }

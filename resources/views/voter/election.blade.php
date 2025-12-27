@@ -63,7 +63,7 @@
 
             @if (Auth::check() && $hasVoted && $election->status !== 'closed')
                 <div class="mb-6 bg-blue-50 border-l-4 border-blue-400 text-blue-700 px-4 py-3 rounded shadow-md">
-                    <p class="font-semibold">✓ Anda sudah memberikan suara pada pemilu ini</p>
+                    <p class="font-semibold">Anda sudah memberikan suara pada pemilu ini</p>
                 </div>
             @endif
 

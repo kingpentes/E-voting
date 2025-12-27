@@ -129,6 +129,9 @@ class VoterElectionController extends Controller
             ->where('election_id', $election->id)
             ->firstOrFail();
 
+        // Check payment logic: First election free, subsequent $5
+        // $previousVotes = $user->votes()->count();
+        
         // Create vote in database first
         $vote = $user->votes()->create([
             'election_id' => $election->id,
@@ -164,7 +167,7 @@ class VoterElectionController extends Controller
             }
         }
 
-        $message = '✓ Suara Anda berhasil dicatat! Terima kasih telah berpartisipasi.';
+        $message = 'Suara Anda berhasil dicatat! Terima kasih telah berpartisipasi.';
         if ($election->contract_address && !$blockchainSuccess) {
             $message .= ' (Catatan: Vote tersimpan di database, namun belum tersinkronisasi ke blockchain)';
         }

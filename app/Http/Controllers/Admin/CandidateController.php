@@ -20,7 +20,9 @@ class CandidateController extends Controller
     public function index(Request $request)
     {
         // Get organizer's elections for filter dropdown
-        $elections = Election::forOrganizer(Auth::id())->get();
+        $elections = Election::forOrganizer(Auth::id())
+            ->where('status', '!=', 'pending_payment')
+            ->get();
         
         // Get election_id from request (for filter)
         $electionId = $request->get('election_id');
@@ -46,12 +48,14 @@ class CandidateController extends Controller
      */
     public function create()
     {
-        // Get organizer's elections
-        $elections = Election::forOrganizer(Auth::id())->get();
+        // Get organizer's elections (exclude unpaid)
+        $elections = Election::forOrganizer(Auth::id())
+            ->where('status', '!=', 'pending_payment')
+            ->get();
         
         if ($elections->isEmpty()) {
             return redirect()->route('admin.elections.create')
-                ->with('error', '✗ Buat pemilu terlebih dahulu sebelum menambahkan kandidat.');
+                ->with('error', 'Buat pemilu terlebih dahulu sebelum menambahkan kandidat.');
         }
 
         return view('admin.candidates.create', compact('elections'));
@@ -82,10 +86,15 @@ class CandidateController extends Controller
         // Verify election belongs to current organizer
         $election = Election::forOrganizer(Auth::id())->findOrFail($validated['election_id']);
 
-        // Prevent adding candidate to published election
+        // Prevent adding candidate to published or unpaid election
         if ($election->is_published) {
             return redirect()->back()
-                ->with('error', '✗ Tidak dapat menambah kandidat ke pemilu yang sudah dipublish.');
+                ->with('error', 'Tidak dapat menambah kandidat ke pemilu yang sudah dipublish.');
+        }
+
+        if ($election->status === 'pending_payment') {
+            return redirect()->route('admin.elections.payment', $election->id)
+                ->with('warning', '⚠ Harap selesaikan pembayaran pemilu terlebih dahulu.');
         }
 
         // Check if candidate number already exists in this election
@@ -132,7 +141,7 @@ class CandidateController extends Controller
         });
 
         return redirect()->route('admin.candidates.manage')
-            ->with('success', '✓ Kandidat berhasil ditambahkan!');
+            ->with('success', 'Kandidat berhasil ditambahkan!');
     }
 
     /**
@@ -150,7 +159,12 @@ class CandidateController extends Controller
         // Prevent editing candidate from published election
         if ($candidate->election->is_published) {
             return redirect()->route('admin.candidates.manage')
-                ->with('error', '✗ Tidak dapat mengedit kandidat dari pemilu yang sudah dipublish.');
+                ->with('error', 'Tidak dapat mengedit kandidat dari pemilu yang sudah dipublish.');
+        }
+        
+        if ($candidate->election->status === 'pending_payment') {
+            return redirect()->route('admin.elections.payment', $candidate->election->id)
+                ->with('warning', '⚠ Harap selesaikan pembayaran pemilu terlebih dahulu.');
         }
 
         $elections = Election::forOrganizer(Auth::id())->get();
@@ -173,7 +187,12 @@ class CandidateController extends Controller
         // Prevent updating candidate from published election
         if ($candidate->election->is_published) {
             return redirect()->route('admin.candidates.manage')
-                ->with('error', '✗ Tidak dapat mengupdate kandidat dari pemilu yang sudah dipublish.');
+                ->with('error', 'Tidak dapat mengupdate kandidat dari pemilu yang sudah dipublish.');
+        }
+
+        if ($candidate->election->status === 'pending_payment') {
+            return redirect()->route('admin.elections.payment', $candidate->election->id)
+                ->with('warning', '⚠ Harap selesaikan pembayaran pemilu terlebih dahulu.');
         }
 
         $validated = $request->validate([
@@ -240,7 +259,7 @@ class CandidateController extends Controller
         });
 
         return redirect()->route('admin.candidates.manage')
-            ->with('success', '✓ Kandidat berhasil diupdate!');
+            ->with('success', 'Kandidat berhasil diupdate!');
     }
 
     /**
@@ -258,7 +277,12 @@ class CandidateController extends Controller
         // Prevent deleting candidate from published election
         if ($candidate->election->is_published) {
             return redirect()->route('admin.candidates.manage')
-                ->with('error', '✗ Tidak dapat menghapus kandidat dari pemilu yang sudah dipublish.');
+                ->with('error', 'Tidak dapat menghapus kandidat dari pemilu yang sudah dipublish.');
+        }
+
+        if ($candidate->election->status === 'pending_payment') {
+            return redirect()->route('admin.elections.payment', $candidate->election->id)
+                ->with('warning', '⚠ Harap selesaikan pembayaran pemilu terlebih dahulu.');
         }
 
         $name = $candidate->name;
@@ -271,6 +295,6 @@ class CandidateController extends Controller
         $candidate->delete();
 
         return redirect()->route('admin.candidates.manage')
-            ->with('success', "✓ Kandidat '$name' berhasil dihapus!");
+            ->with('success', "Kandidat '$name' berhasil dihapus!");
     }
 }

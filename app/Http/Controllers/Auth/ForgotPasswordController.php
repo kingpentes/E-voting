@@ -54,13 +54,13 @@ class ForgotPasswordController extends Controller
         $sent = $gmailService->sendOTP($email, $otp);
 
         if (!$sent) {
-            return back()->with('error', '✗ Gagal mengirim OTP. Silakan coba lagi.');
+            return back()->with('error', 'Gagal mengirim OTP. Silakan coba lagi.');
         }
 
         // Redirect to verify OTP page
         return redirect()->route('password.verify.form')
             ->with('email', $email)
-            ->with('success', '✓ Kode OTP telah dikirim ke email Anda. Silakan cek inbox Anda.');
+            ->with('success', 'Kode OTP telah dikirim ke email Anda. Silakan cek inbox Anda.');
     }
 
     /**
@@ -72,7 +72,7 @@ class ForgotPasswordController extends Controller
         
         if (!$email) {
             return redirect()->route('password.request')
-                ->with('error', '✗ Sesi expired. Silakan request OTP kembali.');
+                ->with('error', 'Sesi expired. Silakan request OTP kembali.');
         }
 
         return view('auth.verify-otp', compact('email'));
@@ -96,25 +96,25 @@ class ForgotPasswordController extends Controller
             ->first();
 
         if (!$record) {
-            return back()->with('error', '✗ Kode OTP tidak ditemukan. Silakan request OTP kembali.');
+            return back()->with('error', 'Kode OTP tidak ditemukan. Silakan request OTP kembali.');
         }
 
         // Check if OTP expired
         if (now()->greaterThan($record->expires_at)) {
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-            return back()->with('error', '✗ Kode OTP sudah kadaluarsa. Silakan request OTP kembali.');
+            return back()->with('error', 'Kode OTP sudah kadaluarsa. Silakan request OTP kembali.');
         }
 
         // Verify OTP
         if ($record->token !== $request->otp) {
-            return back()->with('error', '✗ Kode OTP salah. Silakan coba lagi.');
+            return back()->with('error', 'Kode OTP salah. Silakan coba lagi.');
         }
 
         // OTP verified, redirect to reset password page
         return redirect()->route('password.reset.form')
             ->with('email', $request->email)
             ->with('otp_verified', true)
-            ->with('success', '✓ Kode OTP berhasil diverifikasi. Silakan buat password baru.');
+            ->with('success', 'Kode OTP berhasil diverifikasi. Silakan buat password baru.');
     }
 
     /**
@@ -127,7 +127,7 @@ class ForgotPasswordController extends Controller
 
         if (!$email || !$otpVerified) {
             return redirect()->route('password.request')
-                ->with('error', '✗ Silakan verifikasi OTP terlebih dahulu.');
+                ->with('error', 'Silakan verifikasi OTP terlebih dahulu.');
         }
 
         return view('auth.reset-password', compact('email'));
@@ -155,7 +155,7 @@ class ForgotPasswordController extends Controller
         // Verify that OTP exists and not expired (verified within last 15 minutes)
         if (!$record || now()->greaterThan($record->expires_at)) {
             return redirect()->route('password.request')
-                ->with('error', '✗ Sesi verifikasi expired. Silakan request OTP kembali.');
+                ->with('error', 'Sesi verifikasi expired. Silakan request OTP kembali.');
         }
 
         // Update user password
@@ -170,7 +170,7 @@ class ForgotPasswordController extends Controller
         $request->session()->forget(['email', 'otp_verified']);
 
         return redirect()->route('login')
-            ->with('success', '✓ Password berhasil direset! Silakan login dengan password baru Anda.');
+            ->with('success', 'Password berhasil direset! Silakan login dengan password baru Anda.');
     }
 
     /**
@@ -181,13 +181,13 @@ class ForgotPasswordController extends Controller
         $email = $request->input('email') ?? session('email');
 
         if (!$email) {
-            return back()->with('error', '✗ Email tidak ditemukan.');
+            return back()->with('error', 'Email tidak ditemukan.');
         }
 
         // Check if user exists
         $user = User::where('email', $email)->first();
         if (!$user) {
-            return back()->with('error', '✗ Email tidak terdaftar dalam sistem.');
+            return back()->with('error', 'Email tidak terdaftar dalam sistem.');
         }
 
         // Generate new OTP
@@ -207,9 +207,9 @@ class ForgotPasswordController extends Controller
         $sent = $gmailService->sendOTP($email, $otp);
 
         if (!$sent) {
-            return back()->with('error', '✗ Gagal mengirim OTP. Silakan coba lagi.');
+            return back()->with('error', 'Gagal mengirim OTP. Silakan coba lagi.');
         }
 
-        return back()->with('success', '✓ Kode OTP baru telah dikirim ke email Anda.');
+        return back()->with('success', 'Kode OTP baru telah dikirim ke email Anda.');
     }
 }
