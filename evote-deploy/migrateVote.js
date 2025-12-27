@@ -46,8 +46,7 @@ if (keyBuffer.length !== 32) {
 
 /**
  * ENKRIPSI VOTE DATA
- * Menggunakan AES-256-GCM untuk enkripsi yang aman
- */
+*/
 
 // Data yang akan dienkripsi (ID kandidat)
 const plaintext = candidateId;
@@ -68,7 +67,6 @@ const tag = cipher.getAuthTag();
 /**
  * GENERATE HASH
  * Hash digunakan untuk verifikasi integritas data
- * Menggunakan SHA-256
  */
 const hash = crypto.createHash('sha256').update(plaintext).digest();
 

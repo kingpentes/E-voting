@@ -125,10 +125,7 @@ async function deploy() {
   // Siapkan deployment transaction
   const deployTx = contract.deploy({ data: bytecode });
 
-  /**
-   * GAS LIMIT CALCULATION
-   * Ambil gas limit dari block terakhir untuk keamanan
-   */
+  // Ambil gas limit dari block terakhir untuk keamanan
   const latest = await web3.eth.getBlock('latest');
   const blockGasLimit = BigInt(latest.gasLimit || latest.gas || '0');
   console.log('Latest block gasLimit:', blockGasLimit.toString());
@@ -156,11 +153,11 @@ async function deploy() {
         from: FROM,
         gas: gasToUse,
         gasPrice: GAS_PRICE,
-        type: '0x0'  // Legacy transaction type
+        type: '0x0'  
       })
         .on('transactionHash', (tx) => console.log('txHash:', tx));
 
-      // Jika berhasil, keluar dari loop
+
       if (instance?.options?.address) break;
 
     } catch (e) {
