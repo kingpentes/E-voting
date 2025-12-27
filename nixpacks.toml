@@ -1,13 +1,8 @@
-[phases.setup]
-nixPkgs = ["php82", "php82Packages.composer", "nodejs_20", "npm-9_x", "libmysqlclient", "nginx"]
 
 [phases.install]
 cmds = [
-    "mkdir -p bootstrap/cache storage/framework/views storage/framework/sessions storage/framework/cache storage/app/public /var/log/nginx /var/lib/nginx",
-    "touch /var/log/nginx/error.log",
-    "chmod -R 777 bootstrap/cache storage /var/log/nginx /var/lib/nginx",
-    "composer install --ignore-platform-reqs --no-interaction --prefer-dist",
-    "rm -rf package-lock.json node_modules",
+    "mkdir -p bootstrap/cache storage/framework/views storage/framework/sessions storage/framework/cache storage/app/public",
+    "chmod -R 777 bootstrap/cache storage",
     "npm install"
 ]
 
