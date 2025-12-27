@@ -1,0 +1,19 @@
+[phases.setup]
+nixPkgs = ["php82", "nodejs_20", "npm-9_x", "libmysqlclient"]
+
+[phases.install]
+cmds = [
+    "mkdir -p bootstrap/cache storage/framework/views storage/framework/sessions storage/framework/cache storage/app/public",
+    "chmod -R 777 bootstrap/cache storage",
+    "composer install --ignore-platform-reqs --no-interaction --prefer-dist",
+    "npm ci"
+]
+
+[phases.build]
+cmds = [
+    "npm run build",
+    "php artisan optimize:clear"
+]
+
+[start]
+cmd = "php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT"
