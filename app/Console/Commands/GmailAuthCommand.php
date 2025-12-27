@@ -31,7 +31,7 @@ class GmailAuthCommand extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->tokenPath = base_path('gmail_token.json');
+        $this->tokenPath = storage_path('app/gmail_token.json');
     }
 
     /**

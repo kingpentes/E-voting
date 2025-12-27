@@ -25,8 +25,15 @@ class GmailService
         $this->client->setAuthConfig($credentials);
         $this->client->setAccessType('offline');
         
-        // Load access token dari file
-        $tokenPath = base_path('gmail_token.json');
+        // Load access token dari ENV (Bootstrap untuk Railway) atau File
+        $tokenPath = storage_path('app/gmail_token.json');
+        
+        // Cek apakah ada token di ENV (GMAIL_TOKEN_JSON) dan file belum ada
+        $envToken = env('GMAIL_TOKEN_JSON');
+        if (!file_exists($tokenPath) && $envToken && is_string($envToken)) {
+            file_put_contents($tokenPath, $envToken);
+        }
+
         if (file_exists($tokenPath)) {
             $accessToken = json_decode(file_get_contents($tokenPath), true);
             $this->client->setAccessToken($accessToken);
