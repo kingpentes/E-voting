@@ -6,7 +6,7 @@ cmds = [
     "mkdir -p bootstrap/cache storage/framework/views storage/framework/sessions storage/framework/cache storage/app/public",
     "chmod -R 777 bootstrap/cache storage",
     "composer install --ignore-platform-reqs --no-interaction --prefer-dist",
-    "npm ci"
+    "npm install"
 ]
 
 [phases.build]
