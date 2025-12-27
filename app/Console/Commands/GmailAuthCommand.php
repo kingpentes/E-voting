@@ -62,9 +62,19 @@ class GmailAuthCommand extends Command
      */
     private function initializeClient(): void
     {
-        $credentialsPath = env('GOOGLE_APPLICATION_CREDENTIALS');
+        $credentials = env('GOOGLE_APPLICATION_CREDENTIALS');
+        $credentialsPath = null;
+        $isJsonEnv = false;
 
-        if (!$credentialsPath || !file_exists($credentialsPath)) {
+        // Cek apakah ENV berisi JSON string (dimulai dengan kurung kurawal)
+        if (is_string($credentials) && str_starts_with(trim($credentials), '{')) {
+            $isJsonEnv = true;
+        } else {
+            // Jika bukan JSON, asumsikan path file
+            $credentialsPath = $credentials;
+        }
+
+        if (!$isJsonEnv && (!$credentialsPath || !file_exists($credentialsPath))) {
             $this->error('❌ GOOGLE_APPLICATION_CREDENTIALS not set or file not found!');
             $this->info('Please set GOOGLE_APPLICATION_CREDENTIALS in your .env file');
             exit(1);
@@ -73,7 +83,11 @@ class GmailAuthCommand extends Command
         $this->client = new GoogleClient();
         $this->client->setApplicationName('E-Voting System');
         $this->client->setScopes([Gmail::GMAIL_SEND]);
-        $this->client->setAuthConfig($credentialsPath);
+        if ($isJsonEnv) {
+            $this->client->setAuthConfig(json_decode($credentials, true));
+        } else {
+            $this->client->setAuthConfig($credentialsPath);
+        }
         $this->client->setAccessType('offline');
         $this->client->setPrompt('consent');
         $this->client->setRedirectUri('http://localhost:8000/admin/gmail/callback');

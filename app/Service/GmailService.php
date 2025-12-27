@@ -17,7 +17,12 @@ class GmailService
         $this->client = new GoogleClient();
         $this->client->setApplicationName('E-Voting System');
         $this->client->setScopes([Gmail::GMAIL_SEND]);
-        $this->client->setAuthConfig(env('GOOGLE_APPLICATION_CREDENTIALS'));
+        // Support for JSON string in ENV (for Railway/Cloud) or File Path
+        $credentials = env('GOOGLE_APPLICATION_CREDENTIALS');
+        if (is_string($credentials) && str_starts_with(trim($credentials), '{')) {
+            $credentials = json_decode($credentials, true);
+        }
+        $this->client->setAuthConfig($credentials);
         $this->client->setAccessType('offline');
         
         // Load access token dari file
