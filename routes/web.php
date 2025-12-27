@@ -152,18 +152,45 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
                 'participation_rate' => $participationRate,
             ];
             
-            // Get candidate statistics
-            $candidates = $election->candidates()
-                ->withCount('votes')
-                ->orderBy('votes_count', 'desc')
-                ->get();
+            // Get candidate statistics - prefer blockchain if contract deployed
+            $candidateStats = collect([]);
             
-            $candidateStats = $candidates->map(function ($candidate) {
-                return [
-                    'name' => $candidate->name,
-                    'votes' => $candidate->votes_count,
-                ];
-            });
+            if ($election->contract_address) {
+                // Use blockchain for results
+                try {
+                    $resultService = app(\App\Service\BlockchainResultService::class);
+                    $blockchainResults = $resultService->getElectionResults($election);
+                    
+                    if (empty($blockchainResults['error'])) {
+                        $candidateStats = collect($blockchainResults['candidates'])->map(function ($candidate) {
+                            return [
+                                'name' => $candidate['name'],
+                                'votes' => $candidate['vote_count'],
+                            ];
+                        });
+                    }
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('Failed to get blockchain results for admin dashboard', [
+                        'election_id' => $election->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+            
+            // Fallback to database if blockchain not available or failed
+            if ($candidateStats->isEmpty()) {
+                $candidates = $election->candidates()
+                    ->withCount('votes')
+                    ->orderBy('votes_count', 'desc')
+                    ->get();
+                
+                $candidateStats = $candidates->map(function ($candidate) {
+                    return [
+                        'name' => $candidate->name,
+                        'votes' => $candidate->votes_count,
+                    ];
+                });
+            }
         }
 
         return view('admin.dashboard', compact('user', 'election', 'stats', 'candidateStats', 'elections'));
@@ -203,6 +230,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->get();
         return view('admin.elections.link', compact('elections'));
     })->name('elections.link');
+    
+    // Gmail OAuth Callback (for artisan gmail:auth command)
+    Route::get('/gmail/callback', function () {
+        $code = request()->get('code');
+        
+        if (!$code) {
+            return response()->json([
+                'error' => 'No authorization code received',
+                'message' => 'Please try again with php artisan gmail:auth'
+            ], 400);
+        }
+        
+        return view('admin.gmail-callback', ['code' => $code]);
+    })->name('gmail.callback');
     
     // Old route aliases for backward compatibility
     Route::get('/elections/rules/manage', [ElectionController::class, 'index'])->name('elections.rules.manage');

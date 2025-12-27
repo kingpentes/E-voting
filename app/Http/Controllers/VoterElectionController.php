@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Election;
 use App\Models\Candidate;
 use App\Service\VoteOnChainService;
+use App\Service\BlockchainResultService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -38,7 +39,21 @@ class VoterElectionController extends Controller
             $hasVoted = $user->hasVotedIn($election->id);
         }
 
-        return view('voter.election', compact('election', 'candidates', 'hasVoted'));
+        // Fetch results from blockchain if election is closed
+        $blockchainResults = null;
+        if ($election->status === 'closed' && $election->contract_address) {
+            try {
+                $resultService = app(BlockchainResultService::class);
+                $blockchainResults = $resultService->getElectionResults($election);
+            } catch (\Throwable $e) {
+                Log::error('Failed to fetch blockchain results', [
+                    'election_id' => $election->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        return view('voter.election', compact('election', 'candidates', 'hasVoted', 'blockchainResults'));
     }
 
     /**
