@@ -2,10 +2,17 @@
 *.log
 .DS_Store
 .env
+.env.railway
 .env.backup
 .env.production
 .env.local
 *.env.local
+
+# Secrets (jangan commit ke GitHub)
+gmail_token.json
+client_secret_*.json
+RAILWAY_DEPLOY.md
+
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -27,7 +34,6 @@ Thumbs.db
 # Storage
 /storage/*.key
 /storage/pail
-/storage/contract/
 /storage/logs/*
 !/storage/logs/.gitkeep
 /storage/framework/cache/*
@@ -43,9 +49,6 @@ Thumbs.db
 /storage/app/private/*
 !/storage/app/private/.gitkeep
 
-# Google OAuth Credentials (SENSITIVE - DO NOT COMMIT)
-client_secret_*.json
-gmail_token.json
 
 # Testing Scripts
 generate_gmail_token.php
@@ -76,7 +79,5 @@ pentest_output.log
 /database/*.sqlite-journal
 
 # Custom
-gmail_token.json
-client_secret_*.json
 *.pem
 *.p12
