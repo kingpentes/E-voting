@@ -1,66 +1,39 @@
-/**
- * SMART CONTRACT DEPLOYMENT SCRIPT
- * =================================
- * Script untuk meng-compile dan men-deploy smart contract EvoteEncrypted ke blockchain Quorum
- * 
- * Fungsi utama:
- * - Compile Solidity smart contract
- * - Deploy contract ke Quorum network
- * - Menyimpan ABI ke Laravel storage untuk digunakan aplikasi
- * 
- * Environment Variables:
- * - RPC: URL RPC node Quorum (default: http://127.0.0.1:18545)
- * - DEPLOY_FROM: Alamat akun yang men-deploy (default: 0xed9d02...)
- * - DEPLOY_GAS_PRICE: Harga gas (default: 0x0)
- */
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import solc from "solc";
+import Web3 from "web3";
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import solc from 'solc';  // Solidity compiler
-import Web3 from 'web3';
-
-/**
- * KONFIGURASI DEPLOYMENT
- */
-// URL RPC node Quorum
-const RPC = process.env.RPC || 'http://127.0.0.1:18545';
-
-// Alamat akun yang akan men-deploy contract (node 1)
-const FROM = (process.env.DEPLOY_FROM || '0xed9d02e382b34818e88b88a309c7fe71e65f419d').toLowerCase();
-
-// Gas price (0 untuk private blockchain)
-const GAS_PRICE = process.env.DEPLOY_GAS_PRICE || '0x0';
+const RPC = process.env.RPC || "http://127.0.0.1:18545";
+const FROM = (
+  process.env.DEPLOY_FROM || "0xed9d02e382b34818e88b88a309c7fe71e65f419d"
+).toLowerCase();
+const GAS_PRICE = process.env.DEPLOY_GAS_PRICE || "0x0";
 
 /**
  * PATH SETUP
  * Mendapatkan path absolut ke file contract
  */
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const contractPath = path.join(__dirname, 'contracts', 'EvoteEncrypted.sol');
-const contractSource = fs.readFileSync(contractPath, 'utf8');
+const contractPath = path.join(__dirname, "contracts", "EvoteEncrypted.sol");
+const contractSource = fs.readFileSync(contractPath, "utf8");
 
 /**
  * COMPILER INPUT
  * Konfigurasi untuk Solidity compiler
  */
 const input = {
-  language: 'Solidity',
+  language: "Solidity",
   sources: {
-    'EvoteEncrypted.sol': { content: contractSource }
+    "EvoteEncrypted.sol": { content: contractSource },
   },
   settings: {
-    evmVersion: 'istanbul',  // EVM version yang kompatibel dengan Quorum
-    optimizer: {
-      enabled: true,   // Aktifkan optimizer untuk efisiensi gas
-      runs: 200        // Optimasi untuk 200 kali eksekusi
-    },
+    evmVersion: "istanbul",
+    optimizer: { enabled: true, runs: 200 },
     outputSelection: {
-      '*': {
-        '*': ['abi', 'evm.bytecode.object']  // Output ABI dan bytecode
-      }
-    }
-  }
+      "*": { "*": ["abi", "evm.bytecode.object"] },
+    },
+  },
 };
 
 /**
@@ -75,19 +48,14 @@ function compile() {
 
   // Check untuk compilation errors
   if (output.errors) {
-    const fatal = output.errors.filter(e => e.severity === 'error');
+    const fatal = output.errors.filter((e) => e.severity === "error");
     if (fatal.length > 0) {
       console.error(fatal);
-      throw new Error('Compilation failed');
+      throw new Error("Compilation failed");
     }
   }
-
-  // Extract ABI dan bytecode dari output
-  const c = output.contracts['EvoteEncrypted.sol']['EvoteEncrypted'];
-  return {
-    abi: c.abi,
-    bytecode: '0x' + c.evm.bytecode.object
-  };
+  const c = output.contracts["EvoteEncrypted.sol"]["EvoteEncrypted"];
+  return { abi: c.abi, bytecode: "0x" + c.evm.bytecode.object };
 }
 
 /**
@@ -100,9 +68,7 @@ async function deploy() {
 
   // Koneksi ke blockchain
   const web3 = new Web3(RPC);
-
-  // Log ukuran bytecode (untuk estimasi gas)
-  console.log('Bytecode size (bytes):', (bytecode.length - 2) / 2);
+  console.log("Bytecode size (bytes):", (bytecode.length - 2) / 2);
 
   /**
    * UNLOCK ACCOUNT (opsional)
@@ -110,10 +76,10 @@ async function deploy() {
    */
   try {
     if (web3.eth.personal && web3.eth.personal.unlockAccount) {
-      await web3.eth.personal.unlockAccount(FROM, '', 600);
+      await web3.eth.personal.unlockAccount(FROM, "", 600);
     }
   } catch (e) {
-    console.warn('unlockAccount warning:', e.message);
+    console.warn("unlockAccount warning:", e.message);
   }
 
   /**
@@ -125,10 +91,9 @@ async function deploy() {
   // Siapkan deployment transaction
   const deployTx = contract.deploy({ data: bytecode });
 
-  // Ambil gas limit dari block terakhir untuk keamanan
-  const latest = await web3.eth.getBlock('latest');
-  const blockGasLimit = BigInt(latest.gasLimit || latest.gas || '0');
-  console.log('Latest block gasLimit:', blockGasLimit.toString());
+  const latest = await web3.eth.getBlock("latest");
+  const blockGasLimit = BigInt(latest.gasLimit || latest.gas || "0");
+  console.log("Latest block gasLimit:", blockGasLimit.toString());
 
   /**
    * DEPLOYMENT DENGAN MULTIPLE GAS CANDIDATES
@@ -141,28 +106,19 @@ async function deploy() {
 
   for (const g of candidates) {
     try {
-      // Hitung gas yang akan digunakan (tidak melebihi block gas limit)
-      const gasToUse = blockGasLimit > 0n
-        ? Number(BigInt(Math.min(g, Number(blockGasLimit - 1000n))))
-        : g;
-
-      console.log('Attempt deploy with gas =', gasToUse);
-
-      // Kirim deployment transaction
-      instance = await deployTx.send({
-        from: FROM,
-        gas: gasToUse,
-        gasPrice: GAS_PRICE,
-        type: '0x0'  
-      })
-        .on('transactionHash', (tx) => console.log('txHash:', tx));
-
-
+      const gasToUse =
+        blockGasLimit > 0n
+          ? Number(BigInt(Math.min(g, Number(blockGasLimit - 1000n))))
+          : g;
+      console.log("Attempt deploy with gas =", gasToUse);
+      instance = await deployTx
+        .send({ from: FROM, gas: gasToUse, gasPrice: GAS_PRICE, type: "0x0" })
+        .on("transactionHash", (tx) => console.log("txHash:", tx));
       if (instance?.options?.address) break;
 
     } catch (e) {
       lastErr = e;
-      console.warn('Attempt failed with gas', g, e.message || e);
+      console.warn("Attempt failed with gas", g, e.message || e);
     }
   }
 
@@ -170,22 +126,24 @@ async function deploy() {
    * VALIDASI DEPLOYMENT
    */
   if (!instance?.options?.address) {
-    throw lastErr || new Error('Deployment failed for all gas candidates');
+    throw lastErr || new Error("Deployment failed for all gas candidates");
   }
 
-  // Log alamat contract yang berhasil di-deploy
-  console.log('contractAddress:', instance.options.address);
+  console.log("contractAddress:", instance.options.address);
 
-  /**
-   * SIMPAN ABI KE LARAVEL STORAGE
-   * ABI diperlukan oleh Laravel untuk berinteraksi dengan contract
-   */
-  const abiOut = 'C://laragon//www//smart-voting//storage//contract//evote_abi.json';
+  // Write ABI into the Laravel app storage path
+  const abiOut =
+    process.env.ABI_OUTPUT_PATH ||
+    "D://E-voting//storage//contract//evote_abi.json";
   try {
+    const dir = path.dirname(abiOut);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
     fs.writeFileSync(abiOut, JSON.stringify(abi, null, 2));
-    console.log('ABI written to', abiOut);
+    console.log("ABI written to", abiOut);
   } catch (e) {
-    console.warn('Failed to write ABI to Laravel storage path:', e.message);
+    console.warn("Failed to write ABI to Laravel storage path:", e.message);
   }
 }
 
@@ -194,6 +152,6 @@ async function deploy() {
  * Jalankan fungsi deploy dan handle errors
  */
 deploy().catch((e) => {
-  console.error('Deploy error:', e);
+  console.error("Deploy error:", e);
   process.exit(1);
 });
