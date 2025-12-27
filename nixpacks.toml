@@ -1,8 +1,12 @@
+[phases.setup]
+nixPkgs = ["php82", "php82Packages.composer", "nodejs_22", "npm-9_x", "libmysqlclient"]
 
 [phases.install]
 cmds = [
     "mkdir -p bootstrap/cache storage/framework/views storage/framework/sessions storage/framework/cache storage/app/public",
     "chmod -R 777 bootstrap/cache storage",
+    "composer install --ignore-platform-reqs --no-interaction --prefer-dist",
+    "rm -rf package-lock.json node_modules",
     "npm install"
 ]
 
