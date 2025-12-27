@@ -67,7 +67,7 @@
                 @endif
 
                 <!-- Form -->
-                <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
+                <form method="POST" action="{{ route('password.reset.update') }}" class="space-y-6">
                     @csrf
                     <input type="hidden" name="email" value="{{ $email }}">
 
