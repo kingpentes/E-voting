@@ -14,8 +14,8 @@ class ContractDeploymentService
             throw new \RuntimeException('Missing BLOCKCHAIN_RPC or BLOCKCHAIN_FROM in environment');
         }
 
-        // Use the evote-deploy folder from environment variable
-        $workdir = env('CONTRACT_DEPLOY_PATH');
+        // Use blockchain folder in Laravel repo, or fallback to CONTRACT_DEPLOY_PATH
+        $workdir = env('CONTRACT_DEPLOY_PATH') ?: base_path('blockchain');
         if (!$workdir || !is_dir($workdir)) {
             throw new \RuntimeException('Deploy folder not found: ' . ($workdir ?: 'CONTRACT_DEPLOY_PATH not set'));
         }
@@ -28,10 +28,17 @@ class ContractDeploymentService
             'DEPLOY_FROM' => $from,
             'ABI_OUTPUT_PATH' => $abiPath,
             'PATH' => getenv('PATH'),
-            'SystemRoot' => getenv('SystemRoot') ?: 'C:\\Windows',
         ];
         
-        $cmd = ['cmd', '/c', 'node', 'deploy.js'];
+        // Cross-platform command: detect OS
+        if (PHP_OS_FAMILY === 'Windows') {
+            $env['SystemRoot'] = getenv('SystemRoot') ?: 'C:\\Windows';
+            $cmd = ['cmd', '/c', 'node', 'deploy.js'];
+        } else {
+            // Linux/Railway
+            $cmd = ['node', 'deploy.js'];
+        }
+        
         $process = new Process($cmd, $workdir, $env, null, 600);
         $process->run();
 

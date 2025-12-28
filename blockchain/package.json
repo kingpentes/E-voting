@@ -1,0 +1,13 @@
+{
+  "name": "evote-deploy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "node deploy.js"
+  },
+  "dependencies": {
+    "solc": "^0.8.21",
+    "web3": "^4.8.0"
+  }
+}
