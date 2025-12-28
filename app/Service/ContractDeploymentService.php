@@ -40,11 +40,31 @@ class ContractDeploymentService
         }
         
         $process = new Process($cmd, $workdir, $env, null, 600);
+        
+        // Log debug info
+        $debugInfo = sprintf(
+            "[DEBUG] Workdir: %s | Command: %s | Node check: %s",
+            $workdir,
+            implode(' ', $cmd),
+            shell_exec('which node 2>&1') ?: 'node not found in PATH'
+        );
+        
         $process->run();
 
-        $output = $process->getOutput() . "\n" . $process->getErrorOutput();
+        $stdout = $process->getOutput();
+        $stderr = $process->getErrorOutput();
+        $exitCode = $process->getExitCode();
+        
+        $output = $stdout . "\n" . $stderr;
+        
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException('Deploy failed: ' . $output);
+            throw new \RuntimeException(sprintf(
+                "Deploy failed (exit code: %d)\n[Debug]: %s\n[STDOUT]: %s\n[STDERR]: %s",
+                $exitCode,
+                $debugInfo,
+                $stdout ?: '(empty)',
+                $stderr ?: '(empty)'
+            ));
         }
 
         $address = null;
