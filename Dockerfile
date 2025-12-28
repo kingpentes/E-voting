@@ -39,9 +39,8 @@ RUN php artisan config:clear && php artisan view:clear
 # Expose port
 EXPOSE 8080
 
-# Start command
-CMD php artisan migrate --force && \
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php -S 0.0.0.0:${PORT:-8080} -t public
+# Set default PORT for Railway
+ENV PORT=8080
+
+# Start command using shell form for proper variable expansion
+CMD ["sh", "-c", "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && php -S 0.0.0.0:$PORT -t public"]
