@@ -120,6 +120,22 @@ class VoterElectionController extends Controller
             return back()->with('error', 'Anda sudah memberikan suara di pemilu ini.');
         }
 
+        // Check if election has started
+        $now = now();
+        if ($election->start_date && $now->lt($election->start_date)) {
+            return back()->with('error', 'Pemilu belum dimulai. Voting akan dibuka pada ' . $election->start_date->format('d M Y H:i') . ' WIB.');
+        }
+
+        // Check if election has ended
+        if ($election->end_date && $now->gt($election->end_date)) {
+            return back()->with('error', 'Pemilu sudah berakhir pada ' . $election->end_date->format('d M Y H:i') . ' WIB.');
+        }
+
+        // Check if election is in active status
+        if ($election->status !== 'active') {
+            return back()->with('error', 'Pemilu tidak dalam status aktif. Status saat ini: ' . $election->status);
+        }
+
         $validated = $request->validate([
             'candidate_id' => ['required', 'exists:candidates,id'],
         ]);
