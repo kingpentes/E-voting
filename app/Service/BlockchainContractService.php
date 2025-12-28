@@ -63,8 +63,8 @@ class BlockchainContractService
         $property->setAccessible(true);
         $contractAddress = $property->getValue($this->contract);
         
-        $workdir = env('CONTRACT_DEPLOY_PATH', base_path('..\\blockchain\\evote-deploy'));
-        $scriptPath = $workdir . '\\storeVote.js';
+        $workdir = env('CONTRACT_DEPLOY_PATH') ?: base_path('blockchain');
+        $scriptPath = $workdir . DIRECTORY_SEPARATOR . 'storeVote.js';
         
         // Ensure hash has 0x prefix and is 66 chars (0x + 64 hex chars)
         $hash32 = self::hex32($hashHex32);
@@ -119,8 +119,8 @@ class BlockchainContractService
         }
         
         // Call Node.js script to get vote count
-        $deployPath = env('CONTRACT_DEPLOY_PATH', base_path('..\\blockchain\\evote-deploy'));
-        $scriptPath = $deployPath . '\\getVoteCount.js';
+        $deployPath = env('CONTRACT_DEPLOY_PATH') ?: base_path('blockchain');
+        $scriptPath = $deployPath . DIRECTORY_SEPARATOR . 'getVoteCount.js';
 
         
         if (!file_exists($scriptPath)) {
@@ -176,8 +176,8 @@ class BlockchainContractService
         }
         
         // Call Node.js script to get votes for candidate
-        $deployPath = env('CONTRACT_DEPLOY_PATH', base_path('..\\blockchain\\evote-deploy'));
-        $scriptPath = $deployPath . '\\getVotesForCandidate.js';
+        $deployPath = env('CONTRACT_DEPLOY_PATH') ?: base_path('blockchain');
+        $scriptPath = $deployPath . DIRECTORY_SEPARATOR . 'getVotesForCandidate.js';
         
         if (!file_exists($scriptPath)) {
             // If script doesn't exist, fallback to counting votes manually
