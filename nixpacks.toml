@@ -2,7 +2,7 @@
 # Ensures both PHP and Node.js are available at runtime for smart contract deployment
 
 [phases.setup]
-nixPkgs = ["php82", "nodejs-18_x"]
+nixPkgs = ["php82", "php82Packages.composer", "nodejs-18_x"]
 
 [phases.install]
 cmds = [
