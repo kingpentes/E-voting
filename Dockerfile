@@ -36,6 +36,13 @@ RUN cd blockchain && npm install && cd ..
 # Laravel optimizations
 RUN php artisan config:clear && php artisan view:clear
 
+# Create storage symlink during build
+RUN php artisan storage:link || true
+
+# Ensure storage directories exist with correct permissions
+RUN mkdir -p storage/app/public/face-photos storage/app/public/candidate-photos storage/framework/cache storage/framework/sessions storage/framework/views storage/logs \
+    && chmod -R 775 storage bootstrap/cache
+
 # Expose port
 EXPOSE 8080
 
