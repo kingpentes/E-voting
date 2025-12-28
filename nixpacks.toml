@@ -1,0 +1,20 @@
+# Nixpacks configuration for Railway
+# Ensures both PHP and Node.js are available at runtime for smart contract deployment
+
+[phases.setup]
+nixPkgs = ["php82", "nodejs-18_x", "npm"]
+
+[phases.install]
+cmds = [
+    "npm install",
+    "cd blockchain && npm install && cd ..",
+    "composer install --no-dev --optimize-autoloader"
+]
+
+[phases.build]
+cmds = [
+    "npm run build"
+]
+
+[start]
+cmd = "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && php -S 0.0.0.0:${PORT:-8080} -t public"
