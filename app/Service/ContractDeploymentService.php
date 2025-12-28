@@ -14,20 +14,38 @@ class ContractDeploymentService
             throw new \RuntimeException('Missing BLOCKCHAIN_RPC or BLOCKCHAIN_FROM in environment');
         }
 
-        // Use blockchain folder in Laravel repo, or fallback to CONTRACT_DEPLOY_PATH
-        $workdir = env('CONTRACT_DEPLOY_PATH') ?: base_path('blockchain');
+        // Prioritize blockchain folder in Laravel repo, fallback to CONTRACT_DEPLOY_PATH
+        $defaultWorkdir = base_path('blockchain');
+        $workdir = is_dir($defaultWorkdir) ? $defaultWorkdir : env('CONTRACT_DEPLOY_PATH');
         if (!$workdir || !is_dir($workdir)) {
-            throw new \RuntimeException('Deploy folder not found: ' . ($workdir ?: 'CONTRACT_DEPLOY_PATH not set'));
+            throw new \RuntimeException('Deploy folder not found: ' . ($workdir ?: 'blockchain folder missing'));
         }
 
         $abiPath = env('CONTRACT_ABI_PATH') ?: storage_path('contract/evote_abi.json');
+        
+        // Find node binary - check common locations for Railway/Nixpacks
+        $nodeBin = 'node'; // default
+        $nodePaths = [
+            '/usr/bin/node',
+            '/usr/local/bin/node', 
+            getenv('HOME') . '/.nix-profile/bin/node',
+            '/root/.nix-profile/bin/node',
+            '/nix/var/nix/profiles/default/bin/node',
+        ];
+        foreach ($nodePaths as $path) {
+            if (file_exists($path) && is_executable($path)) {
+                $nodeBin = $path;
+                break;
+            }
+        }
         
         // Build environment array to pass to Process
         $env = [
             'RPC' => $rpc,
             'DEPLOY_FROM' => $from,
             'ABI_OUTPUT_PATH' => $abiPath,
-            'PATH' => getenv('PATH'),
+            'PATH' => getenv('PATH') . ':/usr/bin:/usr/local/bin:' . getenv('HOME') . '/.nix-profile/bin:/root/.nix-profile/bin',
+            'HOME' => getenv('HOME') ?: '/root',
         ];
         
         // Cross-platform command: detect OS
@@ -35,18 +53,19 @@ class ContractDeploymentService
             $env['SystemRoot'] = getenv('SystemRoot') ?: 'C:\\Windows';
             $cmd = ['cmd', '/c', 'node', 'deploy.js'];
         } else {
-            // Linux/Railway
-            $cmd = ['node', 'deploy.js'];
+            // Linux/Railway - use found node binary
+            $cmd = [$nodeBin, 'deploy.js'];
         }
         
         $process = new Process($cmd, $workdir, $env, null, 600);
         
         // Log debug info
         $debugInfo = sprintf(
-            "[DEBUG] Workdir: %s | Command: %s | Node check: %s",
+            "[DEBUG] Workdir: %s | NodeBin: %s | Command: %s | which node: %s",
             $workdir,
+            $nodeBin,
             implode(' ', $cmd),
-            shell_exec('which node 2>&1') ?: 'node not found in PATH'
+            trim(shell_exec('which node 2>&1') ?: 'not in PATH')
         );
         
         $process->run();
