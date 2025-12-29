@@ -1,26 +1,27 @@
 <x-admin-layout title="Daftar Voter">
     <x-admin-sidebar active="voters" />
 
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden w-full lg:w-auto">
         <header class="bg-white shadow-sm z-10">
-            <div class="px-8 py-6">
-                <div class="flex items-center justify-between mb-4">
+            <div class="px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Daftar Voter</h1>
-                        <p class="text-gray-600 mt-1">Kelola dan pantau pemilih yang terdaftar</p>
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Daftar Voter</h1>
+                        <p class="text-gray-600 mt-1 text-sm lg:text-base">Kelola dan pantau pemilih yang terdaftar</p>
                     </div>
                 </div>
 
                 <!-- Statistics Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-4 sm:mt-6">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-3 sm:p-4 text-white">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-blue-100 text-sm">Total Voter</p>
-                                <p class="text-3xl font-bold mt-1">{{ $stats['total_voters'] }}</p>
+                                <p class="text-blue-100 text-xs sm:text-sm">Total Voter</p>
+                                <p class="text-2xl sm:text-3xl font-bold mt-1">{{ $stats['total_voters'] }}</p>
                             </div>
-                            <div class="bg-white/20 rounded-lg p-3">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="bg-white/20 rounded-lg p-2 sm:p-3">
+                                <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
                                     </path>
@@ -29,14 +30,15 @@
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white">
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-3 sm:p-4 text-white">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-green-100 text-sm">Sudah Voting</p>
-                                <p class="text-3xl font-bold mt-1">{{ $stats['voted'] }}</p>
+                                <p class="text-green-100 text-xs sm:text-sm">Sudah Voting</p>
+                                <p class="text-2xl sm:text-3xl font-bold mt-1">{{ $stats['voted'] }}</p>
                             </div>
-                            <div class="bg-white/20 rounded-lg p-3">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="bg-white/20 rounded-lg p-2 sm:p-3">
+                                <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 13l4 4L19 7"></path>
                                 </svg>
@@ -44,14 +46,15 @@
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 text-white">
+                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-3 sm:p-4 text-white">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-orange-100 text-sm">Belum Voting</p>
-                                <p class="text-3xl font-bold mt-1">{{ $stats['not_voted'] }}</p>
+                                <p class="text-orange-100 text-xs sm:text-sm">Belum Voting</p>
+                                <p class="text-2xl sm:text-3xl font-bold mt-1">{{ $stats['not_voted'] }}</p>
                             </div>
-                            <div class="bg-white/20 rounded-lg p-3">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="bg-white/20 rounded-lg p-2 sm:p-3">
+                                <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -62,7 +65,7 @@
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-8">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
             @if (session('success'))
                 <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
                     <p class="text-green-800 font-medium">{{ session('success') }}</p>
@@ -105,7 +108,8 @@
                             <p class="text-blue-800 font-semibold">Menampilkan voter pemilu: {{ $election->title }}</p>
                             <p class="text-blue-700 text-sm mt-1">Hanya voter yang mendaftar menggunakan access code
                                 <span class="font-mono font-bold">{{ $election->access_code }}</span> yang ditampilkan
-                                di sini.</p>
+                                di sini.
+                            </p>
                         </div>
                     </div>
                 </div>

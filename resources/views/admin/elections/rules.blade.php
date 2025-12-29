@@ -1,21 +1,23 @@
 <x-admin-layout title="Buat Pengaturan Pemilu">
     <x-admin-sidebar active="rules" />
 
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden w-full lg:w-auto">
         <header class="bg-white shadow-sm z-10">
-            <div class="px-8 py-6 flex items-center justify-between">
+            <div
+                class="px-4 sm:px-6 lg:px-8 py-4 lg:py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Buat Pengaturan Pemilu</h1>
-                    <div class="flex items-center mt-1 space-x-2">
-                        <p class="text-gray-600">Atur judul, deskripsi, dan peraturan pemilu baru</p>
+                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Buat Pengaturan Pemilu</h1>
+                    <div class="flex flex-wrap items-center mt-1 gap-2">
+                        <p class="text-gray-600 text-sm lg:text-base">Atur judul, deskripsi, dan peraturan pemilu baru
+                        </p>
                         <span
-                            class="px-3 py-1 text-sm font-semibold rounded-full {{ $fee === 'Gratis' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                            class="px-3 py-1 text-xs sm:text-sm font-semibold rounded-full {{ $fee === 'Gratis' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                             Biaya: {{ $fee }}
                         </span>
                     </div>
                 </div>
                 <a href="{{ route('admin.elections.rules.manage') }}"
-                    class="px-6 py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all flex items-center space-x-2">
+                    class="px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all flex items-center space-x-2 w-fit">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -25,14 +27,15 @@
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-8">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
             <div class="max-w-5xl mx-auto">
                 <form action="{{ route('admin.elections.store') }}" method="POST" class="space-y-6">
                     @csrf
 
                     <!-- Informasi Pemilu -->
-                    <div class="bg-white rounded-2xl shadow-md p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <div class="bg-white rounded-2xl shadow-md p-4 sm:p-6 lg:p-8">
+                        <h2
+                            class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
                             <svg class="w-7 h-7 mr-3 text-purple-600" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -116,9 +119,9 @@
                     <!-- Pengaturan Lanjutan removed (not used) -->
 
                     <!-- Action Buttons -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                         <button type="submit"
-                            class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                            class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
                             <span class="flex items-center justify-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

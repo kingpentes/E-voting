@@ -13,12 +13,12 @@
     <div class="min-h-screen">
         <!-- Header -->
         <header class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                         @auth
                             <a href="{{ route('voter.verification') }}"
-                                class="text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg hover:bg-white/10 transition duration-200 flex items-center">
+                                class="text-white hover:text-blue-100 font-medium px-3 py-2 rounded-lg hover:bg-white/10 transition duration-200 flex items-center w-fit">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7"></path>
@@ -27,13 +27,13 @@
                             </a>
                         @endauth
                         <div>
-                            <h1 class="text-3xl font-bold text-white">{{ $election->title }}</h1>
-                            <p class="text-blue-100 mt-1">{{ $election->description }}</p>
+                            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white">{{ $election->title }}</h1>
+                            <p class="text-blue-100 mt-1 text-sm sm:text-base">{{ $election->description }}</p>
                         </div>
                     </div>
                     @auth
                         <div class="flex items-center space-x-4">
-                            <span class="text-white text-sm">{{ Auth::user()->name }}</span>
+                            <span class="text-white text-sm hidden sm:inline">{{ Auth::user()->name }}</span>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
@@ -48,7 +48,7 @@
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
             @if (session('success'))
                 <div class="mb-6 bg-green-50 border-l-4 border-green-400 text-green-700 px-4 py-3 rounded shadow-md">
                     <p class="font-semibold">{{ session('success') }}</p>
@@ -290,7 +290,7 @@
             @endif
 
             <!-- Candidates Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 @forelse($candidates as $candidate)
                     <a href="{{ route('voter.candidate.detail', ['code' => $election->access_code, 'candidateId' => $candidate->id]) }}"
                         class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-300">
