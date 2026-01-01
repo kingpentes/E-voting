@@ -446,4 +446,46 @@ class ElectionController extends Controller
 
         return redirect()->route('admin.candidates.create', ['election_id' => $election->id]);
     }
+
+    /**
+     * Extend the end date/time of an election.
+     */
+    public function extendTime(Request $request, string $id)
+    {
+        $election = Election::forOrganizer(Auth::id())->findOrFail($id);
+
+        // Only allow extending for published (active) elections that are not closed
+        if (!$election->is_published) {
+            return redirect()->back()
+                ->with('error', 'Hanya pemilu yang sudah dipublish yang dapat diperpanjang waktunya.');
+        }
+
+        if ($election->status === 'closed') {
+            return redirect()->back()
+                ->with('error', 'Pemilu yang sudah ditutup tidak dapat diperpanjang waktunya.');
+        }
+
+        $validated = $request->validate([
+            'new_end_date' => ['required', 'date', 'after:today'],
+            'new_end_time' => ['nullable', 'date_format:H:i'],
+        ]);
+
+        // Ensure new end date is after current end date
+        $currentEndDate = $election->end_date;
+        $newEndDate = \Carbon\Carbon::parse($validated['new_end_date']);
+
+        if ($currentEndDate && $newEndDate->lte($currentEndDate)) {
+            return redirect()->back()
+                ->with('error', 'Tanggal baru harus setelah tanggal berakhir saat ini (' . $currentEndDate->format('d M Y') . ').');
+        }
+
+        // Update the election end date/time
+        $election->update([
+            'end_date' => $validated['new_end_date'],
+            'end_time' => $validated['new_end_time'] ?? $election->end_time,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Waktu pemilu berhasil diperpanjang hingga ' . $newEndDate->format('d M Y') . '!');
+    }
 }
