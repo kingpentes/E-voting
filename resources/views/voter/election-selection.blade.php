@@ -13,10 +13,10 @@
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
         <header class="shadow-lg" style="background: linear-gradient(to right, #3b24cc, #6a4cff);">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div class="flex justify-between items-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-white">Pilih Pemilu</h1>
+                        <h1 class="text-xl sm:text-2xl font-bold text-white">Pilih Pemilu</h1>
                         <p class="text-blue-100 text-sm mt-1">Selamat datang, {{ $user->name }}</p>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
@@ -28,7 +28,7 @@
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
             @if(session('success'))
                 <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <p class="text-green-800">{{ session('success') }}</p>
@@ -36,26 +36,26 @@
             @endif
 
             @if($elections->isEmpty())
-                <div class="bg-white rounded-2xl shadow-xl p-12 text-center">
-                    <svg class="w-20 h-20 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-8 sm:p-12 text-center">
+                    <svg class="w-16 h-16 sm:w-20 sm:h-20 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                     </svg>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Belum Ada Pemilu Tersedia</h2>
-                    <p class="text-gray-600">Anda belum terdaftar di pemilu manapun. Silakan gunakan kode undangan untuk bergabung.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Belum Ada Pemilu Tersedia</h2>
+                    <p class="text-gray-600 text-sm sm:text-base">Anda belum terdaftar di pemilu manapun. Silakan gunakan kode undangan untuk bergabung.</p>
                     <a href="{{ route('voter.verification', ['add_new' => 1]) }}" class="mt-6 inline-block text-white font-semibold py-3 px-6 rounded-xl transform transition duration-200 hover:scale-[1.02] shadow-lg" style="background: linear-gradient(to right, #3b24cc, #6a4cff);">
                         Masukkan Kode Undangan
                     </a>
                 </div>
             @else
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Pemilu yang Tersedia</h2>
-                    <p class="text-gray-600">Pilih pemilu yang ingin Anda ikuti untuk mulai memberikan suara</p>
+                <div class="mb-6 sm:mb-8">
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Pemilu yang Tersedia</h2>
+                    <p class="text-gray-600 text-sm sm:text-base">Pilih pemilu yang ingin Anda ikuti untuk mulai memberikan suara</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     @foreach($elections as $election)
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition duration-300 overflow-hidden {{ $election->pivot->approval_status !== 'approved' ? 'opacity-75' : '' }}">
-                            <div class="p-6">
+                        <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition duration-300 overflow-hidden {{ $election->pivot->approval_status !== 'approved' ? 'opacity-75' : '' }}">
+                            <div class="p-4 sm:p-6">
                                 <div class="flex items-center justify-between mb-4">
                                     @if($election->status === 'closed')
                                         <span class="px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">

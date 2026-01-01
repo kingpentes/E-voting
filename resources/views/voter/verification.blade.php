@@ -15,20 +15,20 @@
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
         <header class="shadow-lg" style="background: linear-gradient(to right, #3b24cc, #6a4cff);">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center space-x-4">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                         @if ($user->participatingElections->count() > 0)
                             <a href="{{ route('voter.verification') }}"
-                                class="text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg hover:bg-white/10 transition duration-200 flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg hover:bg-white/10 transition duration-200 flex items-center text-sm sm:text-base">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7"></path>
                                 </svg>
                                 Kembali ke Daftar Pemilu
                             </a>
                         @endif
-                        <h1 class="text-2xl font-bold text-white">Verifikasi Identitas</h1>
+                        <h1 class="text-xl sm:text-2xl font-bold text-white">Verifikasi Identitas</h1>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -40,7 +40,7 @@
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
             <!-- Status Messages -->
             @if ($user->verification_status === 'pending' && $user->id_card)
                 <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -65,9 +65,9 @@
             @endif
 
             <!-- Verification Form -->
-            <div class="bg-white rounded-2xl shadow-xl p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Verifikasi Identitas untuk Pemilu Baru</h2>
-                <p class="text-gray-600 mb-8">Upload ID card, ambil foto wajah, dan masukkan kode undangan pemilu</p>
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Verifikasi Identitas untuk Pemilu Baru</h2>
+                <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">Upload ID card, ambil foto wajah, dan masukkan kode undangan pemilu</p>
 
                 <form action="{{ route('voter.verification.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf

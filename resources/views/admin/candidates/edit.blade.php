@@ -1,15 +1,15 @@
 <x-admin-layout title="Edit Kandidat">
     <x-admin-sidebar active="manage" />
     
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden w-full lg:w-auto">
         <header class="bg-white shadow-sm z-10">
-            <div class="px-8 py-6 flex items-center justify-between">
+            <div class="px-4 sm:px-6 lg:px-8 py-4 lg:py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Edit Kandidat</h1>
-                    <p class="text-gray-600 mt-1">Ubah data kandidat yang sudah ada</p>
+                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Edit Kandidat</h1>
+                    <p class="text-gray-600 mt-1 text-sm lg:text-base">Ubah data kandidat yang sudah ada</p>
                 </div>
                 <a href="{{ route('admin.candidates.manage') }}" 
-                   class="px-6 py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all flex items-center space-x-2">
+                   class="px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all flex items-center space-x-2 w-fit">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
@@ -18,15 +18,15 @@
             </div>
         </header>
         
-        <main class="flex-1 overflow-y-auto p-8">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
             <div class="max-w-4xl mx-auto">
                 <form action="{{ route('admin.candidates.update', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
                     
                     <!-- Card Form -->
-                    <div class="bg-white rounded-2xl shadow-md p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Data Kandidat</h2>
+                    <div class="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 lg:p-8">
+                        <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Data Kandidat</h2>
                         
                         <!-- Pilih Pemilu -->
                         <div class="mb-6">
@@ -72,17 +72,17 @@
                             <label for="photo" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Foto Kandidat
                             </label>
-                            <div class="flex items-center space-x-6">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                                 <div class="flex-shrink-0">
                                      <img id="photoPreview" 
                                          src="{{ $candidate->photo_url ?? ('https://ui-avatars.com/api/?name=' . urlencode($candidate->name) . '&size=256&background=random') }}" 
                                          alt="{{ $candidate->name }}" 
-                                         class="w-32 h-32 rounded-full object-cover border-4 border-gray-200"> 
+                                         class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-200"> 
                                 </div>
-                                <div class="flex-1">
+                                <div class="flex-1 w-full">
                                     <input type="file" id="photo" name="photo" accept="image/*"
                                            onchange="previewPhoto(event)"
-                                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all cursor-pointer">
+                                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 sm:file:py-3 file:px-4 sm:file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all cursor-pointer">
                                     <p class="text-sm text-gray-500 mt-2">Kosongkan jika tidak ingin mengubah foto. Format: JPG, PNG, atau GIF. Maksimal 2MB</p>
                                 </div>
                             </div>
@@ -133,9 +133,13 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex items-center space-x-4 pt-6 border-t border-gray-200">
+                        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-6 border-t border-gray-200">
+                            <a href="{{ route('admin.candidates.manage') }}"
+                               class="px-6 sm:px-8 py-3 sm:py-4 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-all text-center">
+                                Batal
+                            </a>
                             <button type="submit"
-                                    class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-4 px-8 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                    class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
                                 <span class="flex items-center justify-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -143,10 +147,6 @@
                                     Update Kandidat
                                 </span>
                             </button>
-                            <a href="{{ route('admin.candidates.manage') }}"
-                               class="px-8 py-4 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-all">
-                                Batal
-                            </a>
                         </div>
                     </div>
                 </form>

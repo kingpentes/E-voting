@@ -1,20 +1,20 @@
 <x-admin-layout title="Persetujuan Voter">
     <x-admin-sidebar active="voters-approval" />
 
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden w-full lg:w-auto">
         <header class="bg-white shadow-sm z-10">
-            <div class="px-8 py-6">
-                <h1 class="text-3xl font-bold text-gray-900">Persetujuan Verifikasi Voter</h1>
-                <p class="text-gray-600 mt-1">Review dan setujui verifikasi identitas voter</p>
+            <div class="px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Persetujuan Verifikasi Voter</h1>
+                <p class="text-gray-600 mt-1 text-sm lg:text-base">Review dan setujui verifikasi identitas voter</p>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-8">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
             <!-- Filter -->
-            <div class="mb-6">
-                <form method="GET" class="flex items-center gap-4">
+            <div class="mb-4 sm:mb-6">
+                <form method="GET" class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                     <label for="status" class="text-sm font-medium text-gray-700">Filter Status:</label>
-                    <select id="status" name="status" onchange="this.form.submit()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 w-48">
+                    <select id="status" name="status" onchange="this.form.submit()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 w-full sm:w-48">
                         <option value="">Semua Status</option>
                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
@@ -30,7 +30,8 @@
             @endif
 
             <!-- Voters List -->
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -118,8 +119,9 @@
                         @endforelse
                     </tbody>
                 </table>
+                </div>
 
-                <div class="px-6 py-4">
+                <div class="px-4 sm:px-6 py-4">
                     {{ $voters->links() }}
                 </div>
             </div>
@@ -127,8 +129,8 @@
     </div>
 
     <!-- Reject Modal -->
-    <div id="rejectModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div id="rejectModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 px-4">
+        <div class="relative top-10 sm:top-20 mx-auto p-4 sm:p-5 border w-full max-w-sm sm:max-w-md shadow-lg rounded-xl bg-white">
             <div class="mt-3">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Tolak Verifikasi</h3>
                 <form id="rejectForm" method="POST">

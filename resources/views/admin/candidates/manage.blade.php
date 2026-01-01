@@ -46,21 +46,21 @@
                     <p class="text-gray-500 mb-6">Mulai dengan menambahkan kandidat pertama Anda</p>
                 </div>
             @else
-                <div class="space-y-6">
+                <div class="space-y-4 sm:space-y-6">
                     @foreach ($candidates as $candidate)
                         <div
-                            class="bg-white rounded-2xl shadow-md overflow-hidden {{ $candidate->election->is_published ? 'border-2 border-green-500' : '' }}">
-                            <div class="bg-gray-50 px-8 py-4 border-b">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-4">
+                            class="bg-white rounded-xl sm:rounded-2xl shadow-md overflow-hidden {{ $candidate->election->is_published ? 'border-2 border-green-500' : '' }}">
+                            <div class="bg-gray-50 px-4 sm:px-6 lg:px-8 py-4 border-b">
+                                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                                         <div
-                                            class="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-2xl">
+                                            class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-lg sm:text-2xl flex-shrink-0">
                                             {{ $candidate->number }}
                                         </div>
-                                        <div>
-                                            <h2 class="text-2xl font-bold text-gray-900">{{ $candidate->name }}</h2>
-                                            <div class="flex items-center space-x-2">
-                                                <p class="text-gray-500">{{ $candidate->election->title }}</p>
+                                        <div class="min-w-0">
+                                            <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">{{ $candidate->name }}</h2>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <p class="text-gray-500 text-sm truncate">{{ $candidate->election->title }}</p>
                                                 @if ($candidate->election->is_published)
                                                     <span
                                                         class="px-2 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full">AKTIF</span>
@@ -82,21 +82,21 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="flex space-x-2">
+                                    <div class="flex flex-wrap gap-2">
                                         @if ($candidate->election->is_published)
                                             <button disabled
-                                                class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed"
+                                                class="px-4 sm:px-5 py-2 sm:py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed text-sm sm:text-base"
                                                 title="Tidak dapat edit kandidat dari pemilu yang sudah dipublish">
                                                 Edit
                                             </button>
                                             <button disabled
-                                                class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed"
+                                                class="px-4 sm:px-5 py-2 sm:py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed text-sm sm:text-base"
                                                 title="Tidak dapat hapus kandidat dari pemilu yang sudah dipublish">
                                                 Hapus
                                             </button>
                                         @else
                                             <a href="{{ route('admin.candidates.edit', $candidate->id) }}"
-                                                class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+                                                class="px-4 sm:px-5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base">
                                                 Edit
                                             </a>
                                             <form action="{{ route('admin.candidates.destroy', $candidate->id) }}"
@@ -105,7 +105,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
-                                                    class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors">
+                                                    class="px-4 sm:px-5 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base">
                                                     Hapus
                                                 </button>
                                             </form>

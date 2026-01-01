@@ -1,22 +1,22 @@
 <x-admin-layout title="Tambah Kandidat">
     <x-admin-sidebar active="candidates" />
     
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden w-full lg:w-auto">
         <header class="bg-white shadow-sm z-10">
-            <div class="px-8 py-6">
-                <h1 class="text-3xl font-bold text-gray-900">Tambah Kandidat</h1>
-                <p class="text-gray-600 mt-1">Tambahkan kandidat baru untuk pemilu</p>
+            <div class="px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Tambah Kandidat</h1>
+                <p class="text-gray-600 mt-1 text-sm lg:text-base">Tambahkan kandidat baru untuk pemilu</p>
             </div>
         </header>
         
-        <main class="flex-1 overflow-y-auto p-8">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
             <div class="max-w-4xl mx-auto">
                 <form action="{{ route('admin.candidates.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     
                     <!-- Card Form -->
-                    <div class="bg-white rounded-2xl shadow-md p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Data Kandidat</h2>
+                    <div class="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 lg:p-8">
+                        <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Data Kandidat</h2>
                         
                         <!-- Pilih Pemilu -->
                         <div class="mb-6">
@@ -64,15 +64,15 @@
                             <label for="photo" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Foto Kandidat <span class="text-red-500">*</span>
                             </label>
-                            <div class="flex items-center space-x-6">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                                 <div class="flex-shrink-0">
                                     <img id="photoPreview" src="https://via.placeholder.com/150" alt="Preview" 
-                                         class="w-32 h-32 rounded-full object-cover border-4 border-gray-200">
+                                         class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-200">
                                 </div>
-                                <div class="flex-1">
+                                <div class="flex-1 w-full">
                                     <input type="file" id="photo" name="photo" accept="image/*" required
                                            onchange="previewPhoto(event)"
-                                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all cursor-pointer">
+                                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 sm:file:py-3 file:px-4 sm:file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all cursor-pointer">
                                     <p class="text-sm text-gray-500 mt-2">Format: JPG, PNG, atau GIF. Maksimal 2MB</p>
                                 </div>
                             </div>
@@ -113,9 +113,13 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex items-center space-x-4 pt-6 border-t border-gray-200">
+                        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-6 border-t border-gray-200">
+                            <a href="{{ route('admin.dashboard') }}"
+                               class="px-6 sm:px-8 py-3 sm:py-4 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-all text-center">
+                                Batal
+                            </a>
                             <button type="submit"
-                                    class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                    class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl">
                                 <span class="flex items-center justify-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -123,10 +127,6 @@
                                     Simpan Kandidat
                                 </span>
                             </button>
-                            <a href="{{ route('admin.dashboard') }}"
-                               class="px-8 py-4 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-all">
-                                Batal
-                            </a>
                         </div>
                     </div>
                 </form>

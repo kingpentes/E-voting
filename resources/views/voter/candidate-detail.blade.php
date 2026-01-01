@@ -13,43 +13,43 @@
     <div class="min-h-screen pb-12">
         <!-- Header with Gradient -->
         <header class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg">
-            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
                 <a href="{{ route('voter.election', ['code' => $election->access_code]) }}"
-                    class="inline-flex items-center text-white hover:text-blue-100 font-semibold mb-4 transition-colors group">
-                    <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none"
+                    class="inline-flex items-center text-white hover:text-blue-100 font-semibold mb-3 sm:mb-4 transition-colors group text-sm sm:text-base">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
                     Kembali
                 </a>
-                <h1 class="text-3xl font-bold text-white">Detail Kandidat</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-white">Detail Kandidat</h1>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+        <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl overflow-hidden border border-gray-100">
                 <!-- Candidate Profile Section -->
-                <div class="p-8 text-center border-b border-gray-100">
+                <div class="p-6 sm:p-8 text-center border-b border-gray-100">
                     <div class="relative inline-block mb-4">
                         <img src="{{ $candidate->photo_url }}" alt="{{ $candidate->name }}"
-                            class="w-40 h-40 rounded-full object-cover border-4 border-blue-100 shadow-xl mx-auto">
+                            class="w-28 h-28 sm:w-40 sm:h-40 rounded-full object-cover border-4 border-blue-100 shadow-xl mx-auto">
                         <span
-                            class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold px-6 py-2 rounded-full shadow-lg">
+                            class="absolute -bottom-2 sm:-bottom-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm sm:text-lg font-bold px-4 sm:px-6 py-1 sm:py-2 rounded-full shadow-lg">
                             #{{ $candidate->number }}
                         </span>
                     </div>
-                    <h2 class="text-4xl font-bold text-gray-900 mt-6 mb-2">{{ $candidate->name }}</h2>
-                    <p class="text-gray-600 text-lg">Kandidat {{ $election->title }}</p>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mt-6 mb-2">{{ $candidate->name }}</h2>
+                    <p class="text-gray-600 text-base sm:text-lg">Kandidat {{ $election->title }}</p>
                 </div>
 
-                <div class="p-8">
+                <div class="p-4 sm:p-6 lg:p-8">
                     <!-- Visi Section -->
-                    <div class="mb-10">
-                        <div class="flex items-center mb-4">
-                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                    <div class="mb-8 sm:mb-10">
+                        <div class="flex items-center mb-3 sm:mb-4">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -58,36 +58,36 @@
                                     </path>
                                 </svg>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900">Visi</h3>
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Visi</h3>
                         </div>
-                        <div class="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-500">
-                            <p class="text-gray-800 text-lg leading-relaxed">{{ $candidate->vision }}</p>
+                        <div class="bg-blue-50 p-4 sm:p-6 rounded-xl border-l-4 border-blue-500">
+                            <p class="text-gray-800 text-base sm:text-lg leading-relaxed">{{ $candidate->vision }}</p>
                         </div>
                     </div>
 
                     <!-- Misi Section -->
                     @if ($candidate->missions->count() > 0)
-                        <div class="mb-10">
-                            <div class="flex items-center mb-4">
-                                <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
-                                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor"
+                        <div class="mb-8 sm:mb-10">
+                            <div class="flex items-center mb-3 sm:mb-4">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
                                         </path>
                                     </svg>
                                 </div>
-                                <h3 class="text-2xl font-bold text-gray-900">Misi</h3>
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Misi</h3>
                             </div>
-                            <div class="space-y-4">
+                            <div class="space-y-3 sm:space-y-4">
                                 @foreach ($candidate->missions->sortBy('order') as $mission)
                                     <div
-                                        class="flex items-start bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all">
+                                        class="flex items-start bg-white border-2 border-gray-100 rounded-xl p-4 sm:p-5 hover:border-blue-300 hover:shadow-md transition-all">
                                         <div
-                                            class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-lg flex items-center justify-center font-bold shadow-md mr-4">
+                                            class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-lg flex items-center justify-center font-bold text-sm sm:text-base shadow-md mr-3 sm:mr-4">
                                             {{ $loop->iteration }}
                                         </div>
-                                        <p class="flex-1 text-gray-800 text-base pt-2 leading-relaxed">
+                                        <p class="flex-1 text-gray-800 text-sm sm:text-base pt-1 sm:pt-2 leading-relaxed">
                                             {{ $mission->mission }}</p>
                                     </div>
                                 @endforeach

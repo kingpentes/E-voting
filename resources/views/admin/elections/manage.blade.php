@@ -41,7 +41,7 @@
                         <div
                             class="bg-white rounded-2xl shadow-md overflow-hidden {{ $election->is_published ? 'border-2 border-green-500' : '' }}">
                             <div
-                                class="bg-gradient-to-r {{ $election->is_published ? 'from-green-50 to-emerald-50' : 'from-gray-50 to-gray-100' }} px-8 py-4 border-b">
+                                class="bg-gradient-to-r {{ $election->is_published ? 'from-green-50 to-emerald-50' : 'from-gray-50 to-gray-100' }} px-4 sm:px-6 lg:px-8 py-4 border-b">
                                 <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
                                     <div class="flex flex-wrap items-center gap-2">
                                         @if ($election->status === 'closed')
@@ -66,13 +66,13 @@
                                     <!-- Publish Button (Only for Draft) -->
                                     @if (!$election->is_published && $election->candidates_count === 0)
                                         <button disabled
-                                            class="px-5 py-2.5 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed"
+                                            class="px-3 sm:px-5 py-2 sm:py-2.5 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed text-xs sm:text-sm"
                                             title="Tambahkan kandidat terlebih dahulu untuk publish">
                                             Publish (Perlu Kandidat)
                                         </button>
                                     @elseif(!$election->is_published && !$election->contract_address)
                                         <button disabled
-                                            class="px-5 py-2.5 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed"
+                                            class="px-3 sm:px-5 py-2 sm:py-2.5 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed text-xs sm:text-sm"
                                             title="Deploy smart contract terlebih dahulu untuk publish. Ini WAJIB agar semua vote tersimpan di blockchain!">
                                             Publish (Perlu Deploy Contract)
                                         </button>
@@ -82,7 +82,7 @@
                                             onsubmit="return confirm('⚠️ PERINGATAN!\n\nSetelah dipublish, Anda TIDAK DAPAT:\n- Mengubah data pemilu\n- Mengedit atau menghapus kandidat\n- Unpublish pemilu\n\nAnda hanya dapat menutup pemilu untuk menampilkan hasil.\n\nApakah Anda yakin ingin mempublish pemilu ini?')">
                                             @csrf
                                             <button type="submit"
-                                                class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                                                class="px-3 sm:px-5 py-2 sm:py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-sm">
                                                 Publish Pemilu
                                             </button>
                                         </form>
@@ -95,7 +95,7 @@
                                             onsubmit="return confirm('Yakin ingin menutup pemilu ini?\n\nSetelah ditutup, hasil voting akan ditampilkan kepada voter.')">
                                             @csrf
                                             <button type="submit"
-                                                class="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors">
+                                                class="px-3 sm:px-5 py-2 sm:py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-sm">
                                                 Tutup Pemilu
                                             </button>
                                         </form>
@@ -104,7 +104,7 @@
                                     <!-- Pay Button (Only for Pending Payment) -->
                                     @if ($election->status === 'pending_payment')
                                         <a href="{{ route('admin.elections.payment', $election->id) }}"
-                                            class="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors blink-animation">
+                                            class="px-3 sm:px-5 py-2 sm:py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors blink-animation text-xs sm:text-sm">
                                             Bayar Sekarang
                                         </a>
                                     @endif
@@ -113,7 +113,7 @@
                                     @if ($election->status !== 'pending_payment')
                                         @if ($election->contract_address)
                                             <button disabled
-                                                class="px-5 py-2.5 bg-gray-400 text-white font-semibold rounded-lg cursor-not-allowed">
+                                                class="px-3 sm:px-5 py-2 sm:py-2.5 bg-gray-400 text-white font-semibold rounded-lg cursor-not-allowed text-xs sm:text-sm">
                                                 Kontrak Terdeploy
                                             </button>
                                         @else
@@ -123,7 +123,7 @@
                                                 onsubmit="return confirm('Deploy smart contract khusus untuk pemilu ini?');">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors">
+                                                    class="px-3 sm:px-5 py-2 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-sm">
                                                     Deploy Smart Contract
                                                 </button>
                                             </form>
@@ -134,19 +134,19 @@
                                     @if ($election->is_published || $election->status === 'closed' || $election->status === 'pending_payment')
                                         @if ($election->status !== 'pending_payment')
                                             <button disabled
-                                                class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed"
+                                                class="px-3 sm:px-5 py-2 sm:py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed text-xs sm:text-sm"
                                                 title="Tidak dapat edit pemilu yang sudah dipublish atau ditutup">
                                                 Edit
                                             </button>
                                         @endif
                                         <button disabled
-                                            class="px-5 py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed"
+                                            class="px-3 sm:px-5 py-2 sm:py-2.5 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed text-xs sm:text-sm"
                                             title="Tidak dapat hapus pemilu yang sudah dipublish, ditutup, atau belum dibayar">
                                             Hapus
                                         </button>
                                     @else
                                         <a href="{{ route('admin.elections.edit', $election->id) }}"
-                                            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+                                            class="px-3 sm:px-5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-sm">
                                             Edit
                                         </a>
                                         <form action="{{ route('admin.elections.delete', $election->id) }}"
@@ -155,7 +155,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
-                                                class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors">
+                                                class="px-3 sm:px-5 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-sm">
                                                 Hapus
                                             </button>
                                         </form>

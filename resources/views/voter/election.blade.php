@@ -221,14 +221,14 @@
                             }
                         @endphp
 
-                        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xl font-semibold">Total Suara Masuk:</span>
-                                <span class="text-4xl font-bold">{{ $totalVotes }}</span>
+                        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
+                            <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+                                <span class="text-lg sm:text-xl font-semibold">Total Suara Masuk:</span>
+                                <span class="text-3xl sm:text-4xl font-bold">{{ $totalVotes }}</span>
                             </div>
                         </div>
 
-                        <div class="space-y-4">
+                        <div class="space-y-3 sm:space-y-4">
                             @foreach ($candidates->sortByDesc(function ($candidate) use ($usingBlockchain) {
         return $usingBlockchain ?? false ? $candidate->blockchain_vote_count ?? 0 : $candidate->votes->count();
     }) as $candidate)
@@ -242,41 +242,41 @@
                                 @endphp
 
                                 <div
-                                    class="bg-white rounded-xl p-5 {{ $isWinner ? 'ring-4 ring-yellow-400 shadow-2xl' : 'shadow-lg' }}">
-                                    <div class="flex items-center justify-between mb-3">
-                                        <div class="flex items-center space-x-4">
+                                    class="bg-white rounded-xl p-4 sm:p-5 {{ $isWinner ? 'ring-2 sm:ring-4 ring-yellow-400 shadow-2xl' : 'shadow-lg' }}">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                                        <div class="flex items-center space-x-3 sm:space-x-4">
                                             <div class="flex-shrink-0">
                                                 <div
-                                                    class="w-10 h-10 rounded-full {{ $loop->iteration === 1 ? 'bg-yellow-500' : ($loop->iteration === 2 ? 'bg-gray-400' : ($loop->iteration === 3 ? 'bg-orange-600' : 'bg-gray-300')) }} flex items-center justify-center shadow-lg">
+                                                    class="w-8 h-8 sm:w-10 sm:h-10 rounded-full {{ $loop->iteration === 1 ? 'bg-yellow-500' : ($loop->iteration === 2 ? 'bg-gray-400' : ($loop->iteration === 3 ? 'bg-orange-600' : 'bg-gray-300')) }} flex items-center justify-center shadow-lg">
                                                     <span
-                                                        class="text-white font-bold text-lg">{{ $loop->iteration }}</span>
+                                                        class="text-white font-bold text-sm sm:text-lg">{{ $loop->iteration }}</span>
                                                 </div>
                                             </div>
                                             <img src="{{ $candidate->photo_url }}" alt="{{ $candidate->name }}"
-                                                class="w-12 h-12 rounded-full object-cover border-2 border-blue-200">
-                                            <div>
-                                                <div class="flex items-center space-x-2">
+                                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-blue-200">
+                                            <div class="min-w-0">
+                                                <div class="flex flex-wrap items-center gap-1 sm:gap-2">
                                                     <span
-                                                        class="font-bold text-gray-900 text-lg">{{ $candidate->name }}</span>
+                                                        class="font-bold text-gray-900 text-base sm:text-lg truncate">{{ $candidate->name }}</span>
                                                     @if ($isWinner)
                                                         <span
-                                                            class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">PEMENANG</span>
+                                                            class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full">PEMENANG</span>
                                                     @endif
                                                 </div>
-                                                <span class="text-sm text-gray-600">Kandidat
+                                                <span class="text-xs sm:text-sm text-gray-600">Kandidat
                                                     #{{ $candidate->number }}</span>
                                             </div>
                                         </div>
-                                        <div class="text-right">
-                                            <div class="text-2xl font-bold text-blue-600">{{ $voteCount }}</div>
-                                            <div class="text-sm text-gray-600">suara</div>
+                                        <div class="text-left sm:text-right ml-11 sm:ml-0">
+                                            <div class="text-xl sm:text-2xl font-bold text-blue-600">{{ $voteCount }}</div>
+                                            <div class="text-xs sm:text-sm text-gray-600">suara</div>
                                         </div>
                                     </div>
 
                                     <!-- Progress Bar -->
-                                    <div class="relative w-full bg-gray-200 rounded-full h-6 overflow-hidden">
-                                        <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-indigo-700 rounded-full transition-all duration-500 flex items-center justify-end px-3"
-                                            style="width: {{ $percentage }}%">
+                                    <div class="relative w-full bg-gray-200 rounded-full h-5 sm:h-6 overflow-hidden">
+                                        <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-indigo-700 rounded-full transition-all duration-500 flex items-center justify-end px-2 sm:px-3"
+                                            style="width: {{ max($percentage, 10) }}%">
                                             <span
                                                 class="text-xs font-bold text-white">{{ number_format($percentage, 1) }}%</span>
                                         </div>

@@ -1,15 +1,15 @@
 <x-admin-layout title="Edit Pengaturan Pemilu">
     <x-admin-sidebar active="rules" />
     
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden w-full lg:w-auto">
         <header class="bg-white shadow-sm z-10">
-            <div class="px-8 py-6 flex items-center justify-between">
+            <div class="px-4 sm:px-6 lg:px-8 py-4 lg:py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Edit Pengaturan Pemilu</h1>
-                    <p class="text-gray-600 mt-1">Ubah judul, deskripsi, dan peraturan pemilu</p>
+                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Edit Pengaturan Pemilu</h1>
+                    <p class="text-gray-600 mt-1 text-sm lg:text-base">Ubah judul, deskripsi, dan peraturan pemilu</p>
                 </div>
                 <a href="{{ route('admin.elections.rules.manage') }}" 
-                   class="px-6 py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all flex items-center space-x-2">
+                   class="px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all flex items-center space-x-2 w-fit">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
@@ -18,16 +18,16 @@
             </div>
         </header>
         
-        <main class="flex-1 overflow-y-auto p-8">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
             <div class="max-w-5xl mx-auto">
                 <form action="{{ route('admin.elections.update', $election->id) }}" method="POST" class="space-y-6">
                     @csrf
                     @method('PUT')
                     
                     <!-- Informasi Pemilu -->
-                    <div class="bg-white rounded-2xl shadow-md p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-7 h-7 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 lg:p-8">
+                        <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
+                            <svg class="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             Informasi Pemilu
@@ -75,9 +75,9 @@
                     </div>
 
                     <!-- Peraturan Pemilihan -->
-                    <div class="bg-white rounded-2xl shadow-md p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-7 h-7 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 lg:p-8">
+                        <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
+                            <svg class="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                             Peraturan Pemilihan
@@ -130,9 +130,13 @@
                     <!-- Pengaturan Lanjutan removed (not used) -->
 
                     <!-- Action Buttons -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                        <a href="{{ route('admin.elections.rules.manage') }}"
+                           class="px-6 sm:px-8 py-3 sm:py-4 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-all text-center">
+                            Batal
+                        </a>
                         <button type="submit"
-                                class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-4 px-8 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
                             <span class="flex items-center justify-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -140,10 +144,6 @@
                                 Update Pengaturan
                             </span>
                         </button>
-                        <a href="{{ route('admin.elections.rules.manage') }}"
-                           class="px-8 py-4 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-all">
-                            Batal
-                        </a>
                     </div>
                 </form>
             </div>

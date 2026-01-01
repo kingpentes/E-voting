@@ -1,15 +1,15 @@
 <x-admin-layout title="Pembayaran Pemilu">
     <x-admin-sidebar active="elections" />
 
-    <div class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+    <div class="flex-1 flex flex-col overflow-hidden bg-gray-50 w-full lg:w-auto">
         <header class="bg-white shadow-sm z-10">
-            <div class="px-8 py-6">
-                <h1 class="text-3xl font-bold text-gray-900">Pembayaran Pemilu</h1>
-                <p class="text-gray-600 mt-1">Selesaikan pembayaran untuk mengaktifkan pemilu Anda</p>
+            <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Pembayaran Pemilu</h1>
+                <p class="text-gray-600 mt-1 text-sm sm:text-base">Selesaikan pembayaran untuk mengaktifkan pemilu Anda</p>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-8 flex items-center justify-center">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8 flex items-center justify-center">
             <div
                 class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
                 <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-6 text-center">

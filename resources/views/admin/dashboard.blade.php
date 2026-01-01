@@ -122,46 +122,46 @@
             </div>
 
             <!-- Chart Section -->
-            <div class="bg-white rounded-2xl shadow-md p-8">
-                <div class="mb-6">
-                    <div class="flex items-start justify-between mb-4">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 lg:p-8">
+                <div class="mb-4 sm:mb-6">
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Statistik per Kandidat</h2>
-                            <p class="text-gray-600">Perolehan suara masing-masing kandidat</p>
+                            <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">Statistik per Kandidat</h2>
+                            <p class="text-gray-600 text-sm sm:text-base">Perolehan suara masing-masing kandidat</p>
                         </div>
 
                         <!-- Blockchain Indicator / Error -->
                         @if ($election)
                             @if (isset($election->blockchain_error) && $election->blockchain_error)
                                 <div
-                                    class="flex items-center space-x-2 bg-red-50 border border-red-200 px-4 py-2 rounded-lg">
-                                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                    class="flex items-center space-x-2 bg-red-50 border border-red-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg w-fit">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                                             clip-rule="evenodd" />
                                     </svg>
-                                    <span class="text-sm font-semibold text-red-700">Error Blockchain</span>
+                                    <span class="text-xs sm:text-sm font-semibold text-red-700">Error Blockchain</span>
                                 </div>
                             @elseif(isset($election->no_contract) && $election->no_contract)
                                 <div
-                                    class="flex items-center space-x-2 bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-lg">
-                                    <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                    class="flex items-center space-x-2 bg-yellow-50 border border-yellow-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg w-fit">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
                                             clip-rule="evenodd" />
                                     </svg>
-                                    <span class="text-sm font-semibold text-yellow-700">Smart Contract Belum
+                                    <span class="text-xs sm:text-sm font-semibold text-yellow-700">Smart Contract Belum
                                         Deploy</span>
                                 </div>
                             @elseif($usingBlockchain ?? false)
                                 <div
-                                    class="flex items-center space-x-2 bg-green-50 border border-green-200 px-4 py-2 rounded-lg">
-                                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    class="flex items-center space-x-2 bg-green-50 border border-green-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg w-fit">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                             clip-rule="evenodd" />
                                     </svg>
-                                    <span class="text-sm font-semibold text-green-700">Data dari Blockchain</span>
+                                    <span class="text-xs sm:text-sm font-semibold text-green-700">Data dari Blockchain</span>
                                 </div>
                             @endif
                         @endif
@@ -169,24 +169,24 @@
                 </div>
 
                 <!-- Chart Type Tabs -->
-                <div class="flex space-x-2 mb-6">
+                <div class="flex flex-wrap gap-2 mb-4 sm:mb-6">
                     <button onclick="showChart('bar')" id="btnBar"
-                        class="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-medium transition-all">
+                        class="px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-900 text-white rounded-lg sm:rounded-xl font-medium text-sm sm:text-base transition-all">
                         Grafik Batang
                     </button>
                     <button onclick="showChart('pie')" id="btnPie"
-                        class="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-all">
+                        class="px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-200 text-gray-700 rounded-lg sm:rounded-xl font-medium text-sm sm:text-base hover:bg-gray-300 transition-all">
                         Grafik Pie
                     </button>
                 </div>
 
                 <!-- Chart Canvas -->
-                <div class="relative" style="height: 400px;">
+                <div class="relative h-64 sm:h-80 lg:h-96">
                     <canvas id="votesChart"></canvas>
                 </div>
 
                 <!-- Legend -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8">
                     @if (isset($election->blockchain_error) && $election->blockchain_error)
                         <div class="col-span-full">
                             <div class="bg-red-50 border-2 border-red-200 rounded-xl p-8 text-center">
